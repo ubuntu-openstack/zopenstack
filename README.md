@@ -7,7 +7,7 @@ This repo contains development-focused test bundles, procedures, tools and scrip
 * bundles/*
     * Juju bundles for dev and test deployments
 * docs/*
-    * Juju bundles for dev and test deployments
+    * Documentation and procedures for deploying test environments and validating them
 * tools/* 
     * Scripts, tools, glue for testing dev deployments
 
