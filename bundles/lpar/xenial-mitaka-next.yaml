@@ -1,0 +1,3 @@
+# A multiple LPAR deployment on Z, in line with the OpenStack-Telemetry
+# charm store bundle which uses the current dev charm versions, aka the
+# 'next charms'.
