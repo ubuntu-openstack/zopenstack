@@ -1,0 +1,10 @@
+.local
+.coverage
+.testrepository
+.tox
+*.sw[nop]
+*.pyc
+trusty/**
+xenial/**
+yakkety/**
+func-results.json
