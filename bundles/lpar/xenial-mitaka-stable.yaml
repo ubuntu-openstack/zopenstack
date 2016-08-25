@@ -283,7 +283,7 @@ services:
         replicas: 5
         swift-hash: 62ce298d-cd4a-4087-b7f3-0c71df0127e0
       to:
-        - "lxc:0"
+        - "lxc:1"
   swift-storage-z1:
     charm: cs:xenial/swift-storage
     options:
