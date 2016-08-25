@@ -131,17 +131,17 @@ relations:
 - - aodh:amqp
   - rabbitmq-server:amqp
 # Swift relations
-- swift-proxy:identity-service
+- - swift-proxy:identity-service
   - keystone:identity-service
-- swift-proxy:swift-storage
+- - swift-proxy:swift-storage
   - swift-storage-z1:swift-storage
-- swift-proxy:swift-storage
+- - swift-proxy:swift-storage
   - swift-storage-z2:swift-storage
-- swift-proxy:swift-storage
+- - swift-proxy:swift-storage
   - swift-storage-z3:swift-storage
-- swift-proxy:swift-storage
+- - swift-proxy:swift-storage
   - swift-storage-z4:swift-storage
-- swift-proxy:swift-storage
+- - swift-proxy:swift-storage
   - swift-storage-z5:swift-storage
 # s390x is Xenial and later only
 series: xenial
