@@ -214,8 +214,10 @@ services:
 # An official Xenial mongodb charm version does not exist as of
 # 2016 Aug 25.  Use WIP/dev version instead.
 #    charm: cs:xenial/mongodb
-    charm: cs:~marcoceppi/mongodb
+    charm: cs:~james-page/xenial/mongodb
     num_units: 1
+    options:
+      source: ppa:ubuntu-s390x-community/mongodb
     to:
     - lxc:5
   mysql:
