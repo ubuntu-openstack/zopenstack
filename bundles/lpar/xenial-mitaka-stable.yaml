@@ -258,6 +258,7 @@ services:
       enable-live-migration: true
       enable-resize: true
       migration-auth-type: ssh
+      cpu-mode: none
     to:
     - '2'
     - '3'
