@@ -1,0 +1,71 @@
+---
+lpars:
+  generic:
+    location:
+      language: "en"
+      country: "US"
+      locale: "en_US.UTF-8"
+    packages:
+      - lxc
+      - ebtables
+      - ssh-import-id
+    network:
+      interface1:
+        device_name: "encc000"
+        vlan_id: "2000"
+        device_id: "0.0.c000"
+        bridge: false
+    ftp_server_ip: "10.13.x.x"
+    swmirror: "us.ports.ubuntu.com"
+    ssh_users:
+      - bob
+      - mike
+      - sarah
+      - mary
+  lpar1name:
+    network:
+      interface2:
+        device_name: "encc003"
+        device_id: "0.0.c003"
+        bridge: true
+    storage:
+      disk1:
+        disk_id: "0.0.xxxx"
+        device_name: "/dev/dasda"
+        auto_format: true
+        force_format: false
+        remove_lvm: true
+        partitions:
+          root:
+            label: "root"
+            filesystem: "ext4"
+            mount_point: "/"
+            minsize: 10240
+            priority: 40960
+            maxsize: 40960
+          swap:
+            label: "swap"
+            minsize: 2048
+            priority: 2048
+            maxsize: 2048
+      disk2:
+        disk_id: "0.0.xxxx"
+        device_name: "/dev/dasdb"
+        partitions:
+          ceph:
+            block_size: 4096
+            label: "ceph"
+            filesystem: "xfs"
+            mount_point: "/mnt/ceph"
+      disk3:
+        disk_id: "0.0.xxxx"
+        device_name: "/dev/dasdc"
+        partitions:
+          swift:
+            block_size: 4096
+            label: "swift"
+            filesystem: "xfs"
+            mount_point: "/mnt/swift"
+      disk4:
+        disk_id: "0.0.xxxx"
+        mount: false

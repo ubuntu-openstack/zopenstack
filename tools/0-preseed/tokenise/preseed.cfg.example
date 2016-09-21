@@ -1,0 +1,107 @@
+d-i debconf/priority string critical
+d-i auto-install/enable boolean true
+d-i apt-setup/proposed boolean true
+d-i pkgsel/update-policy select none
+d-i pkgsel/include string lxc ebtables ssh-import-id
+d-i debian-installer/language string en
+d-i debian-installer/country string US
+d-i debian-installer/locale string en_US.UTF-8
+d-i netcfg/disable_autoconfig boolean true
+d-i netcfg/disable_dhcp boolean true
+
+# disable zfcp
+
+d-i s390-zfcp/no_zfcp_hosts note
+d-i s390-zfcp/select_zfcp_host string Finish
+
+
+# select first disk
+
+d-i s390-dasd/dasd string 0.0.????
+d-i s390-dasd/auto-format boolean true
+d-i s390-dasd/force-format boolean false
+ 
+
+# configure root and swap partitions on first disk
+
+d-i partman-md/device_remove_md boolean true
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-lvm/device_remove_lvm_span boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+ 
+d-i partman-auto/disk string /dev/dasda
+d-i partman-auto/method string regular
+d-i partman-auto/expert_recipe string                         \
+     basic-boot ::                                            \
+              10240 40960 40960  ext4                         \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ / }                         \
+              .                                               \
+              2048 2048 2048	linux-swap                    \
+                      method{ swap } format{ }                \
+              .                                               \
+d-i partman-auto/choose_recipe select basic-boot
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+# basic user configuration
+d-i network-console/password password pass4inst
+d-i network-console/password-again password pass4inst
+d-i network-console/start note
+d-i passwd/user-fullname string ubuntu
+d-i passwd/username string ubuntu
+d-i passwd/user-password-crypted password SOME_MD5_CRYPTED_PASSWORD_GOES_HERE
+d-i user-setup/encrypt-home boolean false
+d-i clock-setup/utc boolean true
+d-i mirror/country string manual
+d-i mirror/protocol string http
+
+# your nearest mirror
+
+d-i mirror/http/hostname string us.ports.ubuntu.com
+d-i mirror/http/directory string /
+d-i mirror/http/proxy string
+d-i mirror/suite string xenial
+d-i live-installer/enable boolean false
+d-i tasksel/first multiselect standard system utilities, OpenSSH server, Basic Ubuntu server
+
+# post preseed bash commands
+
+d-i preseed/late_command string \
+cp /etc/network/interfaces /target/etc/network/interfaces.d/workaround_hack; \
+sed -i -e 's/iface encc000.VLAN_ID inet static/iface lxcbr0 inet static\n\tbridge-ports encc000.VLAN_ID/g' /target/etc/network/interfaces.d/workaround_hack; \
+sed -i 's/auto encc000.VLAN_ID/auto lxcbr0/g' /target/etc/network/interfaces.d/workaround_hack; \
+echo -e "\nauto encc000.VLAN_ID" >> /target/etc/network/interfaces.d/workaround_hack; \
+echo -e "iface encc000.VLAN_ID inet manual\n\tvlan-raw-device encc000" >> /target/etc/network/interfaces.d/workaround_hack; \
+sed -i 's/vlan_raw_device encc000//g' /target/etc/network/interfaces.d/workaround_hack; \
+in-target wget ftp://FTP_SERVER/openstack/90-ubuntu -O /etc/sudoers.d/90-ubuntu; \
+in-target chmod 0440 /etc/sudoers.d/90-ubuntu; \
+in-target wget ftp://FTP_SERVER/openstack/mac_rewrite.sh -O /usr/local/bin/mac_rewrite.sh; \
+in-target chmod 755 /usr/local/bin/mac_rewrite.sh; \
+echo "* * * * * root /usr/local/bin/mac_rewrite.sh" >> /target/etc/crontab; \
+in-target mkdir /home/ubuntu/.ssh/; \
+in-target ssh-import-id example user names go here -o /home/ubuntu/.ssh/authorized_keys2; \
+in-target chown -R ubuntu: /home/ubuntu/.ssh/; \
+in-target chzdev --no-root-update -pVe 0.0.???? bridge_role=primary; \
+in-target chzdev --no-root-update -Ve 0.0.????; \
+echo "yes"|dasdfmt -f /dev/dasdb --label=ceph -b 4096; \
+sleep 30; \
+fdasd /dev/dasdb -a -l ceph; \
+mkfs.xfs -L ceph -f -b size=4096 /dev/dasdb1; \
+in-target mkdir /mnt/ceph; \
+echo -e "LABEL=\"ceph\"\t/mnt/ceph\txfs\tdefaults\t0\t0" >> /target/etc/fstab; \
+in-target chzdev --no-root-update -Ve 0.0.????; \
+echo "yes"|dasdfmt -f /dev/dasdc --label=swift -b 4096; \
+sleep 30; \
+fdasd /dev/dasdc -a -l swift; \
+mkfs.xfs -L swift -f -b size=4096 /dev/dasdc1; \
+in-target mkdir /mnt/swift; \
+echo -e "LABEL=\"swift\"\t/mnt/swift\txfs\tdefaults\t0\t0" >> /target/etc/fstab; \
+in-target chzdev --no-root-update -Ve 0.0.????; \
+echo "exit 0" > /target/usr/lib/s390x-linux-gnu/lxc/lxc-net
+d-i finish-install/reboot_in_progress note
+

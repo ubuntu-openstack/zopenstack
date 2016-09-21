@@ -1,0 +1,235 @@
+d-i debconf/priority string critical
+d-i auto-install/enable boolean true
+
+# use -proposed udebs
+d-i apt-setup/proposed boolean true
+
+## base-installer  base-installer/install-recommends boolean true
+d-i pkgsel/update-policy select none
+d-i pkgsel/include string lxc ebtables ssh-import-id
+
+
+#
+# Localization
+#
+d-i debian-installer/language string en
+d-i debian-installer/country string US
+d-i debian-installer/locale string en_US.UTF-8
+## d-i localechooser/supported-locales multiselect en_US.UTF-8
+
+# activate qeth
+#d-i s390-netdevice/choose_networktype string qeth
+#d-i s390-netdevice/qeth/choose string 0.0.c000-0.0.c001-0.0.c002
+#d-i s390-netdevice/qeth/layer2 boolean true
+#d-i s390-netdevice/qeth/port string 0
+
+# use static network configuration
+#d-i netcfg/choose_interface select auto
+d-i netcfg/disable_autoconfig boolean true
+d-i netcfg/disable_dhcp boolean true
+#d-i netcfg/get_ipaddress string {IP_ADDR}
+#d-i netcfg/get_netmask string {MASK}
+#d-i netcfg/get_gateway string {GATEWAY}
+#d-i netcfg/get_nameservers string {DNS}
+#d-i netcfg/use_vlan boolean true
+#d-i netcfg/vlan_id string {VLAN}
+#d-i netcfg/confirm_static boolean true
+#d-i netcfg/hostname string {HOSTNAME}
+#d-i netcfg/dhcp_options select Configure network manually
+#d-i netcfg/get_domain {DOMAIN}
+
+#d-i s390-netdevice/choose_networktype string qeth
+#d-i s390-netdevice/qeth/choose string 0.0.c003-0.0.c004-0.0.c005
+#d-i s390-netdevice/qeth/layer2 boolean true
+#d-i s390-netdevice/qeth/port string 0 
+
+d-i s390-zfcp/no_zfcp_hosts note
+d-i s390-zfcp/select_zfcp_host string Finish
+
+d-i s390-dasd/dasd string {DASDSTRING}
+d-i s390-dasd/auto-format boolean true
+d-i s390-dasd/force-format boolean false
+ 
+# optional lines to overwrite old RAIDs and LVMs ....
+d-i partman-md/device_remove_md boolean true
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-lvm/device_remove_lvm_span boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+ 
+# partitioning of a single DASD with two partitions
+d-i partman-auto/disk string /dev/dasda
+d-i partman-auto/method string regular
+d-i partman-auto/expert_recipe string                         \
+     basic-boot ::                                            \
+              16000 20480 20480	ext4                          \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ / }                         \
+              .                                               \
+              2048 2048 2048	linux-swap                    \
+                      method{ swap } format{ }                \
+              .                                               \
+#              2048 16384 100000   xfs                         \
+#                      method{ format } format{ }              \
+#                      use_filesystem{ } filesystem{ xfs }     \
+#                      mountpoint{ /home }                     \
+#              .
+d-i partman-auto/choose_recipe select basic-boot
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+# provide network-console password
+d-i network-console/password password pass4inst
+d-i network-console/password-again password pass4inst
+d-i network-console/start note
+
+# user setup
+d-i passwd/user-fullname string {FULLNAME}
+d-i passwd/username string {USERNAME}
+d-i passwd/user-password-crypted password {PASSWDCRYPTED}
+
+d-i user-setup/encrypt-home boolean false
+
+# HW clock
+d-i clock-setup/utc boolean true
+# time zone
+#d-i time/zone string Europe/Berlin
+
+# servant mirror settings
+d-i mirror/country string manual
+d-i mirror/protocol string http
+d-i mirror/http/hostname string us.ports.ubuntu.com
+d-i mirror/http/directory string /
+#
+# Use a http proxy
+#d-i mirror/http/proxy string http://myproxy.example.com:3128
+# Use no proxy
+d-i mirror/http/proxy string
+
+# The Debian release to install
+d-i mirror/suite string xenial
+
+# do not enable live installer, use normal instead
+d-i live-installer/enable boolean false
+
+# activate DASD, dasdfmt if needed
+#d-i s390-dasd/dasd string 0.0.0200,0.0.0300,0.0.0400
+
+# DASD configuration
+#d-i s390-dasd/auto-format boolean true
+#d-i s390-dasd/force-format boolean true
+
+# zfcp configuration
+## d-i s390-zfcp/zfcp string 
+## 0.0.3c44:0x500507630443c3e8:0x403240a800000000
+
+#d-i disk-detect/multipath/enable boolean true
+
+# optional lines to overwrite old RAIDs and LVMs ....A
+# d-i partman/confirm boolean true
+# d-i partman-md/device_remove_md boolean true
+# d-i partman-md/confirm_nooverwrite boolean true
+# d-i partman-md/confirm boolean true
+# d-i partman-lvm/device_remove_lvm boolean true
+# d-i partman-lvm/confirm_nooverwrite boolean true
+# d-i partman-lvm/confirm boolean true
+# d-i partman-partitioning/confirm_write_new_label boolean true
+# d-i partman/confirm_write_new_label boolean true
+
+# auto-partition, all files in one partition
+#d-i partman-auto/disk string /dev/dasda
+#d-i partman-auto/method string regular
+#d-i partman-auto/choose_recipe select atomic
+#d-i partman/choose_partition select finish
+
+#d-i partman/mount_style select uuid
+
+# Use restricted software?
+## apt-mirror-setup        apt-setup/restricted    boolean true
+# Use software from the "universe" component?
+## apt-mirror-setup        apt-setup/universe      boolean true
+# Use software from the "multiverse" component?
+## apt-mirror-setup        apt-setup/multiverse    boolean true
+# Use backported software?
+## apt-mirror-setup        apt-setup/backports     boolean true
+# Use software from the "partner" repository?
+## apt-mirror-setup        apt-setup/partner       boolean false
+# Enable source repositories in APT?
+## apt-setup-udeb  apt-setup/enable-source-repositories    boolean true
+
+# General type of mail configuration:
+# Choices: No configuration, Internet Site, Internet with smarthost, Satellite system, Local only
+#d-i postfix/main_mailer_type select No configuration   <-- does not work
+
+# Software selection
+d-i tasksel/first multiselect standard system utilities, OpenSSH server, Basic Ubuntu server
+
+# Should kexec-tools handle reboots?
+## kexec-tools	kexec-tools/load_kexec	boolean	false
+# Should kdump-tools be enabled by default?
+## kdump-tools     kdump-tools/use_kdump   boolean true
+
+# after installation, install some packages - use only one line!!	
+d-i preseed/late_command string \
+cp /etc/network/interfaces /target/etc/network/interfaces.d/workaround_hack; \
+sed -i -e 's/iface encc000.2893 inet static/iface lxcbr0 inet static\n\tbridge-ports encc000.2893/g' /target/etc/network/interfaces.d/workaround_hack; \
+sed -i 's/auto encc000.2893/auto lxcbr0/g' /target/etc/network/interfaces.d/workaround_hack; \
+echo -e "\nauto encc000.2893" >> /target/etc/network/interfaces.d/workaround_hack; \
+echo -e "iface encc000.2893 inet manual\n\tvlan-raw-device encc000" >> /target/etc/network/interfaces.d/workaround_hack; \
+sed -i 's/vlan_raw_device encc000//g' /target/etc/network/interfaces.d/workaround_hack; \
+in-target wget ftp://{FTPSERVER}/openstack/90-ubuntu -O /etc/sudoers.d/90-ubuntu; \
+in-target chmod 0440 /etc/sudoers.d/90-ubuntu; \
+in-target wget ftp://{FTPSERVER}/openstack/mac_rewrite.sh -O /usr/local/bin/mac_rewrite.sh; \
+in-target chmod 755 /usr/local/bin/mac_rewrite.sh; \
+echo "* * * * * root /usr/local/bin/mac_rewrite.sh" >> /target/etc/crontab; \
+in-target mkdir /home/ubuntu/.ssh/; \
+ssh-import-id 1chb1n admcleod james-page uosci-testing-bot jog cgregan -o /target/home/ubuntu/.ssh/authorized_keys; \
+in-target chzdev --no-root-update -pVe c003; \
+in-target chzdev --no-root-update -Ve 0.0.1b4b; \
+echo "yes"|dasdfmt -f /dev/dasdb --label=ceph -b 4096; \
+sleep 30; \
+fdasd /dev/dasdb -a -l ceph; \
+mkfs.xfs -L ceph -f -b size=4096 /dev/dasdb1; \
+in-target mkdir /mnt/ceph; \
+echo -e "LABEL=ceph\t/mnt/ceph\txfs\tdefaults\t0\t0" >> /target/etc/fstab; \
+in-target chzdev --no-root-update -Ve 0.0.2b4f; \
+echo "yes"|dasdfmt -f /dev/dasdc --label=swift-b 4096; \
+sleep 30; \
+fdasd /dev/dasdc -a -l swift; \
+mkfs.xfs -L swift -f -b size=4096 /dev/dasdc1; \
+in-target mkdir /mnt/swift; \
+echo -e "LABEL=swift\t/mnt/swift\txfs\tdefaults\t0\t0" >> /target/etc/fstab; \
+echo "exit 0" > /target/usr/lib/s390x-linux-gnu/lxc/lxc-net
+
+
+#d-i preseed/late_command string in-target sed -i s/prohibit-password/yes/g /etc/ssh/sshd_config; apt-install xfsprogs initramfs-tools screen ftp rsync vim build-essential multipath-tools lsscsi lvm2 automake-1.15 crash strace bc expect ethtool scsitools aptitude vlan libssl-dev opencryptoki libopencryptoki-dev libica-dev libica-utils makedumpfile kdump-tools python flex libjson0-dev libcryptsetup-dev cryptsetup openssl-ibmca sosreport libtool libldap2-dev byacc
+## d-i preseed/late_command string in-target sed -i s/prohibit-password/yes/g /etc/ssh/sshd_config; apt-install xfsprogs initramfs-tools screen ftp rsync vim build-essential multipath-tools lsscsi lvm2 scsitools kdump-tools
+
+# reboot at the end
+d-i finish-install/reboot_in_progress note
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

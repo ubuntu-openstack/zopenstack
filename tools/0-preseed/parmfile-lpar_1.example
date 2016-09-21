@@ -1,0 +1,20 @@
+# To make this example functional:
+# 
+# Ensure netdevice has the right ID (c000 is the default)
+# Replace FTP_SERVER with your preseed ftp address
+# Ensure the preseed file is named correctly and available on your preseed ftp server
+# Replace all network info currently marked as x.x.x.x
+#
+
+ro locale=en_US auto=true priority=critical apt-setup/proposed=true
+url=ftp://FTP_SERVER/preseed/preseed-xxxx.cfg
+s390-netdevice/choose_networktype=qeth                             
+s390-netdevice/qeth/layer2=true s390-netdevice/qeth/port=0         
+s390-netdevice/qeth/choose=0.0.c000-0.0.c001-0.0.c002              
+netcfg/get_ipaddress=x.x.x.x netcfg/get_netmask=x.x.x.x
+netcfg/get_gateway=x.x.x.x netcfg/get_nameservers=x.x.x.x
+netdevice/qeth/layer2=true netcfg/confirm_static=true              
+netcfg/use_autoconfig=0 netcfg/disable_dhcp=true netcfg/vlan_id=xxxx
+hostname=xxxx domain=xxxx network-console/start=note
+network-console/password=pass4inst                              
+network-console/password-again=pass4inst
