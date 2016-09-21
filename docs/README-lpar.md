@@ -58,33 +58,33 @@ environments:
   manual:
     type: manual
     bootstrap-host: 10.0.0.2
-~~
+~~~~
 
 To bootstrap: 
-~~
+~~~~
 juju bootstrap -e manual
-~~
+~~~~
 
 ## Add machines to juju
 
 If you have specified a user other than ubuntu in your preseed, change it here.
 You will also need to know the ip address of each LPAR.
 
-~~
+~~~~
 juju add-machine ssh:ubuntu@10.0.0.3
 juju add-machine ssh:ubuntu@10.0.0.4
 juju add-machine ssh:ubuntu@10.0.0.5
 juju add-machine ssh:ubuntu@10.0.0.6
 juju add-machine ssh:ubuntu@10.0.0.7
-~~
+~~~~
 
 
 ## Deploy the openstack bundle
 
-~~
+~~~~
 (from dir ./zopenstack/tools/1-deploy)
 juju-deployer -vdc ../../bundles/lpar/xenial-mitaka-stable.yaml
-~~
+~~~~
 
 
 ### 2-configure
@@ -99,9 +99,9 @@ to configure an openstack environment.
 
 simply run 
 
-~~
+~~~~
 ./configure s390x-multi-lpar
-~~
+~~~~
 
 Once the configuration is complete, you can move onto the testing phase
 
@@ -121,23 +121,23 @@ You should be able to launch a nova container as follows:
 
 If you have not already sourced novarc:
 
-~~
+~~~~
 source novarc
-~~
+~~~~
 
 Then, to launch a xenial instance:
 
-~~
+~~~~
 ./tools/instance_launch.sh 5 xenial-s390x
-~~
+~~~~
 
 You should receive details on how to ssh to this machine in the output.
 
 To see if the instance was launched successfully:
 
-~~
+~~~~
 nova list
-~~
+~~~~
 
 If the instance is ready, use the ssh command provided in the instance_launch
 output to see if you can ssh to the nova instance.
