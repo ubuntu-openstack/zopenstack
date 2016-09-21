@@ -1,4 +1,4 @@
-TODO: create a step-by-step doc for reproducing the deployment of the test model, and the testing of said model.
+TODO: automated 3-testing and 4-collect
 
 # Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
 ## Deployment
