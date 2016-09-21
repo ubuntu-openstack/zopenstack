@@ -76,6 +76,7 @@ juju add-machine ssh:ubuntu@10.0.0.7
 ~~~~
 git@github.com:ubuntu-openstack/zopenstack.git
 git checkout multi-lpar-native
+~~~~
 
 ### Deploy the openstack bundle
 
