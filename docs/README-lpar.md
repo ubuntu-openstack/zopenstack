@@ -27,6 +27,7 @@ of tokenise will use a yaml to output multiple preseed bundles.
 
 Tokenise can also be found at: github.com/xxxxx/tokenise
 
+There is currently a bug with setting bridge_state after a reboot. It must be set manually after any reboot.
 
 
 ## Deploying 
