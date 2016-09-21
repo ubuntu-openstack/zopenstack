@@ -16,10 +16,10 @@ Please read the heading of each file to see what information you will need.
 
 In general, you will need to know:
 
-Disk IDs
-Network IDs
-VLAN IDs
-Preseed FTP Server address, directories and file names.
+* Disk IDs
+* Network IDs
+* VLAN IDs
+* Preseed FTP Server address, directories and file names.
 
 There is also a tool called 'tokenise' included here, which will currently
 generate a single preseed file based on command line switches. A future version
