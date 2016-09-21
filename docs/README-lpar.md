@@ -40,10 +40,6 @@ media" manually and the appropriate preseed selected
 To achieve this, you will need to use an existing LPAR or other machine which 
 has network connectivity to the LPARS. First, install juju (instructions?)
 
-Then bootstrap:
-
-juju 1.25.x:
-
 Your ~/.juju/environments.yaml should have a 'manual' stanza which looks like
 the following:
 
