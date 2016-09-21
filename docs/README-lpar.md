@@ -27,7 +27,11 @@ of tokenise will use a yaml to output multiple preseed bundles.
 
 Tokenise can also be found at: github.com/xxxxx/tokenise
 
-There is currently a bug with setting bridge_state after a reboot. It must be set manually after any reboot.
+There is currently a bug with setting bridge_state after a reboot. It must be set manually after any reboot, e.g.:
+
+~~~~
+echo primary > /sys/devices/qeth/0.0.c003/bridge_role
+~~~~
 
 
 ## Deploying 
@@ -118,10 +122,9 @@ nova list
 ~~~~
 
 If the instance is ready, use the ssh command provided in the instance_launch
-output to see if you can ssh to the nova instance.
+output to see if you can ssh to the nova instance, e.g.:
 
 ~~~~
-e.g. 
 ssh -i ~/testkey.pem ubuntu@ip_address
 ~~~~
 
