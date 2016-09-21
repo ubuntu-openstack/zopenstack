@@ -101,8 +101,9 @@ to configure an openstack environment.
 simply run 
 
 ~~~~
-source tools/2-configure/novarc
-tools/2-configure/configure s390x-multi-lpar
+cd tools/2-configure
+source novarc
+./configure s390x-multi-lpar
 ~~~~
 
 Once the configuration is complete, you can move onto the testing phase
