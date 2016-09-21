@@ -1,11 +1,8 @@
 TODO: automated 3-testing and 4-collect
 
 # Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
-## Deployment
 
-We will assume you are in the zopenstack root directory.
-
-### 0-preseed
+## Preseeding
 
 The preseed examples in this directory (named lpar_1) can be used to manually
 craft a set of files which will configure an lpar for network connectivity. 
@@ -32,14 +29,12 @@ Tokenise can also be found at: github.com/xxxxx/tokenise
 
 
 
-# Deploying 
-
-## Preseed
+## Deploying 
 
 Once your preseed bundles are crafted, each lpar can be "reloaded from removable 
 media" manually and the appropriate preseed selected
 
-## Bootstrap juju environment
+### Bootstrap juju environment
 
 To achieve this, you will need to use an existing LPAR or other machine which 
 has network connectivity to the LPARS. First, install juju (instructions?)
@@ -63,7 +58,7 @@ To bootstrap:
 juju bootstrap -e manual
 ~~~~
 
-## Add machines to juju
+### Add machines to juju
 
 If you have specified a user other than ubuntu in your preseed, change it here.
 You will also need to know the ip address of each LPAR.
@@ -76,21 +71,21 @@ juju add-machine ssh:ubuntu@10.0.0.6
 juju add-machine ssh:ubuntu@10.0.0.7
 ~~~~
 
-## Clone this repo
+### Clone this repo
 
 ~~~~
 git@github.com:ubuntu-openstack/zopenstack.git
 git checkout multi-lpar-native
 
-## Deploy the openstack bundle
+### Deploy the openstack bundle
 
 ~~~~
 cd zopenstack
 juju-deployer -vdc bundles/lpar/xenial-mitaka-stable.yaml
 ~~~~
 
-# Configuring Openstack
-## Configure and the s390x profile
+## Configuring Openstack
+### Configure and the s390x profile
 
 The openstack-charm-testing repo provides profiles scripts and profiles
 to configure an openstack environment.
@@ -105,8 +100,8 @@ source novarc
 
 Once the configuration is complete, you can move onto the testing phase
 
-# Testing
-## Manual testing
+## Testing
+### Manual testing
 
 You should be able to launch a nova instance as follows:
 
