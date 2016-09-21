@@ -3,6 +3,8 @@ TODO: create a step-by-step doc for reproducing the deployment of the test model
 # Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
 ## Deployment
 
+We will assume you are in the zopenstack root directory.
+
 ### 0-preseed
 
 link: tools/0-preseed/README.md
@@ -82,8 +84,7 @@ juju add-machine ssh:ubuntu@10.0.0.7
 ## Deploy the openstack bundle
 
 ~~~~
-(from dir ./zopenstack/tools/1-deploy)
-juju-deployer -vdc ../../bundles/lpar/xenial-mitaka-stable.yaml
+juju-deployer -vdc bundles/lpar/xenial-mitaka-stable.yaml
 ~~~~
 
 
@@ -100,7 +101,7 @@ to configure an openstack environment.
 simply run 
 
 ~~~~
-./configure s390x-multi-lpar
+tools/2-configure/configure s390x-multi-lpar
 ~~~~
 
 Once the configuration is complete, you can move onto the testing phase
@@ -122,13 +123,13 @@ You should be able to launch a nova container as follows:
 If you have not already sourced novarc:
 
 ~~~~
-source novarc
+source tools/2-configure/novarc
 ~~~~
 
 Then, to launch a xenial instance:
 
 ~~~~
-./tools/instance_launch.sh 5 xenial-s390x
+tools/2-configure/tools/instance_launch.sh 5 xenial-s390x
 ~~~~
 
 You should receive details on how to ssh to this machine in the output.
