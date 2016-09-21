@@ -7,8 +7,6 @@ We will assume you are in the zopenstack root directory.
 
 ### 0-preseed
 
-link: tools/0-preseed/README.md
-
 The preseed examples in this directory (named lpar_1) can be used to manually
 craft a set of files which will configure an lpar for network connectivity. 
 
@@ -32,9 +30,7 @@ of tokenise will use a yaml to output multiple preseed bundles.
 
 Tokenise can also be found at: github.com/xxxxx/tokenise
 
-### 1-deploy
 
-link: tools/1-deploy/README.md
 
 # Deploying 
 
@@ -80,17 +76,18 @@ juju add-machine ssh:ubuntu@10.0.0.6
 juju add-machine ssh:ubuntu@10.0.0.7
 ~~~~
 
+## Clone this repo
+
+~~~~
+git@github.com:ubuntu-openstack/zopenstack.git
+git checkout multi-lpar-native
 
 ## Deploy the openstack bundle
 
 ~~~~
+cd zopenstack
 juju-deployer -vdc bundles/lpar/xenial-mitaka-stable.yaml
 ~~~~
-
-
-### 2-configure
-
-link: tools/2-configure/README.md
 
 # Configuring Openstack
 ## Configure and the s390x profile
@@ -108,25 +105,17 @@ source novarc
 
 Once the configuration is complete, you can move onto the testing phase
 
-Todo: modify neutron-net and neutron-tenant to add vlan in as per pastebin:
-
-https://pastebin.canonical.com/164921/
-
-
-### 3-test
-
-link: tools/3-test/README.md
-
 # Testing
 ## Manual testing
 
 You should be able to launch a nova instance as follows:
 
 ~~~~
-tools/2-configure/tools/instance_launch.sh 5 xenial-s390x
+# launch some instances
+./tools/instance_launch.sh 5 xenial-s390x
+# give these instances public (ext_net) ip addresses
+./tools/float_all.sh
 ~~~~
-
-You should receive details on how to ssh to this machine in the output.
 
 To see if the instance was launched successfully:
 
@@ -136,6 +125,11 @@ nova list
 
 If the instance is ready, use the ssh command provided in the instance_launch
 output to see if you can ssh to the nova instance.
+
+~~~~
+e.g. 
+ssh -i ~/testkey.pem ubuntu@ip_address
+~~~~
 
 ### 4-collect
 
