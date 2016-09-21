@@ -86,7 +86,7 @@ juju-deployer -vdc bundles/lpar/xenial-mitaka-stable.yaml
 ## Configuring Openstack
 ### Configure and the s390x profile
 
-The openstack-charm-testing repo provides profiles scripts and profiles
+The openstack-charm-testing repo provides scripts and profiles
 to configure an openstack environment.
 
 simply run 
