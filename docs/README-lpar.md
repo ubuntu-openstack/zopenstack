@@ -101,6 +101,7 @@ to configure an openstack environment.
 simply run 
 
 ~~~~
+source tools/2-configure/novarc
 tools/2-configure/configure s390x-multi-lpar
 ~~~~
 
@@ -118,15 +119,7 @@ link: tools/3-test/README.md
 # Testing
 ## Manual testing
 
-You should be able to launch a nova container as follows:
-
-If you have not already sourced novarc:
-
-~~~~
-source tools/2-configure/novarc
-~~~~
-
-Then, to launch a xenial instance:
+You should be able to launch a nova instance as follows:
 
 ~~~~
 tools/2-configure/tools/instance_launch.sh 5 xenial-s390x
