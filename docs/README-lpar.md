@@ -1,5 +1,3 @@
-TODO: automated 3-testing and 4-collect
-
 # Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
 
 ## Preseeding
@@ -25,7 +23,7 @@ There is also a tool called 'tokenise' included here, which will currently
 generate a single preseed file based on command line switches. A future version
 of tokenise will use a yaml to output multiple preseed bundles.
 
-Tokenise can also be found at: github.com/xxxxx/tokenise
+The tokenise tool can be found in tools/0-preseed/tokenise.
 
 There is currently a bug with setting bridge_state after a reboot. It must be set manually after any reboot, e.g.:
 
@@ -128,7 +126,13 @@ output to see if you can ssh to the nova instance, e.g.:
 ssh -i ~/testkey.pem ubuntu@ip_address
 ~~~~
 
-### 4-collect
+### Tempest testing
+
+WIP
+
+## Collection
+
+WIP
 
 
 
