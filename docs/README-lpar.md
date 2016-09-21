@@ -52,7 +52,8 @@ environments:
 
 To bootstrap: 
 ~~~~
-juju bootstrap -e manual
+juju switch manual
+juju bootstrap
 ~~~~
 
 ### Add machines to juju
