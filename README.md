@@ -22,6 +22,7 @@ TODO: Create doc, add link to doc.
 
 ### Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
 TODO: Create doc, add link to doc.
+link: docs/README-lpar.md
 
 ### Ubuntu Native LPAR Testing with Juju 2.x [beta/pre-release]
 TODO: Create doc, add link to doc.

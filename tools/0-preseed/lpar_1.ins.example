@@ -1,0 +1,9 @@
+# Be sure to replace parmfile.xxxx with the right filename
+#
+
+* Ubuntu for z Series (boot from CD-ROM or FTP-Server)
+kernel.ubuntu 0x00000000
+initrd.off 0x0001040c
+initrd.siz 0x00010414
+parmfile.xxxx 0x00010480
+initrd.ubuntu 0x01000000

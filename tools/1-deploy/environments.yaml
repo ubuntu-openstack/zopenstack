@@ -1,0 +1,4 @@
+environments:
+  manual:
+    type: manual
+    bootstrap-host: 10.x.x.x

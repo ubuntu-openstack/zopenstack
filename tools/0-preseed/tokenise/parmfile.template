@@ -1,0 +1,12 @@
+ro locale=en_US auto=true priority=critical apt-setup/proposed=true
+url=ftp://{FTPSERVER}/preseed/{CFGFILE}
+s390-netdevice/choose_networktype=qeth                             
+s390-netdevice/qeth/layer2=true s390-netdevice/qeth/port=0         
+s390-netdevice/qeth/choose=0.0.c000-0.0.c001-0.0.c002              
+netcfg/get_ipaddress={IP_ADDR} netcfg/get_netmask={MASK}
+netcfg/get_gateway={GATEWAY} netcfg/get_nameservers={DNS}
+netdevice/qeth/layer2=true netcfg/confirm_static=true              
+netcfg/use_autoconfig=0 netcfg/disable_dhcp=true netcfg/vlan_id={VLAN}
+hostname={HOSTNAME} domain={DOMAIN} network-console/start=note
+network-console/password=pass4inst                              
+network-console/password-again=pass4inst
