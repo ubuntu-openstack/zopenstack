@@ -68,8 +68,8 @@ relations:
   - neutron-gateway
 - - neutron-openvswitch
   - rabbitmq-server
-- - aodh:shawhite-db
-  - mysql:shawhite-db
+- - aodh:shared-db
+  - mysql:shared-db
 - - aodh:identity-service
   - keystone:identity-service
 - - aodh:amqp
