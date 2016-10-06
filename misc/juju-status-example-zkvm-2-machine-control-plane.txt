@@ -1,0 +1,46 @@
+# All units good except neutron-gateway, which is waiting for the z/KVM compute to be added.
+#
+
+[Services]            
+NAME                  STATUS  EXPOSED CHARM                                                        
+aodh                  active  false   cs:~openstack-charmers-next/xenial/aodh-10                   
+ceilometer            active  false   cs:~openstack-charmers-next/xenial/ceilometer-237            
+ceilometer-agent              false   cs:~openstack-charmers-next/xenial/ceilometer-agent-227      
+glance                active  false   cs:~openstack-charmers-next/xenial/glance-257                
+heat                  active  false   cs:~openstack-charmers-next/xenial/heat-237                  
+juju-gui              unknown false   cs:xenial/juju-gui-139                                       
+keystone              active  false   cs:~openstack-charmers-next/xenial/keystone-260              
+mongodb               unknown false   cs:trusty/mongodb-37                                         
+mysql                 active  false   cs:~openstack-charmers-next/xenial/percona-cluster-232       
+neutron-api           active  false   cs:~openstack-charmers-next/xenial/neutron-api-266           
+neutron-gateway       active  false   cs:~openstack-charmers-next/xenial/neutron-gateway-256       
+neutron-openvswitch           false   cs:~openstack-charmers-next/xenial/neutron-openvswitch-245   
+nova-cloud-controller blocked false   cs:~openstack-charmers-next/xenial/nova-cloud-controller-267 
+openstack-dashboard   active  false   cs:~openstack-charmers-next/xenial/openstack-dashboard-243   
+rabbitmq-server       active  false   cs:~openstack-charmers-next/xenial/rabbitmq-server-240       
+swift-proxy           active  false   cs:~openstack-charmers-next/xenial/swift-proxy-65            
+swift-storage         active  false   cs:~openstack-charmers-next/xenial/swift-storage-237         
+
+[Units]                 
+ID                      WORKLOAD-STATE AGENT-STATE VERSION MACHINE PORTS                                   PUBLIC-ADDRESS             MESSAGE                       
+aodh/0                  active         executing   1.25.6  2/lxc/0                                         nn.nnn.169.199             (update-status) Unit is ready 
+ceilometer/0            active         idle        1.25.6  1/lxc/0 8777/tcp                                nn.nnn.170.42              Unit is ready                 
+glance/0                active         idle        1.25.6  1/lxc/1 9292/tcp                                nn.nnn.170.232             Unit is ready                 
+heat/0                  active         idle        1.25.6  2/lxc/1 8000/tcp,8004/tcp                       nn.nnn.169.162             Unit is ready                 
+juju-gui/0              unknown        idle        1.25.6  1/lxc/2 80/tcp,443/tcp                          nn.nnn.169.126                                           
+keystone/0              active         idle        1.25.6  1/lxc/3 5000/tcp                                nn.nnn.170.167             Unit is ready                 
+mongodb/0               unknown        idle        1.25.6  1/lxc/4 27017/tcp,27019/tcp,27021/tcp,28017/tcp nn.nnn.169.52                                            
+mysql/0                 active         idle        1.25.6  2/lxc/2                                         nn.nnn.169.192             Unit is ready                 
+neutron-api/0           active         idle        1.25.6  2/lxc/3 9696/tcp                                nn.nnn.170.187             Unit is ready                 
+neutron-gateway/0       active         idle        1.25.6  1                                               grizzled-family.nnnnstack  Unit is ready                 
+nova-cloud-controller/0 blocked        idle        1.25.6  2/lxc/4 8774/tcp                                nn.nnn.169.233             Missing relations: compute    
+openstack-dashboard/0   active         idle        1.25.6  1/lxc/5 80/tcp,443/tcp                          nn.nnn.170.235             Unit is ready                 
+rabbitmq-server/0       active         idle        1.25.6  2/lxc/5 5672/tcp                                nn.nnn.169.186             Unit is ready                 
+swift-proxy/0           active         idle        1.25.6  1/lxc/6 8080/tcp                                nn.nnn.170.80              Unit is ready                 
+swift-storage/0         active         idle        1.25.6  2                                               cylindrical-base.nnnnstack Unit is ready                 
+
+[Machines] 
+ID         STATE   VERSION DNS                        INS-ID                                                         SERIES HARDWARE                                                                                                              
+0          started 1.25.6  fat-machine.nnnnstack      /MAAS/api/1.0/nodes/node-d4692494-8228-11e4-8078-d4bed9a84493/ xenial arch=amd64 cpu-cores=8 mem=49152M tags=node-d4692494-8228-11e4-8078-d4bed9a84493,demo,uosci availability-zone=default 
+1          started 1.25.6  grizzled-family.nnnnstack  /MAAS/api/1.0/nodes/node-d74ee982-8228-11e4-8078-d4bed9a84493/ xenial arch=amd64 cpu-cores=8 mem=49152M tags=node-d74ee982-8228-11e4-8078-d4bed9a84493,demo,uosci availability-zone=default 
+2          started 1.25.6  cylindrical-base.nnnnstack /MAAS/api/1.0/nodes/node-d65842d0-8228-11e4-9105-d4bed9a84493/ xenial arch=amd64 cpu-cores=8 mem=49152M tags=node-d65842d0-8228-11e4-9105-d4bed9a84493,demo,uosci availability-zone=default 

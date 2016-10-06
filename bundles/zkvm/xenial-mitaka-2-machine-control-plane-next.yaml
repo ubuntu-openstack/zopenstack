@@ -3,15 +3,12 @@
 # the OpenStack-Telemetry charm store bundle which uses the current
 # dev charm versions, aka the 'next charms'.
 #
+# Creates a dense 2-machine amd64 control plane to server one or more
+# z/KVM compute nodes.  Ceph is excluded due to the low machine count,
+# and swift is used instead for object storage.
+#
 # This is a proof-of-concept test bundle, intended to be an example.
 # It is not highly-available, nor is it soak tested.
-
-
-# TODO: use 7 machines total, 6 for applications and services.  Use
-# ceph and swift.
-#
-
-
 machines:
 # Juju Bootstrap / Controller
   "0":
