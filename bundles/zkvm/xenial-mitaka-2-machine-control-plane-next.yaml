@@ -104,7 +104,7 @@ services:
     num_units: 1
     options:
       remote-user: userfoo
-      remote-repos: "file:///mnt/osmitakacomp2,file:///mnt/osprereqs"
+      remote-repos: "file:///mnt/osmitakacomp,file:///mnt/osprereqs"
       remote-key: id_rsa
       remote-hosts: "10.10.10.10 10.10.10.11"
     to:
