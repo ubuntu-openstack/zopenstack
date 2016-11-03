@@ -10,9 +10,10 @@
 # This is a proof-of-concept test bundle, intended to be an example.
 # It is not highly-available, nor is it soak tested.
 machines:
+# Don't need machine 0 for juju 2
 # Juju Bootstrap / Controller
-  "0":
-    constraints: arch=amd64 tags=uosci
+#  "0":
+#    constraints: arch=amd64 tags=uosci
 # OpenStack Neutron Gateway + OpenStack Control Plane
   "1":
     constraints: arch=amd64 tags=uosci
@@ -100,6 +101,7 @@ services:
       remote-repos: "file:///mnt/osmitakacomp,file:///mnt/osprereqs"
       remote-key: id_rsa
       remote-hosts: "10.10.10.10 10.10.10.11"
+      cpu-mode: "none"
     to:
     - lxc:2
   aodh:
