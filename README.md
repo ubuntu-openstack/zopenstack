@@ -14,15 +14,11 @@ This repo contains development-focused test bundles, procedures, tools and scrip
 
 ## Usage & Examples
 
-### z/KVM Testing with Juju 1.25.x [stable]
-TODO: Create doc, add link to doc.
-
-### z/KVM Testing with Juju 2.x [beta/pre-release]
-TODO: Create doc, add link to doc.
+### z/KVM Testing with Juju >= 2.0
+[docs/README-zkvm.md](docs/README-zkvm.md)
 
 ### Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
-TODO: Create doc, add link to doc.
-link: docs/README-lpar.md
+[docs/README-lpar.md](docs/README-lpar.md)
 
 ### Ubuntu Native LPAR Testing with Juju 2.x [beta/pre-release]
 TODO: Create doc, add link to doc.

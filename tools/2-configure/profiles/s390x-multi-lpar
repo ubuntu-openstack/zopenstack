@@ -1,4 +1,7 @@
 #!/bin/bash -ex
+#
+# Juju >= 2.0 Only (Native deploy - No `juju-deployer`)
+#
 
 # Set overrides, if not already set.
 [[ -z "$GATEWAY" ]] && export GATEWAY="10.13.3.1"
@@ -45,9 +48,9 @@ image_id=$(glance image-list | grep cirros | awk '{ print $2 }')
 image_alt_id=$(glance image-list | grep precise | awk '{ print $2 }')
 ext_net=$(neutron net-list | grep ext_net | awk '{ print $2 }')
 router=$(neutron router-list | grep provider-router | awk '{ print $2}')
-keystone=$(juju-deployer -f keystone)
-dashboard=$(juju-deployer -f openstack-dashboard)
-ncc=$(juju-deployer -f nova-cloud-controller)
+keystone=$(juju run --unit keystone/0 "unit-get private-address")
+dashboard=$(juju run --unit openstack-dashboard/0 "unit-get private-address")
+ncc=$(juju run --unit nova-cloud-controller/0 "unit-get private-address")
 http=${OS_AUTH_PROTOCOL:-http}
 
 # Insert vars into tempest conf
