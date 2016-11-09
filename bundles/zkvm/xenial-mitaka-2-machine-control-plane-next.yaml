@@ -1,3 +1,5 @@
+# Juju 2.0 or later required (lxd placement)
+#
 # A mixed-architecture deployment with the control plane and storage
 # services on x86, and multiple compute nodes on z/KVM, in line with
 # the OpenStack-Telemetry charm store bundle which uses the current
@@ -6,6 +8,10 @@
 # Creates a dense 2-machine amd64 control plane to server one or more
 # z/KVM compute nodes.  Ceph is excluded due to the low machine count,
 # and swift is used instead for object storage.
+#
+# The machine tags are specific to the original test lab and will
+# need to be adjusted when deployed elsewhere.  As will user, remote
+# key, and potentially other config values.
 #
 # This is a proof-of-concept test bundle, intended to be an example.
 # It is not highly-available, nor is it soak tested.
@@ -16,10 +22,10 @@ machines:
 #    constraints: arch=amd64 tags=uosci
 # OpenStack Neutron Gateway + OpenStack Control Plane
   "1":
-    constraints: arch=amd64 tags=uosci
+    constraints: arch=amd64 tags=netspaces
 # OpenStack Object Storage + OpenStack Control Plane
   "2":
-    constraints: arch=amd64 tags=uosci
+    constraints: arch=amd64 tags=netspaces
 series: xenial
 relations:
 - - keystone
@@ -82,7 +88,6 @@ relations:
   - keystone:identity-service
 - - aodh:amqp
   - rabbitmq-server:amqp
-####
 - - nova-compute-proxy
   - nova-cloud-controller
 - - nova-compute-proxy
@@ -91,41 +96,51 @@ relations:
   - rabbitmq-server:amqp
 - - nova-compute-proxy
   - glance
-####
 services:
   nova-compute-proxy:
-    branch: https://github.com/openstack-charmers/charm-nova-compute-proxy
+    charm: cs:~openstack-charmers-next/nova-compute-proxy
     num_units: 1
     options:
-      remote-user: userfoo
+      remote-user: root
       remote-repos: "file:///mnt/osmitakacomp,file:///mnt/osprereqs"
-      remote-key: id_rsa
+      remote-key: |
+        -----BEGIN DSA PRIVATE KEY-----
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxx SAMPLE xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxx
+        -----END DSA PRIVATE KEY-----
       remote-hosts: "10.10.10.10 10.10.10.11"
       cpu-mode: "none"
     to:
-    - lxc:2
+    - lxd:2
   aodh:
     charm: cs:~openstack-charmers-next/xenial/aodh
     num_units: 1
     to:
-    - lxc:2
+    - lxd:2
   ceilometer:
     charm: cs:~openstack-charmers-next/xenial/ceilometer
     num_units: 1
     to:
-    - lxc:1
+    - lxd:1
   ceilometer-agent:
     charm: cs:~openstack-charmers-next/xenial/ceilometer-agent
   glance:
     charm: cs:~openstack-charmers-next/xenial/glance
     num_units: 1
     to:
-    - lxc:1
+    - lxd:1
   heat:
     charm: cs:~openstack-charmers-next/xenial/heat
     num_units: 1
     to:
-    - lxc:2
+    - lxd:2
   keystone:
     charm: cs:~openstack-charmers-next/xenial/keystone
     options:
@@ -133,17 +148,12 @@ services:
       admin-token: ubuntutesting
     num_units: 1
     to:
-    - lxc:1
+    - lxd:1
   mongodb:
     charm: cs:trusty/mongodb
     num_units: 1
     to:
-    - lxc:1
-  juju-gui:
-    charm: cs:juju-gui
-    num_units: 1
-    to:
-    - lxc:1
+    - lxd:1
   mysql:
     charm: cs:~openstack-charmers-next/xenial/percona-cluster
     options:
@@ -153,7 +163,7 @@ services:
       sst-password: ChangeMe123
     num_units: 1
     to:
-    - lxc:2
+    - lxd:2
   neutron-api:
     charm: cs:~openstack-charmers-next/xenial/neutron-api
     options:
@@ -161,7 +171,7 @@ services:
       neutron-security-groups: true
     num_units: 1
     to:
-    - lxc:2
+    - lxd:2
   neutron-gateway:
     charm: cs:~openstack-charmers-next/xenial/neutron-gateway
     options:
@@ -179,18 +189,18 @@ services:
       network-manager: Neutron
     num_units: 1
     to:
-    - lxc:2
+    - lxd:2
   openstack-dashboard:
     charm: cs:~openstack-charmers-next/xenial/openstack-dashboard
     options:
     num_units: 1
     to:
-    - lxc:1
+    - lxd:1
   rabbitmq-server:
     charm: cs:~openstack-charmers-next/xenial/rabbitmq-server
     num_units: 1
     to:
-    - lxc:2
+    - lxd:2
   swift-proxy:
     charm: cs:~openstack-charmers-next/xenial/swift-proxy
     options:
@@ -199,9 +209,10 @@ services:
       zone-assignment: manual
     num_units: 1
     to:
-    - lxc:1
+    - lxd:1
   swift-storage:
     charm: cs:~openstack-charmers-next/xenial/swift-storage
+    num_units: 1
     options:
       block-device: sdb
       overwrite: "true"
