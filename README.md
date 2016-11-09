@@ -6,8 +6,6 @@ This repo contains development-focused test bundles, procedures, tools and scrip
 ## Repo Directory Contents
 * bundles/*
     * Juju bundles for dev and test deployments
-* docs/*
-    * Documentation and procedures for deploying test environments and validating them
 * tools/* 
     * Scripts, tools, glue for testing dev deployments
 
@@ -15,10 +13,10 @@ This repo contains development-focused test bundles, procedures, tools and scrip
 ## Usage & Examples
 
 ### z/KVM Testing with Juju >= 2.0
-[docs/README-zkvm.md](docs/README-zkvm.md)
+[README-zkvm.md](README-zkvm.md)
 
 ### Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
-[docs/README-lpar.md](docs/README-lpar.md)
+[README-lpar.md](README-lpar.md)
 
 ### Ubuntu Native LPAR Testing with Juju 2.x [beta/pre-release]
 TODO: Create doc, add link to doc.
