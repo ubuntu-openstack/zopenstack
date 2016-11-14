@@ -8,3 +8,5 @@ trusty/**
 xenial/**
 yakkety/**
 func-results.json
+*tempest.conf
+tools/*/tempest/
