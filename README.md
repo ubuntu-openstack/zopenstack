@@ -2,6 +2,8 @@
 
 This repo contains development-focused test bundles, procedures, tools and scripts -- not intended for production use.
 
+Bundles, scripts and charm configuration options may need to be adjusted for different lab environments.
+
 
 ## Repo Directory Contents
 * bundles/*
@@ -10,13 +12,19 @@ This repo contains development-focused test bundles, procedures, tools and scrip
     * Scripts, tools, glue for testing dev deployments
 
 
-## Usage & Examples
+## Scenarios
 
-### z/KVM Testing with Juju >= 2.0
-[README-zkvm.md](README-zkvm.md)
+### Ubuntu Native LPAR (OpenStack-on-LXD)
+A single LPAR running Ubuntu Server natively, with OpenStack deployed via Juju and the OpenStack Charms on the LXD provider.
 
-### Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
-[README-lpar.md](README-lpar.md)
+ - [See: Charm Guide - OpenStack on LXD](http://docs.openstack.org/developer/charm-guide/openstack-on-lxd.html)
 
-### Ubuntu Native LPAR Testing with Juju 2.x [beta/pre-release]
-TODO: Create doc, add link to doc.
+### Ubuntu Native Multi-LPAR Testing
+Multiple LPARs running Ubuntu Server natively, with OpenStack deployed via Juju and the OpenStack Charmns on the Juju manual provider.
+
+ - [See: README-lpar.md](README-lpar.md)
+
+### z/KVM
+z/KVM compute nodes with amd64 control plane.
+
+  - [See: README-zkvm.md](README-zkvm.md)
