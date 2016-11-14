@@ -1,3 +1,6 @@
+# WIP
+#  TODO:  Update template for use with Ubuntu image in comptue tests.
+#
 [DEFAULT]
 lock_path=/tmp
 [baremetal]

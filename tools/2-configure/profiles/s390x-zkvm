@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-# Set overrides, if not already set.
+# Set lab network values, if not already set.
 [[ -z "$GATEWAY" ]] && export GATEWAY="10.245.168.1"
 [[ -z "$CIDR_EXT" ]] && export CIDR_EXT="10.245.168.0/21"
 [[ -z "$FIP_RANGE" ]] && export FIP_RANGE="10.245.171.0:10.245.175.254"

@@ -28,4 +28,10 @@
     ./tools/1-deploy/zkvm-deploy.sh
     ```
 
+## Post-Deploy Configuration
+
+* TODO: add post-deploy config section
+
+## Testing
+
 * TODO: add testing section
