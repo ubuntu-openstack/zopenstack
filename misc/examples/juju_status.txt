@@ -1,0 +1,99 @@
+Model    Controller        Cloud/Region      Version
+default  maas-xenial-demo  maas-xenial-demo  2.0.1
+
+App                    Version      Status   Scale  Charm                  Store       Rev  OS      Notes
+aodh                   2.0.5        active       1  aodh                   jujucharms   13  ubuntu
+ceilometer             6.1.3        active       1  ceilometer             jujucharms  241  ubuntu
+glance                 12.0.0       active       1  glance                 jujucharms  258  ubuntu
+heat                   6.1.0        active       1  heat                   jujucharms  241  ubuntu
+keystone               9.2.0        active       1  keystone               jujucharms  266  ubuntu
+mongodb                             unknown      1  mongodb                jujucharms   37  ubuntu
+mysql                  5.6.21-25.8  active       1  percona-cluster        jujucharms  234  ubuntu
+neutron-api            8.3.0        active       1  neutron-api            jujucharms  268  ubuntu
+neutron-gateway        8.3.0        active       1  neutron-gateway        jujucharms  263  ubuntu
+nova-cloud-controller  13.1.2       active       1  nova-cloud-controller  jujucharms  271  ubuntu
+nova-compute-proxy     mitaka       active       1  nova-compute-proxy     jujucharms    3  ubuntu
+openstack-dashboard    9.1.0        active       1  openstack-dashboard    jujucharms  248  ubuntu
+rabbitmq-server        3.5.7        active       1  rabbitmq-server        jujucharms  244  ubuntu
+swift-proxy            2.7.0        active       1  swift-proxy            jujucharms   66  ubuntu
+swift-storage          2.7.0        active       1  swift-storage          jujucharms  240  ubuntu
+
+Unit                      Workload  Agent      Machine  Public address  Ports                                    Message
+aodh/0*                   active    idle       1/lxd/0  10.10.10.27                                            Unit is ready
+ceilometer/0*             active    idle       0/lxd/0  10.10.10.24   8777/tcp                                 Unit is ready
+glance/0*                 active    idle       0/lxd/1  10.10.10.26   9292/tcp                                 Unit is ready
+heat/0*                   active    idle       1/lxd/1  10.10.10.29   8000/tcp,8004/tcp                        Unit is ready
+keystone/0*               active    idle       0/lxd/2  10.10.10.28   5000/tcp                                 Unit is ready
+mongodb/0*                unknown   idle       0/lxd/3  10.10.10.11   27017/tcp,27019/tcp,27021/tcp,28017/tcp
+mysql/0*                  active    idle       1/lxd/2  10.10.10.30                                            Unit is ready
+neutron-api/0*            active    idle       1/lxd/3  10.10.10.12   9696/tcp                                 Unit is ready
+neutron-gateway/0*        active    idle       0        10.10.10.15                                            Unit is ready
+nova-cloud-controller/0*  active    idle       1/lxd/4  10.10.10.21   8774/tcp                                 Unit is ready
+nova-compute-proxy/0*     active    executing  1/lxd/5  10.10.10.23                                            Unit is ready (managing: 10.10.10.93,10.10.10.94)
+openstack-dashboard/0*    active    idle       0/lxd/4  10.10.10.13   80/tcp,443/tcp                           Unit is ready
+rabbitmq-server/0*        active    idle       1/lxd/6  10.10.10.25   5672/tcp                                 Unit is ready
+swift-proxy/0*            active    idle       0/lxd/5  10.10.10.22   8080/tcp                                 Unit is ready
+swift-storage/0*          active    idle       1        10.10.10.17                                            Unit is ready
+
+Machine  State    DNS            Inst id                                                         Series  AZ
+0        started  10.10.10.15  /MAAS/api/1.0/nodes/node-d9f7ecba-8228-11e4-9105-d4bed9a84493/  xenial  zone1
+0/lxd/0  started  10.10.10.24  juju-0b0571-0-lxd-0                                             xenial
+0/lxd/1  started  10.10.10.26  juju-0b0571-0-lxd-1                                             xenial
+0/lxd/2  started  10.10.10.28  juju-0b0571-0-lxd-2                                             xenial
+0/lxd/3  started  10.10.10.11  juju-0b0571-0-lxd-3                                             trusty
+0/lxd/4  started  10.10.10.13  juju-0b0571-0-lxd-4                                             xenial
+0/lxd/5  started  10.10.10.22  juju-0b0571-0-lxd-5                                             xenial
+1        started  10.10.10.17  /MAAS/api/1.0/nodes/node-89a56008-823c-11e4-8078-d4bed9a84493/  xenial  zone2
+1/lxd/0  started  10.10.10.27  juju-0b0571-1-lxd-0                                             xenial
+1/lxd/1  started  10.10.10.29  juju-0b0571-1-lxd-1                                             xenial
+1/lxd/2  started  10.10.10.30  juju-0b0571-1-lxd-2                                             xenial
+1/lxd/3  started  10.10.10.12  juju-0b0571-1-lxd-3                                             xenial
+1/lxd/4  started  10.10.10.21  juju-0b0571-1-lxd-4                                             xenial
+1/lxd/5  started  10.10.10.23  juju-0b0571-1-lxd-5                                             xenial
+1/lxd/6  started  10.10.10.25  juju-0b0571-1-lxd-6                                             xenial
+
+Relation                 Provides               Consumes               Type
+cluster                  aodh                   aodh                   peer
+identity-service         aodh                   keystone               regular
+shared-db                aodh                   mysql                  regular
+amqp                     aodh                   rabbitmq-server        regular
+cluster                  ceilometer             ceilometer             peer
+identity-service         ceilometer             keystone               regular
+database                 ceilometer             mongodb                regular
+amqp                     ceilometer             rabbitmq-server        regular
+cluster                  glance                 glance                 peer
+identity-service         glance                 keystone               regular
+shared-db                glance                 mysql                  regular
+image-service            glance                 nova-cloud-controller  regular
+image-service            glance                 nova-compute-proxy     regular
+amqp                     glance                 rabbitmq-server        regular
+cluster                  heat                   heat                   peer
+identity-service         heat                   keystone               regular
+shared-db                heat                   mysql                  regular
+amqp                     heat                   rabbitmq-server        regular
+cluster                  keystone               keystone               peer
+shared-db                keystone               mysql                  regular
+identity-service         keystone               neutron-api            regular
+identity-service         keystone               nova-cloud-controller  regular
+identity-service         keystone               openstack-dashboard    regular
+identity-service         keystone               swift-proxy            regular
+replica-set              mongodb                mongodb                peer
+cluster                  mysql                  mysql                  peer
+shared-db                mysql                  neutron-api            regular
+shared-db                mysql                  nova-cloud-controller  regular
+cluster                  neutron-api            neutron-api            peer
+neutron-plugin-api       neutron-api            neutron-gateway        regular
+neutron-api              neutron-api            nova-cloud-controller  regular
+neutron-plugin-api       neutron-api            nova-compute-proxy     regular
+amqp                     neutron-api            rabbitmq-server        regular
+cluster                  neutron-gateway        neutron-gateway        peer
+quantum-network-service  neutron-gateway        nova-cloud-controller  regular
+amqp                     neutron-gateway        rabbitmq-server        regular
+cluster                  nova-cloud-controller  nova-cloud-controller  peer
+cloud-compute            nova-cloud-controller  nova-compute-proxy     regular
+amqp                     nova-cloud-controller  rabbitmq-server        regular
+amqp                     nova-compute-proxy     rabbitmq-server        regular
+cluster                  openstack-dashboard    openstack-dashboard    peer
+cluster                  rabbitmq-server        rabbitmq-server        peer
+cluster                  swift-proxy            swift-proxy            peer
+swift-storage            swift-proxy            swift-storage          regular

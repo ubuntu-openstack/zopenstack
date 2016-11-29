@@ -2,25 +2,51 @@
 
 ## Prep
 
+### z/KVM Preseeding
+
+The preseed examples included in this repo (named zkvm_1* in the
+tools/0-preseed directory) can be used to manually craft a set of files which
+will boot, install and configure a z/KVM instance on an LPAR.
+
+This z/KVM instance will have a primary disk containing a root and swap partition.
+
+A preseed bundle consists of: zkvm_name.ins, zkvm_name.prm, and
+zkvm_name-kickstart.cfg
+
+Please read the heading of each file to see what information you will need.
+
+Minimum requirements for this step:
+
+	Disk IDs 
+	Network IDs 
+	VLAN IDs 
+	Preseed FTP Server address, directories and file names.
+	SSH key which the charm will use to log into the z/KVM instance
+	OS and openstack prereqs and packages location
+
+1. Copy zkvm_1*example files to an ftp server accessible to your lpars
+2. Configure ins, prm and kickstart files with correct disks, network interfaces and network configuration
+3. Access zSystems HMC - right click on the appropriate LPAR and select Recovery / Load from removable Media or Server
+4. Enter correct details for ftp server
+5. Select appropriate ins file
+
+The example file contains a reboot command at the end, so after completing the installation the instance will reboot.
+Once it has rebooted it is ready to be provisioned via the nova-compute-proxy charm.
+
 ### z/KVM Machine Prep
 
-The z/KVM machines need to be provisioned and configured in advance of the
-OpenStack control plane and compute node deployment.
+After manually provisioning or preseeding a z/KVM instance as desribed above, 
+the following steps will be required.
 
-1. SSH keys generated and added to authorized_keys, to allow the proxy charm to perform remote operations on the z/KVM machines via ssh.
-2. Mount and repoprep the osprereqs and openstack compute ISOs on each z/KVM machine.
-    * Example:
+1. Modify the bundle (bundles/zkvm/xenial-mitaka-2-machine-control-plane-next.yaml) and insert the private key generated
+during the preseed step (it is also possible but not recommended to use a password
+for the user specified in the bundle configuration)
 
-      ```
-      mkdir /mnt/osprereqs
-      mkdir /mnt/osmitakacomp
-      mount -o loop zkvm-1.1.2-rc1.6-osprereqs-0.1.0.iso /mnt/osprereqs
-      mount -o loop openstack-mitaka-compute-0.1.0.iso /mnt/osmitakacomp
-      createrepo /mnt/osmitakacomp
-      createrepo /mnt/osprereqs
-      ```
+2. Ensure that the nova-compute-proxy charm config values for the z/KVM IP addresses
+are accurate in the xenial-mitaka-2-machine-control-plane-next.yaml file.
 
-3. Ensure that the nova-compute-proxy charm config values for these are accurate in the bundle.yaml file.
+3. Set remote-repos to the ftp location for the openstack packages repo, e.g.
+ftp://anonymous:me@10.10.10.10/zKVM/1.1.3/MAIN/openstack/mitaka/
 
 
 ### x86 Machine Prep
@@ -36,26 +62,18 @@ one would follow to set up any MAAS.
 Juju needs to be configured to utilize the MAAS cluster.  See
 [https://jujucharms.com/docs/stable/clouds-maas](https://jujucharms.com/docs/stable/clouds-maas) for more info.
 
-## Deploying
-  * Review, adjust if necessary, and run:
+## Deploy and Configure
+  * The following script will deploy, wait for status to settle and then configure. 
+    Review, adjust if necessary, and run:
 
     ```sh
     ./tools/1-deploy/zkvm-deploy.sh
     ```
-
-## Post-Deploy Configuration
-  * After confirming Juju status for all units is reported as Ready, configure
-    the deployed cloud with tenants, images, networks, and such.
-
-    ```sh
-    cd ../tools/2-configure
-    ./configure
-    ```
-
-## Post-Deploy Configuration
-
-* TODO: add post-deploy config section
-
+    
 ## Testing
 
 * TODO: add testing section
+
+## Known Issues
+
+There is a bug (https://bugs.launchpad.net/charm-nova-compute-proxy/+bug/1641464) related to the systemd timeout for the openstack-nova-compute service in combination with the way the openstack and neutron services are enabled and (re)started with systemctl - the workaround at time of writing is to ssh into the z/KVM instance and kill the hung systemctl process, then manually enable and restart the openstack and neutron services. Another slightly more simple workaround is to modify the systemd service file for openstack-nova-compute and set the start timeout to something between 30 and 60 seconds.

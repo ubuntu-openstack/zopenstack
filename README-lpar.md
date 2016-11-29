@@ -2,7 +2,7 @@
 
 ## Preseeding
 
-The preseed examples in this directory (named lpar_1) can be used to manually
+The preseed examples in this repo (named lpar_1 in tools/0-preseed/) can be used to manually
 craft a set of files which will configure an lpar for network connectivity. 
 
 This lpar will have a primary disk containing a root and swap partition.

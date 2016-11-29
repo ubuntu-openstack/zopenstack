@@ -58,8 +58,6 @@ relations:
   - rabbitmq-server
 - - ceilometer
   - mongodb
-- - ceilometer-agent
-  - ceilometer
 - - heat
   - mysql
 - - heat
@@ -75,13 +73,9 @@ relations:
 - - neutron-api
   - nova-cloud-controller
 - - neutron-api
-  - neutron-openvswitch
-- - neutron-api
   - keystone
 - - neutron-api
   - neutron-gateway
-- - neutron-openvswitch
-  - rabbitmq-server
 - - aodh:shared-db
   - mysql:shared-db
 - - aodh:identity-service
@@ -102,19 +96,12 @@ services:
     num_units: 1
     options:
       remote-user: root
-      remote-repos: "file:///mnt/osmitakacomp,file:///mnt/osprereqs"
+      remote-password: ""
+      remote-repos: "ftp://"
       remote-key: |
-        -----BEGIN DSA PRIVATE KEY-----
-        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        xxxxxxxxxxxxxxxxxxxxxxxxxx SAMPLE xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        xxxxxxxxxxxxxxxxxxxx
-        -----END DSA PRIVATE KEY-----
+        ----BEGIN RSA PRIVATE KEY-----
+	PRIVATE KEY DATA HERE .........
+        -----END RSA PRIVATE KEY-----
       remote-hosts: "10.10.10.10 10.10.10.11"
       cpu-mode: "none"
     to:
@@ -129,8 +116,6 @@ services:
     num_units: 1
     to:
     - lxd:1
-  ceilometer-agent:
-    charm: cs:~openstack-charmers-next/xenial/ceilometer-agent
   glance:
     charm: cs:~openstack-charmers-next/xenial/glance
     num_units: 1
@@ -181,8 +166,6 @@ services:
     num_units: 1
     to:
     - 1
-  neutron-openvswitch:
-    charm: cs:~openstack-charmers-next/xenial/neutron-openvswitch
   nova-cloud-controller:
     charm: cs:~openstack-charmers-next/xenial/nova-cloud-controller
     options:
