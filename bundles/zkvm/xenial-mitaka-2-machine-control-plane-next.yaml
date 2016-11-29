@@ -97,7 +97,7 @@ services:
     options:
       remote-user: root
       remote-password: ""
-      remote-repos: ""
+      remote-repos: "ftp://"
       remote-key: |
         ----BEGIN RSA PRIVATE KEY-----
 	PRIVATE KEY DATA HERE .........
