@@ -38,7 +38,7 @@ Once it has rebooted it is ready to be provisioned via the nova-compute-proxy ch
 After manually provisioning or preseeding a z/KVM instance as desribed above, 
 the following steps will be required.
 
-1. Modify the bundle (bundles/zkvm/bundles/zkvm/xenial-mitaka-2-machine-control-plane-next.yaml) and insert the private key generated
+1. Modify the bundle (bundles/zkvm/xenial-mitaka-2-machine-control-plane-next.yaml) and insert the private key generated
 during the preseed step (it is also possible but not recommended to use a password
 for the user specified in the bundle configuration)
 
