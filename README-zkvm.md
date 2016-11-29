@@ -38,12 +38,12 @@ Once it has rebooted it is ready to be provisioned via the nova-compute-proxy ch
 After manually provisioning or preseeding a z/KVM instance as desribed above, 
 the following steps will be required.
 
-1. Modify the bundle (bundles/zkvm/???) and insert the private key generated
+1. Modify the bundle (bundles/zkvm/bundles/zkvm/xenial-mitaka-2-machine-control-plane-next.yaml) and insert the private key generated
 during the preseed step (it is also possible but not recommended to use a password
 for the user specified in the bundle configuration)
 
 2. Ensure that the nova-compute-proxy charm config values for the z/KVM IP addresses
-are accurate in the ????bundle.yaml???? file.
+are accurate in the xenial-mitaka-2-machine-control-plane-next.yaml file.
 
 
 ### x86 Machine Prep
@@ -73,4 +73,4 @@ Juju needs to be configured to utilize the MAAS cluster.  See
 
 ## Known Issues
 
-There is a bug (https://bugs.launchpad.net/charm-nova-compute-proxy/+bug/1641464) with the way the openstack and neutron services are enabled and (re)started with systemctl - the workaround at time of writing is to ssh into the z/KVM instance and kill the hung systemctl process, then manually enable and restart the openstack<tab> and neutron<tab> services
+There is a bug (https://bugs.launchpad.net/charm-nova-compute-proxy/+bug/1641464) with the way the openstack and neutron services are enabled and (re)started with systemctl - the workaround at time of writing is to ssh into the z/KVM instance and kill the hung systemctl process, then manually enable and restart the openstack and neutron services.
