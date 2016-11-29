@@ -59,27 +59,14 @@ one would follow to set up any MAAS.
 Juju needs to be configured to utilize the MAAS cluster.  See
 [https://jujucharms.com/docs/stable/clouds-maas](https://jujucharms.com/docs/stable/clouds-maas) for more info.
 
-## Deploying and configuring
+## Deploy and Configure
   * The following script will deploy, wait for status to settle and then configure. 
     Review, adjust if necessary, and run:
 
     ```sh
     ./tools/1-deploy/zkvm-deploy.sh
     ```
-
-## Post-Deploy Configuration
-  * After confirming Juju status for all units is reported as Ready, configure
-    the deployed cloud with tenants, images, networks, and such.
-
-    ```sh
-    cd ../tools/2-configure
-    ./configure
-    ```
-
-## Post-Deploy Configuration
-
-* TODO: add post-deploy config section
-
+    
 ## Testing
 
 * TODO: add testing section
