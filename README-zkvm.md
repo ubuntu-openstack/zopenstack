@@ -76,4 +76,4 @@ Juju needs to be configured to utilize the MAAS cluster.  See
 
 ## Known Issues
 
-There is a bug (https://bugs.launchpad.net/charm-nova-compute-proxy/+bug/1641464) with the way the openstack and neutron services are enabled and (re)started with systemctl - the workaround at time of writing is to ssh into the z/KVM instance and kill the hung systemctl process, then manually enable and restart the openstack and neutron services.
+There is a bug (https://bugs.launchpad.net/charm-nova-compute-proxy/+bug/1641464) related to the systemd timeout for the openstack-nova-compute service in combination with the way the openstack and neutron services are enabled and (re)started with systemctl - the workaround at time of writing is to ssh into the z/KVM instance and kill the hung systemctl process, then manually enable and restart the openstack and neutron services. Another slightly more simple workaround is to modify the systemd service file for openstack-nova-compute and set the start timeout to something between 30 and 60 seconds.
