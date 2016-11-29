@@ -45,6 +45,9 @@ for the user specified in the bundle configuration)
 2. Ensure that the nova-compute-proxy charm config values for the z/KVM IP addresses
 are accurate in the xenial-mitaka-2-machine-control-plane-next.yaml file.
 
+3. Set remote-repos to the ftp location for the openstack packages repo, e.g.
+ftp://anonymous:me@10.10.10.10/zKVM/1.1.3/MAIN/openstack/mitaka/
+
 
 ### x86 Machine Prep
 
