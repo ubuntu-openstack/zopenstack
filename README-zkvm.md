@@ -52,7 +52,7 @@ ftp://anonymous:me@10.10.10.10/zKVM/1.1.3/MAIN/openstack/mitaka/
 ### x86 Machine Prep
 
 x86 machines need to be enlisted, commissioned and ready to deploy in MAAS.
-See [maas.io](maas.io) for more information.  Installation and configuration
+See [https://maas.io](maas.io) for more information.  Installation and configuration
 of MAAS is outside the scope of this document, as it is the same procedure as
 one would follow to set up any MAAS.
 
