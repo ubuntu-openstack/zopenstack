@@ -1,0 +1,156 @@
+jenkins@bastion-host:~/git/zopenstack$ tools/2-configure/tools/instance_launch.sh 2 xenial-s390x
+ + Keying nova and ~/testkey.pem...
+ + Grabbing 'private' network ID...
+ + Determining flavor to use...
+ + Nova booting 2 xenial-s390x instances as flavor m1.small...
+xenial-s390x180712 xenial-s390x 2384564d-a3b6-422e-a3b0-34c9ae6763be
+WARNING: Option "--key_name" is deprecated; use "--key-name"; this option will be removed in novaclient 3.3.0.
++--------------------------------------+-----------------------------------------------------+
+| Property                             | Value                                               |
++--------------------------------------+-----------------------------------------------------+
+| OS-DCF:diskConfig                    | MANUAL                                              |
+| OS-EXT-AZ:availability_zone          |                                                     |
+| OS-EXT-SRV-ATTR:host                 | -                                                   |
+| OS-EXT-SRV-ATTR:hypervisor_hostname  | -                                                   |
+| OS-EXT-SRV-ATTR:instance_name        | instance-00000001                                   |
+| OS-EXT-STS:power_state               | 0                                                   |
+| OS-EXT-STS:task_state                | scheduling                                          |
+| OS-EXT-STS:vm_state                  | building                                            |
+| OS-SRV-USG:launched_at               | -                                                   |
+| OS-SRV-USG:terminated_at             | -                                                   |
+| accessIPv4                           |                                                     |
+| accessIPv6                           |                                                     |
+| config_drive                         |                                                     |
+| created                              | 2016-11-29T18:07:18Z                                |
+| flavor                               | m1.small (2)                                        |
+| hostId                               |                                                     |
+| id                                   | 74aac53f-9cbe-49ce-99e0-45b69586b223                |
+| image                                | xenial-s390x (5f545950-442b-469a-99e4-3b75d27d487d) |
+| key_name                             | testkey                                             |
+| metadata                             | {}                                                  |
+| name                                 | xenial-s390x180712                                  |
+| os-extended-volumes:volumes_attached | []                                                  |
+| progress                             | 0                                                   |
+| security_groups                      | default                                             |
+| status                               | BUILD                                               |
+| tenant_id                            | 5bb88242d7ce4528b2d0add840f3f7e5                    |
+| updated                              | 2016-11-29T18:07:18Z                                |
+| user_id                              | 7f08c26bd8504ca79a4a94333dca77da                    |
++--------------------------------------+-----------------------------------------------------+
+xenial-s390x180719 xenial-s390x 2384564d-a3b6-422e-a3b0-34c9ae6763be
+WARNING: Option "--key_name" is deprecated; use "--key-name"; this option will be removed in novaclient 3.3.0.
++--------------------------------------+-----------------------------------------------------+
+| Property                             | Value                                               |
++--------------------------------------+-----------------------------------------------------+
+| OS-DCF:diskConfig                    | MANUAL                                              |
+| OS-EXT-AZ:availability_zone          |                                                     |
+| OS-EXT-SRV-ATTR:host                 | -                                                   |
+| OS-EXT-SRV-ATTR:hypervisor_hostname  | -                                                   |
+| OS-EXT-SRV-ATTR:instance_name        | instance-00000002                                   |
+| OS-EXT-STS:power_state               | 0                                                   |
+| OS-EXT-STS:task_state                | scheduling                                          |
+| OS-EXT-STS:vm_state                  | building                                            |
+| OS-SRV-USG:launched_at               | -                                                   |
+| OS-SRV-USG:terminated_at             | -                                                   |
+| accessIPv4                           |                                                     |
+| accessIPv6                           |                                                     |
+| config_drive                         |                                                     |
+| created                              | 2016-11-29T18:07:24Z                                |
+| flavor                               | m1.small (2)                                        |
+| hostId                               |                                                     |
+| id                                   | f87cd895-0d98-4543-87a9-2c066f4100ec                |
+| image                                | xenial-s390x (5f545950-442b-469a-99e4-3b75d27d487d) |
+| key_name                             | testkey                                             |
+| metadata                             | {}                                                  |
+| name                                 | xenial-s390x180719                                  |
+| os-extended-volumes:volumes_attached | []                                                  |
+| progress                             | 0                                                   |
+| security_groups                      | default                                             |
+| status                               | BUILD                                               |
+| tenant_id                            | 5bb88242d7ce4528b2d0add840f3f7e5                    |
+| updated                              | 2016-11-29T18:07:24Z                                |
+| user_id                              | 7f08c26bd8504ca79a4a94333dca77da                    |
++--------------------------------------+-----------------------------------------------------+
+ + Hint:  use ssh -i ~/testkey.pem ubuntu@<ip> to access new instances (may also need a floating IP).
+jenkins@bastion-host:~/git/zopenstack$ tools/float_all.sh 
+ + Floating all instances.
+ + Creating 2 more floating IPs.
++--------------------------------------+--------------+-----------+----------+---------+
+| Id                                   | IP           | Server Id | Fixed IP | Pool    |
++--------------------------------------+--------------+-----------+----------+---------+
+| 22ea216a-7bdb-40d8-8b42-a5eda38caea7 | 10.0.0.1     | -         | -        | ext_net |
++--------------------------------------+--------------+-----------+----------+---------+
++--------------------------------------+--------------+-----------+----------+---------+
+| Id                                   | IP           | Server Id | Fixed IP | Pool    |
++--------------------------------------+--------------+-----------+----------+---------+
+| 2751e86d-cafa-4ef9-9f9d-23060aaeeb03 | 10.0.0.2     | -         | -        | ext_net |
++--------------------------------------+--------------+-----------+----------+---------+
+ + Associating floating IP 10.0.0.1 to instance 74aac53f-9cbe-49ce-99e0-45b69586b223.
+ + Associating floating IP 10.0.0.2 to instance f87cd895-0d98-4543-87a9-2c066f4100ec.
++--------------------------------------+--------------------+--------+------------+-------------+----------------------------------+
+| ID                                   | Name               | Status | Task State | Power State | Networks                         |
++--------------------------------------+--------------------+--------+------------+-------------+----------------------------------+
+| 74aac53f-9cbe-49ce-99e0-45b69586b223 | xenial-s390x180712 | ACTIVE | -          | Running     | private=172.16.0.3, 10.0.0.1     |
+| f87cd895-0d98-4543-87a9-2c066f4100ec | xenial-s390x180719 | ACTIVE | -          | Running     | private=172.16.0.4, 10.0.0.2     |
++--------------------------------------+--------------------+--------+------------+-------------+----------------------------------+
+
+jenkins@bastion-host:~/git/zopenstack$ ssh -i ~/testkey.pem ubuntu@10.0.0.1
+The authenticity of host '10.0.0.1 (10.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:cctU71uu91l+CFRxLAZzWOfd8dUoqxpfhZQm0g4gfsw.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '10.0.0.1' (ECDSA) to the list of known hosts.
+Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-38-generic s390x)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+0 packages can be updated.
+0 updates are security updates.
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+ubuntu@xenial-s390x180712:~$ logout
+Connection to 10.0.0.1 closed.
+jenkins@bastion-host:~/git/zopenstack$ ssh -i ~/testkey.pem ubuntu@10.0.0.2
+The authenticity of host '10.0.0.2 (10.0.0.2)' can't be established.
+ECDSA key fingerprint is SHA256:V7hA0sNmDfWKT85nlrGVk9FavKnTl8KoI4Zlvrx9PcM.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '10.0.0.2' (ECDSA) to the list of known hosts.
+Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-38-generic s390x)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+0 packages can be updated.
+0 updates are security updates.
+
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+ubuntu@xenial-s390x180719:~$ 

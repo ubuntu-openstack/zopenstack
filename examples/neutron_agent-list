@@ -1,0 +1,14 @@
+neutron agent-list
++--------------------------------------+--------------------+------------+-------------------+-------+----------------+---------------------------+
+| id                                   | agent_type         | host       | availability_zone | alive | admin_state_up | binary                    |
++--------------------------------------+--------------------+------------+-------------------+-------+----------------+---------------------------+
+| 51df3ee9-a5e8-429b-931d-a8cccfde9dae | Open vSwitch agent | shady-wave |                   | :-)   | True           | neutron-openvswitch-agent |
+| 648aac04-1fa2-498c-b364-7027b3b4a9fa | Loadbalancer agent | shady-wave |                   | :-)   | True           | neutron-lbaas-agent       |
+| 7f40a6e9-962e-45b9-9f38-9cb795a26875 | Open vSwitch agent | s4lp3      |                   | :-)   | True           | neutron-openvswitch-agent |
+| 9fe75f3f-cd48-4f64-b161-86a917bcd5d3 | DHCP agent         | shady-wave | nova              | :-)   | True           | neutron-dhcp-agent        |
+| b8ec6ccd-65b3-4f77-9980-8cb03d7cadc2 | L3 agent           | shady-wave | nova              | :-)   | True           | neutron-l3-agent          |
+| c9723b65-71f4-45db-b94b-cccce9e7edc9 | Metering agent     | shady-wave |                   | :-)   | True           | neutron-metering-agent    |
+| cf6853be-d61c-4615-b12c-4db90219fdf7 | Metadata agent     | shady-wave |                   | :-)   | True           | neutron-metadata-agent    |
+| f488b741-491c-48e7-a331-17467f4339cf | Open vSwitch agent | s4lp4      |                   | :-)   | True           | neutron-openvswitch-agent |
++--------------------------------------+--------------------+------------+-------------------+-------+----------------+---------------------------+
+
