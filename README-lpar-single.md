@@ -24,8 +24,12 @@ This repo contains some [example artifacts](misc/example-newton-single-lpar) fro
 `ERROR nova ValueError: Invalid InitiatorConnector protocol specified ISCSI`
 
 Nova and os-brick have known issues with s390x architectures in Newton as of this 
-writing.  Fixes were committed to master in those projects, November 2016.  These 
-fixes will need to be backported to Newton in order to provide out-of-the-box functionality.
+writing.  [Fixes](https://bugs.launchpad.net/nova/+bug/1639239/comments/11) were 
+committed to master in those projects, November 2016.  These fixes will need to 
+be backported to Newton in order to provide out-of-the-box functionality.
+
+Interested parties should track the status of Ubuntu Cloud Archive targets
+in the [bug](https://bugs.launchpad.net/nova/+bug/1639239).
 
 Until that lands, for dev/test scenarios, one can use this workaround on the nova-compute Juju unit after it is initially deployed and before it is attempted to be used.
 
