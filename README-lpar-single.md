@@ -61,7 +61,7 @@ Until that lands, for dev/test scenarios, one can use this workaround on the nov
     ```
 
 
-4. From within the nova-compute/0 unit, apply the patch and restart the service as follows:
+4. From the nova-compute/0 unit, apply the patch and restart the service as follows:
     ```
     sudo patch --verbose -Nb /usr/lib/python2.7/dist-packages/nova/virt/libvirt/driver.py < rough.patch
     sudo rm -fv /usr/lib/python2.7/dist-packages/nova/virt/libvirt/*pyc
