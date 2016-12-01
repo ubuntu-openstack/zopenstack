@@ -67,4 +67,4 @@ Until that lands, for dev/test scenarios, one can use this workaround on the nov
     sudo rm -fv /usr/lib/python2.7/dist-packages/nova/virt/libvirt/*pyc
     sudo service nova-compute restart 
     ```
-5. Finally, continue with the remainder of the OpenStack-on-LXD procedure.
+5. Finally, continue with the remainder of the [OpenStack-on-LXD procedure](http://docs.openstack.org/developer/charm-guide/openstack-on-lxd.html).
