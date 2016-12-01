@@ -1,0 +1,147 @@
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> uname -a
+Linux 10-13-3-10 4.4.0-51-generic #72-Ubuntu SMP Thu Nov 24 18:29:36 UTC 2016 s390x s390x s390x GNU/Linux
+
+
+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> lxc list
++----------------+---------+-------------------+------+------------+-----------+
+|      NAME      |  STATE  |       IPV4        | IPV6 |    TYPE    | SNAPSHOTS |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-0  | RUNNING | 10.0.8.93 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-1  | RUNNING | 10.0.8.11 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-10 | RUNNING | 10.0.8.71 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-11 | RUNNING | 10.0.8.39 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-12 | RUNNING | 10.0.8.166 (eth0) |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-2  | RUNNING | 10.0.8.146 (eth0) |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-3  | RUNNING | 10.0.8.56 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-4  | RUNNING | 10.0.8.29 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-5  | RUNNING | 10.0.8.14 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-6  | RUNNING | 10.0.8.90 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-7  | RUNNING | 10.0.8.114 (eth0) |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-8  | RUNNING | 10.0.8.141 (eth0) |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-43eb11-9  | RUNNING | 10.0.8.169 (eth0) |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+| juju-6939f6-0  | RUNNING | 10.0.8.65 (eth0)  |      | PERSISTENT | 0         |
++----------------+---------+-------------------+------+------------+-----------+
+
+
+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> sudo zfs list
+NAME                                                                            USED  AVAIL  REFER  MOUNTPOINT
+pool0                                                                          20.7G  59.2G    96K  none
+pool0/containers                                                               19.2G  59.2G    96K  none
+pool0/containers/juju-43eb11-0                                                 2.14G  59.2G  2.72G  /var/lib/lxd/containers/juju-43eb11-0.zfs
+pool0/containers/juju-43eb11-1                                                 2.14G  59.2G  2.72G  /var/lib/lxd/containers/juju-43eb11-1.zfs
+pool0/containers/juju-43eb11-10                                                 976M  59.2G  1.53G  /var/lib/lxd/containers/juju-43eb11-10.zfs
+pool0/containers/juju-43eb11-11                                                2.10G  59.2G  2.68G  /var/lib/lxd/containers/juju-43eb11-11.zfs
+pool0/containers/juju-43eb11-12                                                 754M  59.2G  1.31G  /var/lib/lxd/containers/juju-43eb11-12.zfs
+pool0/containers/juju-43eb11-2                                                 2.14G  59.2G  2.72G  /var/lib/lxd/containers/juju-43eb11-2.zfs
+pool0/containers/juju-43eb11-3                                                  862M  59.2G  1.42G  /var/lib/lxd/containers/juju-43eb11-3.zfs
+pool0/containers/juju-43eb11-4                                                 1.03G  59.2G  1.60G  /var/lib/lxd/containers/juju-43eb11-4.zfs
+pool0/containers/juju-43eb11-5                                                 1019M  59.2G  1.57G  /var/lib/lxd/containers/juju-43eb11-5.zfs
+pool0/containers/juju-43eb11-6                                                  883M  59.2G  1.44G  /var/lib/lxd/containers/juju-43eb11-6.zfs
+pool0/containers/juju-43eb11-7                                                 1.22G  59.2G  1.80G  /var/lib/lxd/containers/juju-43eb11-7.zfs
+pool0/containers/juju-43eb11-8                                                  942M  59.2G  1.49G  /var/lib/lxd/containers/juju-43eb11-8.zfs
+pool0/containers/juju-43eb11-9                                                 1.03G  59.2G  1.61G  /var/lib/lxd/containers/juju-43eb11-9.zfs
+pool0/containers/juju-6939f6-0                                                 2.06G  59.2G  2.63G  /var/lib/lxd/containers/juju-6939f6-0.zfs
+pool0/images                                                                   1.47G  59.2G    96K  none
+pool0/images/02f68ff7f9f9866710077a502adb931534cda06835463f63677a904a9b832f9f   753M  59.2G   753M  /var/lib/lxd/images/02f68ff7f9f9866710077a502adb931534cda06835463f63677a904a9b832f9f.zfs
+pool0/images/0b68aec67923edf69c007a8996b8f990841b961d320341fda8d44b568b7ab908   753M  59.2G   753M  /var/lib/lxd/images/0b68aec67923edf69c007a8996b8f990841b961d320341fda8d44b568b7ab908.zfs
+
+
+
+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> sudo zpool iostat -v
+               capacity     operations    bandwidth
+pool        alloc   free   read  write   read  write
+----------  -----  -----  -----  -----  -----  -----
+pool0       20.7G  61.8G  1.01K    174  92.5M  5.48M
+  dasda     5.81G  14.8G    270     52  22.8M  1.61M
+  dasdb     10.2G  31.0G    471     69  44.6M  2.45M
+  dasdc     4.68G  15.9G    295     52  25.2M  1.42M
+----------  -----  -----  -----  -----  -----  -----
+
+
+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> sudo zpool iostat -v
+               capacity     operations    bandwidth
+pool        alloc   free   read  write   read  write
+----------  -----  -----  -----  -----  -----  -----
+pool0       20.7G  61.8G  1.01K    174  92.5M  5.48M
+  dasda     5.81G  14.8G    270     52  22.8M  1.61M
+  dasdb     10.2G  31.0G    471     69  44.6M  2.45M
+  dasdc     4.68G  15.9G    295     52  25.2M  1.42M
+----------  -----  -----  -----  -----  -----  -----
+
+
+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> sudo zpool status
+  pool: pool0
+ state: ONLINE
+  scan: none requested
+config:
+
+        NAME        STATE     READ WRITE CKSUM
+        pool0       ONLINE       0     0     0
+          dasda     ONLINE       0     0     0
+          dasdb     ONLINE       0     0     0
+          dasdc     ONLINE       0     0     0
+
+errors: No known data errors
+
+
+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> lsblk
+NAME     MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+dasda     94:0    0 20.6G  0 disk 
+dasdb     94:4    0 41.3G  0 disk 
+dasdc     94:8    0 20.6G  0 disk 
+dasdd     94:12   0 41.3G  0 disk 
+|-dasdd1  94:13   0 37.5G  0 part /
+`-dasdd2  94:14   0  3.8G  0 part [SWAP]
+
+
+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> df -h
+Filesystem                       Size  Used Avail Use% Mounted on
+udev                              16G     0   16G   0% /dev
+tmpfs                            3.2G  673M  2.5G  22% /run
+/dev/dasdd1                       37G  2.4G   33G   7% /
+tmpfs                             16G   96K   16G   1% /dev/shm
+tmpfs                            5.0M     0  5.0M   0% /run/lock
+tmpfs                             16G     0   16G   0% /sys/fs/cgroup
+tmpfs                            3.2G     0  3.2G   0% /run/user/1000
+pool0/containers/juju-6939f6-0    62G  2.7G   60G   5% /var/lib/lxd/containers/juju-6939f6-0.zfs
+pool0/containers/juju-43eb11-0    62G  2.8G   60G   5% /var/lib/lxd/containers/juju-43eb11-0.zfs
+pool0/containers/juju-43eb11-1    62G  2.8G   60G   5% /var/lib/lxd/containers/juju-43eb11-1.zfs
+pool0/containers/juju-43eb11-2    62G  2.8G   60G   5% /var/lib/lxd/containers/juju-43eb11-2.zfs
+pool0/containers/juju-43eb11-3    61G  1.5G   60G   3% /var/lib/lxd/containers/juju-43eb11-3.zfs
+pool0/containers/juju-43eb11-6    61G  1.5G   60G   3% /var/lib/lxd/containers/juju-43eb11-6.zfs
+pool0/containers/juju-43eb11-4    61G  1.7G   60G   3% /var/lib/lxd/containers/juju-43eb11-4.zfs
+pool0/containers/juju-43eb11-5    61G  1.6G   60G   3% /var/lib/lxd/containers/juju-43eb11-5.zfs
+pool0/containers/juju-43eb11-7    62G  1.8G   60G   3% /var/lib/lxd/containers/juju-43eb11-7.zfs
+pool0/containers/juju-43eb11-11   62G  2.7G   60G   5% /var/lib/lxd/containers/juju-43eb11-11.zfs
+pool0/containers/juju-43eb11-12   61G  1.4G   60G   3% /var/lib/lxd/containers/juju-43eb11-12.zfs
+pool0/containers/juju-43eb11-8    61G  1.5G   60G   3% /var/lib/lxd/containers/juju-43eb11-8.zfs
+pool0/containers/juju-43eb11-9    61G  1.7G   60G   3% /var/lib/lxd/containers/juju-43eb11-9.zfs
+pool0/containers/juju-43eb11-10   61G  1.6G   60G   3% /var/lib/lxd/containers/juju-43eb11-10.zfs
+
+
+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/example-newton-single-lpar> free -m
+              total        used        free      shared  buff/cache   available
+Mem:          32027       26967         323         524        4736        2341
+Swap:          3907        1643        2263
+

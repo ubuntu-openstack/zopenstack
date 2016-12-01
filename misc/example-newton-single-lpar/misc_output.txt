@@ -1,0 +1,153 @@
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack service list
+o+----------------------------------+----------+--------------+
+| ID                               | Name     | Type         |
++----------------------------------+----------+--------------+
+| 245d48cd61734bef8c8db32af988f763 | swift    | object-store |
+| 48f88040f21941c6aea0dc6f68bb722d | nova     | compute      |
+| 6506aebbcd4e47969251facf361707cd | keystone | identity     |
+| 7d9a123831df48e492089107b9b72f9e | cinderv2 | volumev2     |
+| a6adaeededb143078e68ca47f4570f4e | neutron  | network      |
+| c3ed1d845770478c9e6dc9b81740cf07 | cinder   | volume       |
+| e08318620c6f4662982b7b2ed3d666b2 | glance   | image        |
++----------------------------------+----------+--------------+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack hypervisor list
++----+---------------------+
+| ID | Hypervisor Hostname |
++----+---------------------+
+|  1 | juju-43eb11-11.lxd  |
++----+---------------------+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack hypervisor show 1
++----------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+| Field                | Value                                                                                                                                 |
++----------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+| aggregates           | []                                                                                                                                    |
+| cpu_info             | {"vendor": null, "model": "host", "arch": "s390x", "features": [], "topology": {"cores": 24, "cells": 1, "threads": 1, "sockets": 1}} |
+| current_workload     | 0                                                                                                                                     |
+| disk_available_least | -1                                                                                                                                    |
+| free_disk_gb         | 1                                                                                                                                     |
+| free_ram_mb          | 30491                                                                                                                                 |
+| host_ip              | 10.0.8.39                                                                                                                             |
+| host_time            |  00:31:09                                                                                                                             |
+| hypervisor_hostname  | juju-43eb11-11.lxd                                                                                                                    |
+| hypervisor_type      | QEMU                                                                                                                                  |
+| hypervisor_version   | 2005000                                                                                                                               |
+| id                   | 1                                                                                                                                     |
+| load_average         | 7.88, 6.27, 6.41                                                                                                                      |
+| local_gb             | 61                                                                                                                                    |
+| local_gb_used        | 60                                                                                                                                    |
+| memory_mb            | 32027                                                                                                                                 |
+| memory_mb_used       | 1536                                                                                                                                  |
+| running_vms          | 1                                                                                                                                     |
+| service_host         | juju-43eb11-11                                                                                                                        |
+| service_id           | 16                                                                                                                                    |
+| state                | up                                                                                                                                    |
+| status               | enabled                                                                                                                               |
+| uptime               | 10 min                                                                                                                                |
+| users                | 2                                                                                                                                     |
+| vcpus                | 24                                                                                                                                    |
+| vcpus_used           | 1                                                                                                                                     |
++----------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack image list
++--------------------------------------+--------+--------+
+| ID                                   | Name   | Status |
++--------------------------------------+--------+--------+
+| 2bf23a3c-ab76-4a45-87d0-d30123c05a02 | xenial | active |
++--------------------------------------+--------+--------+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> 
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack server list
++--------------------------------------+----------------------------+--------+-----------------------+
+| ID                                   | Name                       | Status | Networks              |
++--------------------------------------+----------------------------+--------+-----------------------+
+| a284d8fa-cf18-42b8-a3c3-0cbf4188135e | openstack-on-lxd-s390x-ftw | ACTIVE | internal=192.168.20.5 |
++--------------------------------------+----------------------------+--------+-----------------------+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack flavor list
++--------------------------------------+-----------+-------+------+-----------+-------+-----------+
+| ID                                   | Name      |   RAM | Disk | Ephemeral | VCPUs | Is Public |
++--------------------------------------+-----------+-------+------+-----------+-------+-----------+
+| 172fd3bd-8c3f-4a8c-8d84-a6619d600e4a | m1.xlarge | 16384 |   80 |        40 |     8 | True      |
+| 193ef38a-08d9-4a4c-bb7e-354e175a5a83 | m1.tiny   |   512 |    1 |         0 |     1 | True      |
+| 8870a6c6-5816-47c7-acf6-c656bd6b5507 | m1.medium |  2048 |   40 |        40 |     2 | True      |
+| da65fe25-dc31-4698-a72a-2490d0fcbceb | m1.large  |  8192 |   40 |        40 |     4 | True      |
+| e6b172e7-6984-4fc8-abe7-8ff4db41ab97 | m1.small  |  1024 |   20 |        40 |     1 | True      |
++--------------------------------------+-----------+-------+------+-----------+-------+-----------+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack server list
++--------------------------------------+----------------------------+--------+-----------------------+
+| ID                                   | Name                       | Status | Networks              |
++--------------------------------------+----------------------------+--------+-----------------------+
+| a284d8fa-cf18-42b8-a3c3-0cbf4188135e | openstack-on-lxd-s390x-ftw | ACTIVE | internal=192.168.20.5 |
++--------------------------------------+----------------------------+--------+-----------------------+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack server show a284d8fa-cf18-42b8-a3c3-0cbf4188135e
++--------------------------------------+----------------------------------------------------------+
+| Field                                | Value                                                    |
++--------------------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig                    | MANUAL                                                   |
+| OS-EXT-AZ:availability_zone          | nova                                                     |
+| OS-EXT-SRV-ATTR:host                 | juju-43eb11-11                                           |
+| OS-EXT-SRV-ATTR:hypervisor_hostname  | juju-43eb11-11.lxd                                       |
+| OS-EXT-SRV-ATTR:instance_name        | instance-00000001                                        |
+| OS-EXT-STS:power_state               | 1                                                        |
+| OS-EXT-STS:task_state                | None                                                     |
+| OS-EXT-STS:vm_state                  | active                                                   |
+| OS-SRV-USG:launched_at               | 2016-12-01T00:17:26.000000                               |
+| OS-SRV-USG:terminated_at             | None                                                     |
+| accessIPv4                           |                                                          |
+| accessIPv6                           |                                                          |
+| addresses                            | internal=192.168.20.5                                    |
+| config_drive                         |                                                          |
+| created                              | 2016-12-01T00:16:45Z                                     |
+| flavor                               | m1.small (e6b172e7-6984-4fc8-abe7-8ff4db41ab97)          |
+| hostId                               | eca5e24725fc8ca143154ac2d71ec0a679acfe51031e42a1adb5aeb1 |
+| id                                   | a284d8fa-cf18-42b8-a3c3-0cbf4188135e                     |
+| image                                | xenial (2bf23a3c-ab76-4a45-87d0-d30123c05a02)            |
+| key_name                             | mykey                                                    |
+| name                                 | openstack-on-lxd-s390x-ftw                               |
+| os-extended-volumes:volumes_attached | []                                                       |
+| progress                             | 0                                                        |
+| project_id                           | 527bd113ef24486ca1705056ee2e5e21                         |
+| properties                           |                                                          |
+| security_groups                      | [{u'name': u'default'}]                                  |
+| status                               | ACTIVE                                                   |
+| updated                              | 2016-12-01T00:17:26Z                                     |
+| user_id                              | b665ddd7ef5a44ffa1c4bfb7b0b41e2f                         |
++--------------------------------------+----------------------------------------------------------+
+ubuntu@10-13-3-10:~/tools/zopenstack/misc/examples-newton-lpar> openstack catalog list
++----------+--------------+--------------------------------------------------------------------------+
+| Name     | Type         | Endpoints                                                                |
++----------+--------------+--------------------------------------------------------------------------+
+| nova     | compute      | RegionOne                                                                |
+|          |              |   publicURL: http://10.0.8.71:8774/v2/527bd113ef24486ca1705056ee2e5e21   |
+|          |              |   internalURL: http://10.0.8.71:8774/v2/527bd113ef24486ca1705056ee2e5e21 |
+|          |              |   adminURL: http://10.0.8.71:8774/v2/527bd113ef24486ca1705056ee2e5e21    |
+|          |              |                                                                          |
+| neutron  | network      | RegionOne                                                                |
+|          |              |   publicURL: http://10.0.8.141:9696                                      |
+|          |              |   internalURL: http://10.0.8.141:9696                                    |
+|          |              |   adminURL: http://10.0.8.141:9696                                       |
+|          |              |                                                                          |
+| cinderv2 | volumev2     | RegionOne                                                                |
+|          |              |   publicURL: http://10.0.8.29:8776/v2/527bd113ef24486ca1705056ee2e5e21   |
+|          |              |   internalURL: http://10.0.8.29:8776/v2/527bd113ef24486ca1705056ee2e5e21 |
+|          |              |   adminURL: http://10.0.8.29:8776/v2/527bd113ef24486ca1705056ee2e5e21    |
+|          |              |                                                                          |
+| glance   | image        | RegionOne                                                                |
+|          |              |   publicURL: http://10.0.8.14:9292                                       |
+|          |              |   internalURL: http://10.0.8.14:9292                                     |
+|          |              |   adminURL: http://10.0.8.14:9292                                        |
+|          |              |                                                                          |
+| cinder   | volume       | RegionOne                                                                |
+|          |              |   publicURL: http://10.0.8.29:8776/v1/527bd113ef24486ca1705056ee2e5e21   |
+|          |              |   internalURL: http://10.0.8.29:8776/v1/527bd113ef24486ca1705056ee2e5e21 |
+|          |              |   adminURL: http://10.0.8.29:8776/v1/527bd113ef24486ca1705056ee2e5e21    |
+|          |              |                                                                          |
+| swift    | object-store | RegionOne                                                                |
+|          |              |   publicURL: http://10.0.8.56:80/swift/v1                                |
+|          |              |   internalURL: http://10.0.8.56:80/swift/v1                              |
+|          |              |   adminURL: http://10.0.8.56:80/swift                                    |
+|          |              |                                                                          |
+| keystone | identity     | RegionOne                                                                |
+|          |              |   publicURL: http://10.0.8.90:5000/v2.0                                  |
+|          |              |   internalURL: http://10.0.8.90:5000/v2.0                                |
+|          |              |   adminURL: http://10.0.8.90:35357/v2.0                                  |
+|          |              |                                                                          |
++----------+--------------+--------------------------------------------------------------------------+
+
