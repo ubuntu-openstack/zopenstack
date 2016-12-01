@@ -1,0 +1,96 @@
+Model   Controller  Cloud/Region         Version
+newton  lxd         localhost/localhost  2.0.2.1
+
+App                    Version      Status  Scale  Charm                  Store       Rev  OS      Notes
+ceph                   10.2.3       active      3  ceph                   jujucharms  269  ubuntu  
+ceph-radosgw           10.2.3       active      1  ceph-radosgw           jujucharms  245  ubuntu  
+cinder                 9.0.0        active      1  cinder                 jujucharms  257  ubuntu  
+cinder-ceph            9.0.0        active      1  cinder-ceph            jujucharms  221  ubuntu  
+glance                 13.0.0       active      1  glance                 jujucharms  253  ubuntu  
+keystone               10.0.0       active      1  keystone               jujucharms  258  ubuntu  
+mysql                  5.6.21-25.8  active      1  percona-cluster        jujucharms  247  ubuntu  
+neutron-api            9.0.0        active      1  neutron-api            jujucharms  246  ubuntu  
+neutron-gateway        9.0.0        active      1  neutron-gateway        jujucharms  232  ubuntu  
+neutron-openvswitch    9.0.0        active      1  neutron-openvswitch    jujucharms  238  ubuntu  
+nova-cloud-controller  14.0.1       active      1  nova-cloud-controller  jujucharms  292  ubuntu  
+nova-compute           14.0.1       active      1  nova-compute           jujucharms  260  ubuntu  
+rabbitmq-server        3.5.7        active      1  rabbitmq-server        jujucharms   56  ubuntu  
+
+Unit                      Workload  Agent      Machine  Public address  Ports     Message
+ceph-radosgw/0*           active    idle       3        10.0.8.56       80/tcp    Unit is ready
+ceph/0*                   active    idle       0        10.0.8.93                 Unit is ready and clustered
+ceph/1                    active    idle       1        10.0.8.11                 Unit is ready and clustered
+ceph/2                    active    idle       2        10.0.8.146                Unit is ready and clustered
+cinder/0*                 active    idle       4        10.0.8.29       8776/tcp  Unit is ready
+  cinder-ceph/0*          active    idle                10.0.8.29                 Unit is ready
+glance/0*                 active    executing  5        10.0.8.14       9292/tcp  (update-status) Unit is ready
+keystone/0*               active    idle       6        10.0.8.90       5000/tcp  Unit is ready
+mysql/0*                  active    idle       7        10.0.8.114                Unit is ready
+neutron-api/0*            active    idle       8        10.0.8.141      9696/tcp  Unit is ready
+neutron-gateway/0*        active    idle       9        10.0.8.169                Unit is ready
+nova-cloud-controller/0*  active    idle       10       10.0.8.71       8774/tcp  Unit is ready
+nova-compute/0*           active    idle       11       10.0.8.39                 Unit is ready
+  neutron-openvswitch/0*  active    idle                10.0.8.39                 Unit is ready
+rabbitmq-server/0*        active    idle       12       10.0.8.166      5672/tcp  Unit is ready
+
+Machine  State    DNS         Inst id         Series  AZ
+0        started  10.0.8.93   juju-43eb11-0   xenial  
+1        started  10.0.8.11   juju-43eb11-1   xenial  
+2        started  10.0.8.146  juju-43eb11-2   xenial  
+3        started  10.0.8.56   juju-43eb11-3   xenial  
+4        started  10.0.8.29   juju-43eb11-4   xenial  
+5        started  10.0.8.14   juju-43eb11-5   xenial  
+6        started  10.0.8.90   juju-43eb11-6   xenial  
+7        started  10.0.8.114  juju-43eb11-7   xenial  
+8        started  10.0.8.141  juju-43eb11-8   xenial  
+9        started  10.0.8.169  juju-43eb11-9   xenial  
+10       started  10.0.8.71   juju-43eb11-10  xenial  
+11       started  10.0.8.39   juju-43eb11-11  xenial  
+12       started  10.0.8.166  juju-43eb11-12  xenial  
+
+Relation                 Provides               Consumes               Type
+mon                      ceph                   ceph                   peer
+mon                      ceph                   ceph-radosgw           regular
+ceph                     ceph                   cinder-ceph            regular
+ceph                     ceph                   glance                 regular
+ceph                     ceph                   nova-compute           regular
+cluster                  ceph-radosgw           ceph-radosgw           peer
+identity-service         ceph-radosgw           keystone               regular
+cluster                  cinder                 cinder                 peer
+storage-backend          cinder                 cinder-ceph            subordinate
+image-service            cinder                 glance                 regular
+identity-service         cinder                 keystone               regular
+shared-db                cinder                 mysql                  regular
+cinder-volume-service    cinder                 nova-cloud-controller  regular
+amqp                     cinder                 rabbitmq-server        regular
+cluster                  glance                 glance                 peer
+identity-service         glance                 keystone               regular
+shared-db                glance                 mysql                  regular
+image-service            glance                 nova-cloud-controller  regular
+image-service            glance                 nova-compute           regular
+amqp                     glance                 rabbitmq-server        regular
+cluster                  keystone               keystone               peer
+shared-db                keystone               mysql                  regular
+identity-service         keystone               neutron-api            regular
+identity-service         keystone               nova-cloud-controller  regular
+cluster                  mysql                  mysql                  peer
+shared-db                mysql                  neutron-api            regular
+shared-db                mysql                  nova-cloud-controller  regular
+cluster                  neutron-api            neutron-api            peer
+neutron-plugin-api       neutron-api            neutron-gateway        regular
+neutron-plugin-api       neutron-api            neutron-openvswitch    regular
+neutron-api              neutron-api            nova-cloud-controller  regular
+amqp                     neutron-api            rabbitmq-server        regular
+cluster                  neutron-gateway        neutron-gateway        peer
+quantum-network-service  neutron-gateway        nova-cloud-controller  regular
+amqp                     neutron-gateway        rabbitmq-server        regular
+neutron-plugin           neutron-openvswitch    nova-compute           regular
+amqp                     neutron-openvswitch    rabbitmq-server        regular
+cluster                  nova-cloud-controller  nova-cloud-controller  peer
+cloud-compute            nova-cloud-controller  nova-compute           regular
+amqp                     nova-cloud-controller  rabbitmq-server        regular
+neutron-plugin           nova-compute           neutron-openvswitch    subordinate
+compute-peer             nova-compute           nova-compute           peer
+amqp                     nova-compute           rabbitmq-server        regular
+cluster                  rabbitmq-server        rabbitmq-server        peer
+

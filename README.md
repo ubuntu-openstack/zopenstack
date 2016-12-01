@@ -19,7 +19,8 @@ prior to use.
 A single LPAR running Ubuntu Server natively, with OpenStack deployed via 
 Juju and the OpenStack Charms on the LXD provider.
 
- - [See: Charm Guide - OpenStack on LXD](http://docs.openstack.org/developer/charm-guide/openstack-on-lxd.html)
+ - [See: README-lpar-single.md](README-lpar-single.md)
+ - [See also: Charm Guide - OpenStack on LXD](http://docs.openstack.org/developer/charm-guide/openstack-on-lxd.html)
 
 #### Ubuntu Native Multi-LPAR
 Multiple LPARs running Ubuntu Server natively, with OpenStack deployed via 
