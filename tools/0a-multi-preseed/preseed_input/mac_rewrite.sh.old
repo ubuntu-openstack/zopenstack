@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Script to rewrite ether headers for macs to get lxc working on z
+#
+# Andrew McLeod 
+#
+ebtables -t nat --flush
+
+hostmac=`ip addr show enc180|grep ether|awk '{print $2}'`
+hostsnat=`ebtables -t nat -L --Lmac2|grep snat`
+
+if ! [[ ${hostsnat} == *${hostmac}* ]]
+then
+        ebtables -t nat -A POSTROUTING -o enc180.1295 -j snat --to-src ${hostmac} --snat-arp --snat-target ACCEPT
+fi
+
+for a in `lxc-ls` ;
+        do ip=`lxc-info -n ${a} -iH` ;
+        if [ ! ${ip} == '' ] ; then
+                ping -c 1 ${ip} > /dev/null ;
+                mac=`arp -a |grep ${ip} | awk '{print $4}'` ;
+                if ! [[ $(ebtables -t nat -Ln --Lmac2) == *${mac}* ]]
+                then
+                        ebtables -t nat -A PREROUTING -p IPv4 -i enc180.1295 --ip-dst ${ip} -j dnat --to-dst ${mac} --dnat-target ACCEPT ;
+                        ebtables -t nat -A PREROUTING -p ARP -i enc180.1295 --arp-ip-dst ${ip} -j dnat --to-dst ${mac} --dnat-target ACCEPT ;
+                fi
+        fi
+done
