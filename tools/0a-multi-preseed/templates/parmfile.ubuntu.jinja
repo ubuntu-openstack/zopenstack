@@ -1,0 +1,12 @@
+ro locale=en_US auto=true priority=critical apt-setup/proposed=true
+url={{ FTP_SERVER }}/{{ HOSTNAME }}/boot/preseed/preseed.cfg
+s390-netdevice/choose_networktype=qeth
+s390-netdevice/qeth/layer2=true s390-netdevice/qeth/port=0
+s390-netdevice/qeth/choose={{ OSA1_TRIPLET }}
+netcfg/get_ipaddress={{ OSA1_ADDRESS }} netcfg/get_netmask={{ OSA1_NETMASK }}
+netcfg/get_gateway={{ OSA1_GATEWAY }} netcfg/get_nameservers={{ OSA1_DNS }}
+netdevice/qeth/layer2=true netcfg/confirm_static=true
+netcfg/use_autoconfig=0 netcfg/disable_dhcp=true netcfg/vlan_id={{ OSA1_VLAN_ID }}
+hostname={{ HOSTNAME }} domain={{ DOMAIN }} network-console/start=note
+network-console/password=pass4inst
+network-console/password-again=pass4inst

@@ -1,0 +1,23 @@
+{
+	"ROOT_DEVNO": "REPLACE_ME_2_2",
+	"UBUNTU_PASSWD": "REPLACE_ME_2",
+	"FTP_SERVER": "REPLACE_ME_2",
+	"HOSTNAME": "REPLACE_ME_2",
+	"DOMAIN": "REPLACE_ME_2",
+	"OSA1_TRIPLET": "REPLACE_ME_2",
+	"OSA1_ADDRESS": "REPLACE_ME_2",
+	"OSA1_NETMASK": "REPLACE_ME_2",
+	"OSA1_GATEWAY": "REPLACE_ME_2",
+	"OSA1_DNS": "REPLACE_ME_2",
+	"OSA1_VLAN_ID": "REPLACE_ME_2",
+    "OSA2_DEVNO": "REPLACE_ME_2",
+    "OSA2_ENCNO": "REPLACE_ME_2",
+    "OSA2_ADDRESS": "REPLACE_ME_2",
+    "EXTRA_DASD_DEVNO": [ "DEV1",
+                          "DEV2",
+                          "DEV3" ],
+    "EXTRA_DASD_LABEL": [ "LABEL1",
+                          "LABEL2",
+                          "LABEL3" ],
+    "SSH_PUB_KEY": "REPLACE_ME_2"
+}
