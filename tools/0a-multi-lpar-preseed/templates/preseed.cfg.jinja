@@ -1,0 +1,134 @@
+# preseed debian installer script for ubuntu xenial 16.04 LPAR
+
+d-i debconf/priority string critical
+d-i auto-install/enable boolean true
+
+# not sure we want the proposed archive to be enabled...
+#d-i apt-setup/proposed boolean true
+d-i pkgsel/update-policy select none
+d-i pkgsel/include string lxc ebtables ssh-import-id
+
+# localization
+d-i debian-installer/language string en
+d-i debian-installer/country string US
+d-i debian-installer/locale string en_US.UTF-8
+
+# a touch of network config
+d-i netcfg/disable_autoconfig boolean true
+d-i netcfg/disable_dhcp boolean true
+
+# zfcp devices
+d-i s390-zfcp/no_zfcp_hosts note
+d-i s390-zfcp/select_zfcp_host string Finish
+
+# dasd
+d-i s390-dasd/dasd string {{ ROOT_DEVNO }}
+d-i s390-dasd/auto-format boolean true
+d-i s390-dasd/force-format boolean false
+ 
+# setup the root and swap partitions
+# note: there doesn't seem to be a way to partition multiple
+# disks so the others are done later inside the preseed
+# late_command string...
+d-i partman-md/device_remove_md boolean true
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-lvm/device_remove_lvm_span boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+
+d-i partman-auto/disk string /dev/disk/by-path/ccw-{{ ROOT_DEVNO }}
+d-i partman-auto/method string regular
+d-i partman-auto/expert_recipe string                         \
+     basic-boot ::                                            \
+              10240 40960 40960  ext4                         \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ / }                         \
+              .                                               \
+              2048 2048 2048    linux-swap                    \
+                      method{ swap } format{ }                \
+              .                                               \
+d-i partman-auto/choose_recipe select basic-boot
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+# network console password
+d-i network-console/password password pass4inst
+d-i network-console/password-again password pass4inst
+d-i network-console/start note
+
+# default user and password
+d-i passwd/user-fullname string ubuntu
+d-i passwd/username string ubuntu
+d-i passwd/user-password password {{ UBUNTU_PASSWD }}
+d-i passwd/user-password-again password {{ UBUNTU_PASSWD }}
+d-i user-setup/encrypt-home boolean false
+
+# timezone
+d-i clock-setup/utc boolean true
+d-i mirror/country string manual
+
+# installation source location
+d-i mirror/protocol string http
+d-i mirror/http/hostname string us.ports.ubuntu.com
+d-i mirror/http/directory string /
+d-i mirror/http/proxy string
+d-i mirror/suite string xenial
+
+# install stuff
+d-i live-installer/enable boolean false
+d-i tasksel/first multiselect standard system utilities, OpenSSH server, Basic Ubuntu server
+
+# late_commands
+# this is where the magic happens....
+d-i preseed/late_command string \
+# activate 2nd interface and set to layer 2 bridge
+in-target chzdev --no-root-update -pVe {{ OSA2_DEVNO }} bridge_role=primary; \
+in-target chzdev -p {{ OSA2_DEVNO }} layer2=1; \
+# configure 2nd interface for multiple vlans by stuffing the config manually
+# Note: the following is for POK Solution Test -- custom private networking
+#touch /target/etc/network/interfaces.d/private_int; \
+#echo -e "auto {{ OSA2_ENCNO }}" > /target/etc/network/interfaces.d/private_int; \
+#echo -e "iface {{ OSA2_ENCNO }} inet manual" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "auto {{ OSA2_ENCNO }}.1295" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "iface {{ OSA2_ENCNO }}.1295 inet static" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "        address {{ OSA2_ADDRESS }}" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "        netmask 255.255.255.0" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "        network 10.20.95.0" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "        broadcast 10.20.95.255" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "        vlan-raw-device {{ OSA2_ENCNO }}" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "        up ip route add 10.20.0.0/16 via 10.20.95.254 || true" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "auto {{ OSA2_ENCNO }}.1299" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "iface {{ OSA2_ENCNO }}.1299 inet manual" >> /target/etc/network/interfaces.d/private_int; \
+#echo -e "        vlan-raw-device {{ OSA2_ENCNO }}" >> /target/etc/network/interfaces.d/private_int; \
+# get the mac_rewrite.sh script from the ftp server
+in-target wget {{ FTP_SERVER }}/{{ HOSTNAME }}/mac_rewrite.sh -O /usr/local/bin/mac_rewrite.sh; \
+in-target chmod 755 /usr/local/bin/mac_rewrite.sh; \
+echo "* * * * * root /usr/local/bin/mac_rewrite.sh" >> /target/etc/crontab; \
+# get the ubuntu sudo perms file from the ftp server
+in-target wget {{ FTP_SERVER }}/{{ HOSTNAME }}/90-ubuntu -O /etc/sudoers.d/90-ubuntu; \
+in-target chmod 0440 /etc/sudoers.d/90-ubuntu; \
+# setup some ssh key access
+in-target mkdir /home/ubuntu/.ssh/; \
+echo -e "{{ SSH_PUB_KEY }}" >> /target/home/ubuntu/.ssh/authorized_keys; \
+in-target chown -R ubuntu:ubuntu /home/ubuntu/.ssh/; \{% for devno in EXTRA_DASD_DEVNO %}
+# activate disk {{ devno }}
+in-target chzdev --no-root-update -Ve {{ devno }}; \
+# format it
+echo "yes"|dasdfmt --label={{ EXTRA_DASD_LABEL[loop.index-1] }} -b 4096 -m 100 /dev/disk/by-path/ccw-{{ devno }}; \
+sleep 30; \
+# partition disk {{ devno }}
+fdasd /dev/disk/by-path/ccw-{{ devno }} -a -l {{ EXTRA_DASD_LABEL[loop.index-1] }}; \
+sleep 10; \
+# setup the file system, make the mount point, and setup fstab...
+mkfs.xfs -L {{ EXTRA_DASD_LABEL[loop.index-1] }} -f -b size=4096 /dev/disk/by-path/ccw-{{ devno }}-part1; \
+in-target mkdir /mnt/{{ EXTRA_DASD_LABEL[loop.index-1] }}; \
+echo -e "LABEL=\"{{ EXTRA_DASD_LABEL[loop.index-1] }}\"\t/mnt/{{ EXTRA_DASD_LABEL[loop.index-1] }}\txfs\tdefaults\t0\t0" >> /target/etc/fstab; \{% endfor %}
+# we're done!
+echo "exit 0" > /target/usr/lib/s390x-linux-gnu/lxc/lxc-net
+d-i finish-install/reboot_in_progress note
+
