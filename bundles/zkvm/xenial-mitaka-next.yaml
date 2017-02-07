@@ -1,9 +1,0 @@
-# A mixed-architecture deployment with the control plane and storage
-# services on x86, and multiple compute nodes on z/KVM, in line with
-# the OpenStack-Telemetry charm store bundle which uses the current
-# dev charm versions, aka the 'next charms'.
-#
-# This is a proof-of-concept test bundle, intended to be an example.
-# It is not highly-available, nor is it soak tested.
-# TODO: use 7 machines total, 6 for applications and services.  Use
-# ceph and swift.
