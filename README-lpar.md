@@ -1,4 +1,4 @@
-# Ubuntu Native LPAR Testing with Juju 1.25.x [stable]
+# Ubuntu Native LPAR Testing with Juju 1.25.x [stable] and 2.1-beta5 [dev]
 
 ## Preseeding
 
@@ -39,6 +39,8 @@ media" manually and the appropriate preseed selected
 
 ### Bootstrap juju environment
 
+#### juju 1.x
+
 To achieve this, you will need to use an existing LPAR or other machine which 
 has network connectivity to the LPARS. First, install juju (instructions?)
 
@@ -57,6 +59,26 @@ To bootstrap:
 juju switch manual
 juju bootstrap
 ~~~~
+
+#### juju 2.1
+
+At time of writing, latest dev version of juju is 2.1-beta5, which is required for this deployment to work. The easiest way to install this is with snapd:
+
+~~~~
+sudo apt-get install snapd
+sudo snapd install juju --devmode --edge
+~~~~
+
+To bootstrap:
+
+~~~~
+juju bootstrap manual/Bootstrap_host_IP controller_name --debug --verbose --constraints arch=architecture
+
+e.g.
+
+juju bootstrap manual/127.0.0.1 s390x --debug --verbose --constraints arch=s390x
+~~~~
+
 
 ### Add machines to juju
 
@@ -80,6 +102,7 @@ git checkout multi-lpar-native
 
 ### Deploy the openstack bundle
 
+Note: please ensure juju-deployer is version 0.9.2 or greater. 0.10 is available via pip at time of writing.
 ~~~~
 cd zopenstack
 juju-deployer -vdc bundles/lpar/xenial-mitaka-stable.yaml
