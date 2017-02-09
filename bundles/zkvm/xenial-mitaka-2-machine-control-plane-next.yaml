@@ -100,7 +100,7 @@ services:
       remote-repos: "ftp://"
       remote-key: |
         ----BEGIN RSA PRIVATE KEY-----
-	PRIVATE KEY DATA HERE .........
+        PRIVATE KEY DATA HERE .........
         -----END RSA PRIVATE KEY-----
       remote-hosts: "10.10.10.10 10.10.10.11"
       cpu-mode: "none"

@@ -33,3 +33,11 @@ z/KVM compute nodes deployed via Juju and a proxy charm, with amd64 control
 plane deployed via Juju and MAAS.
 
   - [See: README-zkvm.md](README-zkvm.md)
+
+#### Validating Bundle Yaml Files
+
+When adjusting bundles, be sure to check validity with the following:
+
+```
+tox -e lint
+```
