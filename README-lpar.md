@@ -1,4 +1,4 @@
-# Ubuntu Native LPAR Testing with Juju 1.25.x [stable] and 2.1-beta5 [dev]
+# Ubuntu Native LPAR Testing with Juju 1.25.x and 2.1.0
 
 ## Preseeding
 
@@ -60,13 +60,13 @@ juju switch manual
 juju bootstrap
 ~~~~
 
-#### juju 2.1
+#### juju 2.1.0
 
-At time of writing, latest dev version of juju is 2.1-beta5, which is required for this deployment to work. The easiest way to install this is with snapd:
+Currently, the easiest way to install juju 2.1.0 on z is with via a snap (at the time of writing, 2.1.0 is in the 'beta' channel', other versions can be installed by checking "snap info juju" and specifying the appropriate channel):
 
 ~~~~
 sudo apt-get install snapd
-sudo snapd install juju --devmode --edge
+sudo snapd install juju --devmode --beta
 ~~~~
 
 To bootstrap:
