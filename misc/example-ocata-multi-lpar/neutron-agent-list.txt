@@ -1,0 +1,14 @@
++--------------------------------------+----------------------+-------+-------------------+-------+----------------+---------------------------+
+| id                                   | agent_type           | host  | availability_zone | alive | admin_state_up | binary                    |
++--------------------------------------+----------------------+-------+-------------------+-------+----------------+---------------------------+
+| 15a3de78-b8db-485e-aac1-c4369b11b741 | Loadbalancerv2 agent | s4lpa |                   | :-)   | True           | neutron-lbaasv2-agent     |
+| 21b467a6-99a8-4df3-b84c-cf6398172220 | Metadata agent       | s4lpa |                   | :-)   | True           | neutron-metadata-agent    |
+| 2b15c338-798d-414c-b910-d8a0d3f23738 | Open vSwitch agent   | s4lpe |                   | :-)   | True           | neutron-openvswitch-agent |
+| 418c78c5-2bf8-4828-a77f-b76bbb65e487 | L3 agent             | s4lpa | nova              | :-)   | True           | neutron-l3-agent          |
+| 4b3e3a2b-039e-485d-a532-c43b371611ef | Open vSwitch agent   | s4lpa |                   | :-)   | True           | neutron-openvswitch-agent |
+| 4f19c906-599f-4065-afcb-42397f05a8aa | Open vSwitch agent   | s4lpd |                   | :-)   | True           | neutron-openvswitch-agent |
+| 51b1f9e7-3673-4584-b71a-5b310d2f70af | Metering agent       | s4lpa |                   | :-)   | True           | neutron-metering-agent    |
+| 824d6b7c-e411-4feb-8a83-2637425bfdd3 | DHCP agent           | s4lpa | nova              | :-)   | True           | neutron-dhcp-agent        |
+| b0873b37-0ee2-44c4-b6c3-91175ae3dd0d | Open vSwitch agent   | s4lpc |                   | :-)   | True           | neutron-openvswitch-agent |
+| e2a4e600-a0bf-4ea2-b6ed-156d108ab8b9 | Open vSwitch agent   | s4lpb |                   | :-)   | True           | neutron-openvswitch-agent |
++--------------------------------------+----------------------+-------+-------------------+-------+----------------+---------------------------+

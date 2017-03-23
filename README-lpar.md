@@ -1,4 +1,4 @@
-# Ubuntu Native LPAR Testing with Juju 1.25.x and 2.1.0
+# Ubuntu Native LPAR Testing with Juju 1.25.x and 2.1
 
 ## Preseeding
 
