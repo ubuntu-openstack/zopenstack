@@ -1,0 +1,8 @@
++----+---------------------+-------+---------+
+| ID | Hypervisor hostname | State | Status  |
++----+---------------------+-------+---------+
+| 1  | s4lpb               | up    | enabled |
+| 2  | s4lpc               | up    | enabled |
+| 3  | s4lpd               | up    | enabled |
+| 4  | s4lpe               | up    | enabled |
++----+---------------------+-------+---------+

@@ -1,0 +1,103 @@
++----------------------------------+------------+--------------+
+| ID                               | Name       | Type         |
++----------------------------------+------------+--------------+
+| 35ce2a135250465384f2e9a017f54850 | cinder     | volume       |
+| 5050ae1aa28b4abf94a4de10a9426976 | swift      | object-store |
+| 5e04ae8197ca47488017dff0c300a992 | aodh       | alarming     |
+| 7189f2c2a3fc4aa8b7557c1a03b532d4 | ceilometer | metering     |
+| 7af91d8490534e4ea4dc31e0e5fab336 | glance     | image        |
+| 8a1fbb9a1f2249248553041c090de446 | cinderv2   | volumev2     |
+| 93efe420f9f1424483d80ab10e23b6b1 | keystone   | identity     |
+| b4ec30b61b2e4a728a121fc93af0d53f | s3         | s3           |
+| eb9c0f0b8da149eeac433e5ff2b02dbc | placement  | placement    |
+| f35df037c36b43f3b7e21ad7479e7e09 | neutron    | network      |
+| fca0bc101d354619abf7720074b33233 | nova       | compute      |
++----------------------------------+------------+--------------+
++----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
+| Field                | Value                                                                                                                                |
++----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
+| aggregates           | []                                                                                                                                   |
+| cpu_info             | {"vendor": null, "model": "host", "arch": "s390x", "features": [], "topology": {"cores": 8, "cells": 1, "threads": 1, "sockets": 1}} |
+| current_workload     | 0                                                                                                                                    |
+| disk_available_least | 5                                                                                                                                    |
+| free_disk_gb         | 13                                                                                                                                   |
+| free_ram_mb          | 9339                                                                                                                                 |
+| host_ip              | 10.0.0.11                                                                                                                           |
+| host_time            |  06:09:46                                                                                                                            |
+| hypervisor_hostname  | s4lpb                                                                                                                                |
+| hypervisor_type      | QEMU                                                                                                                                 |
+| hypervisor_version   | 2008000                                                                                                                              |
+| id                   | 1                                                                                                                                    |
+| load_average         | 0.33, 0.29, 0.24                                                                                                                     |
+| local_gb             | 13                                                                                                                                   |
+| local_gb_used        | 6                                                                                                                                    |
+| memory_mb            | 9851                                                                                                                                 |
+| memory_mb_used       | 6732                                                                                                                                 |
+| running_vms          | 0                                                                                                                                    |
+| service_host         | s4lpb                                                                                                                                |
+| service_id           | 17                                                                                                                                   |
+| state                | up                                                                                                                                   |
+| status               | enabled                                                                                                                              |
+| uptime               | 23:22                                                                                                                                |
+| users                | 0                                                                                                                                    |
+| vcpus                | 8                                                                                                                                    |
+| vcpus_used           | 0                                                                                                                                    |
++----------------------+--------------------------------------------------------------------------------------------------------------------------------------+
++--------------------------------------+--------------+--------+
+| ID                                   | Name         | Status |
++--------------------------------------+--------------+--------+
+| 9da057b8-2add-42a2-90de-32fca293d899 | xenial-s390x | active |
++--------------------------------------+--------------+--------+
++--------------------------------------+--------------------+--------+---------------------------------+
+| ID                                   | Name               | Status | Networks                        |
++--------------------------------------+--------------------+--------+---------------------------------+
+| 758f6d4f-6021-42c6-9cd1-110d0ca0c526 | xenial-s390x094734 | ACTIVE | private=172.16.0.3, 10.0.0.136 |
+| 27e053e5-3d46-49e2-bb3b-685c3fc2deaa | xenial-s390x094732 | ACTIVE | private=172.16.0.9, 10.0.0.132 |
++--------------------------------------+--------------------+--------+---------------------------------+
++----+------------+------+------+-----------+-------+-----------+
+| ID | Name       |  RAM | Disk | Ephemeral | VCPUs | Is Public |
++----+------------+------+------+-----------+-------+-----------+
+| 2  | m1.small   |  512 |    5 |         0 |     1 | True      |
+| 3  | m1.medium  | 1024 |   12 |         0 |     2 | True      |
+| 6  | m1.cirros  |   64 |    1 |         0 |     1 | True      |
+| 7  | m1.tempest |  256 |    5 |         0 |     1 | True      |
+| 8  | m2.tempest |  512 |    5 |         0 |     1 | True      |
++----+------------+------+------+-----------+-------+-----------+
++--------------------------------------+----------------------------------------------------------+
+| Property                             | Value                                                    |
++--------------------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig                    | MANUAL                                                   |
+| OS-EXT-AZ:availability_zone          | nova                                                     |
+| OS-EXT-SRV-ATTR:host                 | s4lpc                                                    |
+| OS-EXT-SRV-ATTR:hypervisor_hostname  | s4lpc                                                    |
+| OS-EXT-SRV-ATTR:instance_name        | instance-00000007                                        |
+| OS-EXT-STS:power_state               | 1                                                        |
+| OS-EXT-STS:task_state                | -                                                        |
+| OS-EXT-STS:vm_state                  | active                                                   |
+| OS-SRV-USG:launched_at               | 2017-03-23T09:48:04.000000                               |
+| OS-SRV-USG:terminated_at             | -                                                        |
+| accessIPv4                           |                                                          |
+| accessIPv6                           |                                                          |
+| config_drive                         |                                                          |
+| created                              | 2017-03-23T09:47:34Z                                     |
+| flavor                               | m1.small (2)                                             |
+| hostId                               | c4524fa2261c25634581d664548c662af5c7b80bce7bbed51086b5ca |
+| id                                   | 27e053e5-3d46-49e2-bb3b-685c3fc2deaa                     |
+| image                                | xenial-s390x (9da057b8-2add-42a2-90de-32fca293d899)      |
+| key_name                             | testkey                                                  |
+| metadata                             | {}                                                       |
+| name                                 | xenial-s390x094732                                       |
+| os-extended-volumes:volumes_attached | []                                                       |
+| private network                      | 172.16.0.9, 10.0.0.132                                  |
+| progress                             | 0                                                        |
+| security_groups                      | default                                                  |
+| status                               | ACTIVE                                                   |
+| tenant_id                            | 06e7b00d534443f4995313e98d0deb12                         |
+| updated                              | 2017-03-23T09:48:07Z                                     |
+| user_id                              | c3f4c56d190c4a12b5e86cb05bb0f22a                         |
++--------------------------------------+----------------------------------------------------------+
+openstack: 'hypervisor-list' is not an openstack command. See 'openstack --help'.
+Did you mean one of these?
+  hypervisor list
+  hypervisor show
+  hypervisor stats show

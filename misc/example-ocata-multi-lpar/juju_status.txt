@@ -1,0 +1,166 @@
+Model    Controller   Cloud/Region  Version
+default  s390x_ocata  manual        2.1.2
+
+App                    Version       Status   Scale  Charm                  Store       Rev  OS      Notes
+aodh                   4.0.0         active       1  aodh                   jujucharms   20  ubuntu  
+ceilometer             8.0.1         active       1  ceilometer             jujucharms  252  ubuntu  
+ceilometer-agent       8.0.1         active       4  ceilometer-agent       jujucharms  236  ubuntu  
+ceph-mon               10.2.5        active       3  ceph-mon               jujucharms  265  ubuntu  
+ceph-osd               10.2.6        active       5  ceph-osd               jujucharms  266  ubuntu  
+cinder                 10.0.0        active       1  cinder                 jujucharms  271  ubuntu  
+cinder-ceph            10.0.0        active       1  cinder-ceph            jujucharms  233  ubuntu  
+glance                 14.0.0        active       1  glance                 jujucharms  267  ubuntu  
+keystone               11.0.0        active       1  keystone               jujucharms  287  ubuntu  
+mongodb                              unknown      1  mongodb                jujucharms    1  ubuntu  
+mysql                  5.6.34-26.19  active       1  percona-cluster        jujucharms  254  ubuntu  
+neutron-api            10.0.0        active       1  neutron-api            jujucharms  279  ubuntu  
+neutron-gateway        10.0.0        active       1  neutron-gateway        jujucharms  270  ubuntu  
+neutron-openvswitch    10.0.0        active       4  neutron-openvswitch    jujucharms  255  ubuntu  
+nova-cloud-controller  15.0.1        active       1  nova-cloud-controller  jujucharms  285  ubuntu  
+nova-compute           15.0.1        active       4  nova-compute           jujucharms  304  ubuntu  
+ntp                                  unknown      5  ntp                    jujucharms    1  ubuntu  
+openstack-dashboard    11.0.0        active       1  openstack-dashboard    jujucharms  262  ubuntu  
+rabbitmq-server        3.5.7         active       1  rabbitmq-server        jujucharms  253  ubuntu  
+swift-proxy            2.13.0        active       1  swift-proxy            jujucharms   78  ubuntu  
+swift-storage-z1       2.13.0        active       1  swift-storage          jujucharms  249  ubuntu  
+swift-storage-z2       2.13.0        active       1  swift-storage          jujucharms  249  ubuntu  
+swift-storage-z3       2.13.0        active       1  swift-storage          jujucharms  249  ubuntu  
+swift-storage-z4       2.13.0        active       1  swift-storage          jujucharms  249  ubuntu  
+swift-storage-z5       2.13.0        active       1  swift-storage          jujucharms  249  ubuntu  
+
+Unit                      Workload  Agent      Machine  Public address  Ports                                    Message
+aodh/0*                   active    idle       4/lxd/0  10.0.0.223     8042/tcp                                 Unit is ready
+ceilometer/0*             active    idle       1/lxd/0  10.0.0.250     8777/tcp                                 Unit is ready
+ceph-mon/0*               active    idle       0/lxd/0  10.0.0.217                                              Unit is ready and clustered
+ceph-mon/1                active    idle       1/lxd/2  10.0.0.206                                              Unit is ready and clustered
+ceph-mon/2                active    idle       2/lxd/1  10.0.0.192                                              Unit is ready and clustered
+ceph-osd/0*               active    idle       0        10.0.0.10                                               Unit is ready (1 OSD)
+ceph-osd/1                active    idle       1        10.0.0.11                                               Unit is ready (1 OSD)
+ceph-osd/2                active    idle       2        10.0.0.12                                               Unit is ready (1 OSD)
+ceph-osd/3                active    idle       3        10.0.0.13                                               Unit is ready (1 OSD)
+ceph-osd/4                active    idle       4        10.0.0.14                                               Unit is ready (1 OSD)
+cinder/0*                 active    idle       1/lxd/1  10.0.0.218     8776/tcp                                 Unit is ready
+  cinder-ceph/0*          active    idle                10.0.0.218                                              Unit is ready
+glance/0*                 active    idle       2/lxd/0  10.0.0.245     9292/tcp                                 Unit is ready
+keystone/0*               active    idle       3/lxd/0  10.0.0.209     5000/tcp                                 Unit is ready
+mongodb/0*                unknown   idle       4/lxd/1  10.0.0.244     27017/tcp,27019/tcp,27021/tcp,28017/tcp  
+mysql/0*                  active    idle       0/lxd/1  10.0.0.233     3306/tcp                                 Unit is ready
+neutron-api/0*            active    idle       0/lxd/2  10.0.0.230     9696/tcp                                 Unit is ready
+neutron-gateway/0*        active    idle       0        10.0.0.10                                               Unit is ready
+  ntp/0*                  unknown   idle                10.0.0.10                                               
+nova-cloud-controller/0*  active    idle       4/lxd/2  10.0.0.201     8774/tcp,8778/tcp                        Unit is ready
+nova-compute/0*           active    idle       1        10.0.0.11                                               Unit is ready
+  ceilometer-agent/0      active    idle                10.0.0.11                                               Unit is ready
+  neutron-openvswitch/2   active    idle                10.0.0.11                                               Unit is ready
+  ntp/1                   unknown   idle                10.0.0.11                                               
+nova-compute/1            active    idle       2        10.0.0.12                                               Unit is ready
+  ceilometer-agent/1*     active    idle                10.0.0.12                                               Unit is ready
+  neutron-openvswitch/3   active    idle                10.0.0.12                                               Unit is ready
+  ntp/2                   unknown   idle                10.0.0.12                                               
+nova-compute/2            active    idle       3        10.0.0.13                                               Unit is ready
+  ceilometer-agent/2      active    idle                10.0.0.13                                               Unit is ready
+  neutron-openvswitch/0*  active    idle                10.0.0.13                                               Unit is ready
+  ntp/3                   unknown   idle                10.0.0.13                                               
+nova-compute/3            active    idle       4        10.0.0.14                                               Unit is ready
+  ceilometer-agent/3      active    idle                10.0.0.14                                               Unit is ready
+  neutron-openvswitch/1   active    idle                10.0.0.14                                               Unit is ready
+  ntp/4                   unknown   idle                10.0.0.14                                               
+openstack-dashboard/0*    active    idle       3/lxd/1  10.0.0.196     80/tcp,443/tcp                           Unit is ready
+rabbitmq-server/0*        active    executing  0/lxd/3  10.0.0.246     5672/tcp                                 (update-status) Unit is ready
+swift-proxy/0*            active    idle       0/lxd/4  10.0.0.237     8080/tcp                                 Unit is ready
+swift-storage-z1/0*       active    idle       0        10.0.0.10                                               Unit is ready
+swift-storage-z2/0*       active    idle       1        10.0.0.11                                               Unit is ready
+swift-storage-z3/0*       active    idle       2        10.0.0.12                                               Unit is ready
+swift-storage-z4/0*       active    idle       3        10.0.0.13                                               Unit is ready
+swift-storage-z5/0*       active    idle       4        10.0.0.14                                               Unit is ready
+
+Machine  State    DNS          Inst id              Series  AZ
+0        started  10.0.0.10   manual:10.0.0.10    xenial  
+0/lxd/0  started  10.0.0.217  juju-384bee-0-lxd-0  xenial  
+0/lxd/1  started  10.0.0.233  juju-384bee-0-lxd-1  xenial  
+0/lxd/2  started  10.0.0.230  juju-384bee-0-lxd-2  xenial  
+0/lxd/3  started  10.0.0.246  juju-384bee-0-lxd-3  xenial  
+0/lxd/4  started  10.0.0.237  juju-384bee-0-lxd-4  xenial  
+1        started  10.0.0.11   manual:10.0.0.11    xenial  
+1/lxd/0  started  10.0.0.250  juju-384bee-1-lxd-0  xenial  
+1/lxd/1  started  10.0.0.218  juju-384bee-1-lxd-1  xenial  
+1/lxd/2  started  10.0.0.206  juju-384bee-1-lxd-2  xenial  
+2        started  10.0.0.12   manual:10.0.0.12    xenial  
+2/lxd/0  started  10.0.0.245  juju-384bee-2-lxd-0  xenial  
+2/lxd/1  started  10.0.0.192  juju-384bee-2-lxd-1  xenial  
+3        started  10.0.0.13   manual:10.0.0.13    xenial  
+3/lxd/0  started  10.0.0.209  juju-384bee-3-lxd-0  xenial  
+3/lxd/1  started  10.0.0.196  juju-384bee-3-lxd-1  xenial  
+4        started  10.0.0.14   manual:10.0.0.14    xenial  
+4/lxd/0  started  10.0.0.223  juju-384bee-4-lxd-0  xenial  
+4/lxd/1  started  10.0.0.244  juju-384bee-4-lxd-1  xenial  
+4/lxd/2  started  10.0.0.201  juju-384bee-4-lxd-2  xenial  
+
+Relation                 Provides               Consumes               Type
+cluster                  aodh                   aodh                   peer
+identity-service         aodh                   keystone               regular
+shared-db                aodh                   mysql                  regular
+amqp                     aodh                   rabbitmq-server        regular
+cluster                  ceilometer             ceilometer             peer
+ceilometer-service       ceilometer             ceilometer-agent       regular
+identity-service         ceilometer             keystone               regular
+database                 ceilometer             mongodb                regular
+amqp                     ceilometer             rabbitmq-server        regular
+nova-ceilometer          ceilometer-agent       nova-compute           regular
+mon                      ceph-mon               ceph-mon               peer
+mon                      ceph-mon               ceph-osd               regular
+ceph                     ceph-mon               cinder-ceph            regular
+ceph                     ceph-mon               glance                 regular
+ceph                     ceph-mon               nova-compute           regular
+cluster                  cinder                 cinder                 peer
+storage-backend          cinder                 cinder-ceph            subordinate
+image-service            cinder                 glance                 regular
+identity-service         cinder                 keystone               regular
+shared-db                cinder                 mysql                  regular
+cinder-volume-service    cinder                 nova-cloud-controller  regular
+amqp                     cinder                 rabbitmq-server        regular
+cluster                  glance                 glance                 peer
+identity-service         glance                 keystone               regular
+shared-db                glance                 mysql                  regular
+image-service            glance                 nova-cloud-controller  regular
+image-service            glance                 nova-compute           regular
+amqp                     glance                 rabbitmq-server        regular
+cluster                  keystone               keystone               peer
+shared-db                keystone               mysql                  regular
+identity-service         keystone               neutron-api            regular
+identity-service         keystone               nova-cloud-controller  regular
+identity-service         keystone               openstack-dashboard    regular
+identity-service         keystone               swift-proxy            regular
+replica-set              mongodb                mongodb                peer
+cluster                  mysql                  mysql                  peer
+shared-db                mysql                  neutron-api            regular
+shared-db                mysql                  nova-cloud-controller  regular
+cluster                  neutron-api            neutron-api            peer
+neutron-plugin-api       neutron-api            neutron-gateway        regular
+neutron-plugin-api       neutron-api            neutron-openvswitch    regular
+neutron-api              neutron-api            nova-cloud-controller  regular
+amqp                     neutron-api            rabbitmq-server        regular
+cluster                  neutron-gateway        neutron-gateway        peer
+quantum-network-service  neutron-gateway        nova-cloud-controller  regular
+juju-info                neutron-gateway        ntp                    subordinate
+amqp                     neutron-gateway        rabbitmq-server        regular
+neutron-plugin           neutron-openvswitch    nova-compute           regular
+amqp                     neutron-openvswitch    rabbitmq-server        regular
+cluster                  nova-cloud-controller  nova-cloud-controller  peer
+cloud-compute            nova-cloud-controller  nova-compute           regular
+amqp                     nova-cloud-controller  rabbitmq-server        regular
+nova-ceilometer          nova-compute           ceilometer-agent       subordinate
+neutron-plugin           nova-compute           neutron-openvswitch    subordinate
+compute-peer             nova-compute           nova-compute           peer
+juju-info                nova-compute           ntp                    subordinate
+amqp                     nova-compute           rabbitmq-server        regular
+ntp-peers                ntp                    ntp                    peer
+cluster                  openstack-dashboard    openstack-dashboard    peer
+cluster                  rabbitmq-server        rabbitmq-server        peer
+cluster                  swift-proxy            swift-proxy            peer
+swift-storage            swift-proxy            swift-storage-z1       regular
+swift-storage            swift-proxy            swift-storage-z2       regular
+swift-storage            swift-proxy            swift-storage-z3       regular
+swift-storage            swift-proxy            swift-storage-z4       regular
+swift-storage            swift-proxy            swift-storage-z5       regular
+
