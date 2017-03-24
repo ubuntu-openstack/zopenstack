@@ -44,7 +44,7 @@ printf "`date` : Waiting for LPARS to restore their snapshots...\n\n"
 
 for lpar in ${LPARS[@]}
         do printf "`date` :: Waiting for restore to complete on: $lpar\n"
-        until ssh -o 'StrictHostKeyChecking=no' -o BatchMode=yes $lpar "until ! bash -c \"/usr/bin/sudo /sbin/lvs -va|/bin/grep '\[snap-root\]'\" ; do printf "Restore in progress - watch % of [snap-root]" ; sleep 30 ; done " 2>/dev/null ; do if [ $? -eq 0 ] ; then printf "\nSnapshot restore complete\n" ; fi ; done
+        until ssh -o 'StrictHostKeyChecking=no' -o BatchMode=yes $lpar "until ! bash -c \"/usr/bin/sudo /sbin/lvs -va|/bin/grep '\[snap-root\]'\" ; do sleep 30 ; done " 2>/dev/null ; do sleep 60 ; done
         printf "`date` : LPAR SNAPSHOT RESTORE: $lpar READY\n\n"
 done
 
