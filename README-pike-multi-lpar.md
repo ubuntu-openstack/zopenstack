@@ -2,7 +2,7 @@
 
 This validation scenario exercises a basic set of [OpenStack Charms](https://jujucharms.com/u/openstack-charmers)
 and [s390x](https://wiki.ubuntu.com/S390X) packages to deploy
-OpenStack Pike using [Juju](https://jujucharms.com) 2.1.2 on [Ubuntu Server](https://www.ubuntu.com/server)
+OpenStack Pike using [Juju](https://jujucharms.com) 2 on [Ubuntu Server](https://www.ubuntu.com/server)
 16.04.
 
 The bundle for this deployment can be found [here](bundles/lpar/xenial-pike-stable.yaml) with deployment instructions [here](README-lpar.md)
@@ -21,9 +21,10 @@ This repo contains some [example artifacts](misc/example-pike-multi-lpar) from a
 
 ### Known Issues and Workarounds
 
-[Bug_1713032](https://bugs.launchpad.net/ubuntu/+source/ceph/+bug/1713032)
+[Bug 1713032](https://bugs.launchpad.net/ubuntu/+source/ceph/+bug/1713032)
 
 ceph-mon will crash on s390x when it decides it has been elected as the leader - this does not cause a hook error
 as ceph-mon does not actually raise an external exception.
 
-Workaround is to disable ceph and use local storage.
+Workaround is to disable ceph either in the bundle, or juju remove-application after deploy, which will force
+openstack to use local storage.
