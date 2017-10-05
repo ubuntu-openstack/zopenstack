@@ -23,6 +23,7 @@ This repo contains some [example artifacts](misc/example-pike-multi-lpar) from a
 
 [Bug 1713032](https://bugs.launchpad.net/ubuntu/+source/ceph/+bug/1713032)
 
+`[luminous] ceph-mon crashes when it is elected leader (s390x) `
 ceph-mon will crash on s390x when it decides it has been elected as the leader - this does not cause a hook error
 as ceph-mon does not actually raise an external exception.
 
