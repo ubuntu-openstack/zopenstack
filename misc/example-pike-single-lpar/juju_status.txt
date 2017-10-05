@@ -1,0 +1,91 @@
+Model    Controller  Cloud/Region         Version
+default  lxd         localhost/localhost  2.0.2.1
+
+App                    Version         Status  Scale  Charm                  Store       Rev  OS      Notes
+designate              2.1.0           active      1  designate              jujucharms   10  ubuntu  
+designate-bind         9.10.3.dfsg.P4  active      1  designate-bind         jujucharms    8  ubuntu  
+glance                 15.0.0          active      1  glance                 jujucharms  259  ubuntu  
+heat                   9.0.0           active      1  heat                   jujucharms  244  ubuntu  
+keystone               12.0.0          active      1  keystone               jujucharms  268  ubuntu  
+mysql                  5.6.34-26.19    active      1  percona-cluster        jujucharms  271  ubuntu  
+neutron-api            11.0.0          active      1  neutron-api            jujucharms  252  ubuntu  
+neutron-gateway        11.0.0          active      1  neutron-gateway        jujucharms  238  ubuntu  
+neutron-openvswitch    11.0.0          active      1  neutron-openvswitch    jujucharms  244  ubuntu  
+nova-cloud-controller  16.0.0          active      1  nova-cloud-controller  jujucharms  300  ubuntu  
+nova-compute           16.0.0          active      1  nova-compute           jujucharms  273  ubuntu  
+openstack-dashboard    12.0.0          active      1  openstack-dashboard    jujucharms  250  ubuntu  
+rabbitmq-server        3.5.7           active      1  rabbitmq-server        jujucharms   66  ubuntu  
+
+Unit                      Workload  Agent      Machine  Public address  Ports              Message
+designate-bind/0*         active    idle       6        10.0.8.16                          Unit is ready
+designate/0*              active    idle       5        10.0.8.173      9001/tcp           Unit is ready
+glance/0*                 active    idle       7        10.0.8.17       9292/tcp           Unit is ready
+heat/0*                   active    idle       8        10.0.8.164      8000/tcp,8004/tcp  Unit is ready
+keystone/0*               active    idle       9        10.0.8.60       5000/tcp           Unit is ready
+mysql/0*                  active    idle       10       10.0.8.176      3306/tcp           Unit is ready
+neutron-api/0*            active    idle       11       10.0.8.153      9696/tcp           Unit is ready
+neutron-gateway/0*        active    executing  12       10.0.8.90                          (update-status) Unit is ready
+nova-cloud-controller/0*  active    idle       13       10.0.8.70       8774/tcp,8778/tcp  Unit is ready
+nova-compute/0*           active    idle       14       10.0.8.74                          Unit is ready
+  neutron-openvswitch/0*  active    idle                10.0.8.74                          Unit is ready
+openstack-dashboard/0*    active    idle       15       10.0.8.38       80/tcp,443/tcp     Unit is ready
+rabbitmq-server/0*        active    idle       16       10.0.8.81       5672/tcp           Unit is ready
+
+Machine  State    DNS         Inst id         Series  AZ
+5        started  10.0.8.173  juju-0574e6-5   xenial  
+6        started  10.0.8.16   juju-0574e6-6   xenial  
+7        started  10.0.8.17   juju-0574e6-7   xenial  
+8        started  10.0.8.164  juju-0574e6-8   xenial  
+9        started  10.0.8.60   juju-0574e6-9   xenial  
+10       started  10.0.8.176  juju-0574e6-10  xenial  
+11       started  10.0.8.153  juju-0574e6-11  xenial  
+12       started  10.0.8.90   juju-0574e6-12  xenial  
+13       started  10.0.8.70   juju-0574e6-13  xenial  
+14       started  10.0.8.74   juju-0574e6-14  xenial  
+15       started  10.0.8.38   juju-0574e6-15  xenial  
+16       started  10.0.8.81   juju-0574e6-16  xenial  
+
+Relation                 Provides               Consumes               Type
+cluster                  designate              designate              peer
+dns-backend              designate              designate-bind         regular
+identity-service         designate              keystone               regular
+shared-db                designate              mysql                  regular
+amqp                     designate              rabbitmq-server        regular
+cluster                  designate-bind         designate-bind         peer
+cluster                  glance                 glance                 peer
+identity-service         glance                 keystone               regular
+shared-db                glance                 mysql                  regular
+image-service            glance                 nova-cloud-controller  regular
+image-service            glance                 nova-compute           regular
+amqp                     glance                 rabbitmq-server        regular
+cluster                  heat                   heat                   peer
+identity-service         heat                   keystone               regular
+shared-db                heat                   mysql                  regular
+amqp                     heat                   rabbitmq-server        regular
+cluster                  keystone               keystone               peer
+shared-db                keystone               mysql                  regular
+identity-service         keystone               neutron-api            regular
+identity-service         keystone               nova-cloud-controller  regular
+identity-service         keystone               openstack-dashboard    regular
+cluster                  mysql                  mysql                  peer
+shared-db                mysql                  neutron-api            regular
+shared-db                mysql                  nova-cloud-controller  regular
+cluster                  neutron-api            neutron-api            peer
+neutron-plugin-api       neutron-api            neutron-gateway        regular
+neutron-plugin-api       neutron-api            neutron-openvswitch    regular
+neutron-api              neutron-api            nova-cloud-controller  regular
+amqp                     neutron-api            rabbitmq-server        regular
+cluster                  neutron-gateway        neutron-gateway        peer
+quantum-network-service  neutron-gateway        nova-cloud-controller  regular
+amqp                     neutron-gateway        rabbitmq-server        regular
+neutron-plugin           neutron-openvswitch    nova-compute           regular
+amqp                     neutron-openvswitch    rabbitmq-server        regular
+cluster                  nova-cloud-controller  nova-cloud-controller  peer
+cloud-compute            nova-cloud-controller  nova-compute           regular
+amqp                     nova-cloud-controller  rabbitmq-server        regular
+neutron-plugin           nova-compute           neutron-openvswitch    subordinate
+compute-peer             nova-compute           nova-compute           peer
+amqp                     nova-compute           rabbitmq-server        regular
+cluster                  openstack-dashboard    openstack-dashboard    peer
+cluster                  rabbitmq-server        rabbitmq-server        peer
+
