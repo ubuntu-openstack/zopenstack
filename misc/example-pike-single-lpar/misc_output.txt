@@ -1,0 +1,100 @@
++----------------------------------+-----------+----------------+
+| ID                               | Name      | Type           |
++----------------------------------+-----------+----------------+
+| 091fa8b9a3174ac4ac123399f35efefc | keystone  | identity       |
+| 4e9c6b42ae9e4867894c829752435129 | nova      | compute        |
+| 8ddc5744a6e646f6b7c341db5c69b80c | glance    | image          |
+| b78b9c478b0b4b4aae64594c9201513c | heat-cfn  | cloudformation |
+| db14d3b3d25640579de99f95c4ca5691 | neutron   | network        |
+| ed476e9955694f7a8d3905887a010fa3 | heat      | orchestration  |
+| f64e5867ba3547018bd7218bae4818c7 | placement | placement      |
+| fdeb324858fc44129bebdea6ee5c2cef | designate | dns            |
++----------------------------------+-----------+----------------+
++----------------------+-------------------------------------------------------------------------------------------------------------------------------------+
+| Field                | Value                                                                                                                               |
++----------------------+-------------------------------------------------------------------------------------------------------------------------------------+
+| aggregates           | []                                                                                                                                  |
+| cpu_info             | {"vendor": null, "model": null, "arch": "s390x", "features": [], "topology": {"cores": 24, "cells": 1, "threads": 1, "sockets": 1}} |
+| current_workload     | 0                                                                                                                                   |
+| disk_available_least | -4                                                                                                                                  |
+| free_disk_gb         | 20                                                                                                                                  |
+| free_ram_mb          | 30491                                                                                                                               |
+| host_ip              | 10.0.8.74                                                                                                                           |
+| host_time            | 20:01:18                                                                                                                            |
+| hypervisor_hostname  | juju-0574e6-14.lxd                                                                                                                  |
+| hypervisor_type      | QEMU                                                                                                                                |
+| hypervisor_version   | 2010000                                                                                                                             |
+| id                   | 1                                                                                                                                   |
+| load_average         | 0.56, 0.58, 0.65                                                                                                                    |
+| local_gb             | 30                                                                                                                                  |
+| local_gb_used        | 10                                                                                                                                  |
+| memory_mb            | 32027                                                                                                                               |
+| memory_mb_used       | 1536                                                                                                                                |
+| running_vms          | 1                                                                                                                                   |
+| service_host         | juju-0574e6-14                                                                                                                      |
+| service_id           | 7                                                                                                                                   |
+| state                | up                                                                                                                                  |
+| status               | enabled                                                                                                                             |
+| uptime               | 3:47                                                                                                                                |
+| users                | 1                                                                                                                                   |
+| vcpus                | 24                                                                                                                                  |
+| vcpus_used           | 2                                                                                                                                   |
++----------------------+-------------------------------------------------------------------------------------------------------------------------------------+
++--------------------------------------+--------+--------+
+| ID                                   | Name   | Status |
++--------------------------------------+--------+--------+
+| 4efe9a09-1554-451c-953d-4ce98061acf1 | xenial | active |
++--------------------------------------+--------+--------+
++--------------------------------------+----------------------+--------+-----------------------------------+--------+----------+
+| ID                                   | Name                 | Status | Networks                          | Image  | Flavor   |
++--------------------------------------+----------------------+--------+-----------------------------------+--------+----------+
+| a4b44147-e214-4fa5-a9cc-ae66691fca76 | openstack-on-lxd-ftw | ACTIVE | internal=192.168.20.8, 10.0.8.206 | xenial | m2.small |
++--------------------------------------+----------------------+--------+-----------------------------------+--------+----------+
++--------------------------------------+-----------+-------+------+-----------+-------+-----------+
+| ID                                   | Name      |   RAM | Disk | Ephemeral | VCPUs | Is Public |
++--------------------------------------+-----------+-------+------+-----------+-------+-----------+
+| 14557cae-f70c-49c2-af25-c35b679d65ca | m1.tiny   |   512 |    1 |         0 |     1 | True      |
+| 4092b8cc-72e9-4e40-8233-a7c62e3603c6 | m2.small  |  1024 |   10 |         0 |     2 | True      |
+| 67dc01cb-8b1b-44a2-947a-23711c537451 | m1.small  |  1024 |   20 |        40 |     1 | True      |
+| a3dc7e8d-8a49-4621-85f5-9f200d7ff0c5 | m1.large  |  8192 |   40 |        40 |     4 | True      |
+| af60c316-3b33-4cce-90bf-a24fcbd792e3 | m1.medium |  2048 |   40 |        40 |     2 | True      |
+| e55d490c-a6ce-4514-80ef-2d4ef100342d | m1.xlarge | 16384 |   80 |        40 |     8 | True      |
++--------------------------------------+-----------+-------+------+-----------+-------+-----------+
++-------------------------------------+----------------------------------------------------------+
+| Field                               | Value                                                    |
++-------------------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig                   | MANUAL                                                   |
+| OS-EXT-AZ:availability_zone         | nova                                                     |
+| OS-EXT-SRV-ATTR:host                | juju-0574e6-14                                           |
+| OS-EXT-SRV-ATTR:hypervisor_hostname | juju-0574e6-14.lxd                                       |
+| OS-EXT-SRV-ATTR:instance_name       | instance-00000003                                        |
+| OS-EXT-STS:power_state              | Running                                                  |
+| OS-EXT-STS:task_state               | None                                                     |
+| OS-EXT-STS:vm_state                 | active                                                   |
+| OS-SRV-USG:launched_at              | 2017-09-26T19:46:56.000000                               |
+| OS-SRV-USG:terminated_at            | None                                                     |
+| accessIPv4                          |                                                          |
+| accessIPv6                          |                                                          |
+| addresses                           | internal=192.168.20.8, 10.0.8.206                        |
+| config_drive                        |                                                          |
+| created                             | 2017-09-26T19:46:50Z                                     |
+| flavor                              | m2.small (4092b8cc-72e9-4e40-8233-a7c62e3603c6)          |
+| hostId                              | c49d1e03bf3d0c6b68361e345fe9b1da2ba29c2dc0ed092b146548a8 |
+| id                                  | a4b44147-e214-4fa5-a9cc-ae66691fca76                     |
+| image                               | xenial (4efe9a09-1554-451c-953d-4ce98061acf1)            |
+| key_name                            | mykey                                                    |
+| name                                | openstack-on-lxd-ftw                                     |
+| progress                            | 0                                                        |
+| project_id                          | 0d851b7c875c47d591b86363dfac974d                         |
+| properties                          |                                                          |
+| security_groups                     | name='default'                                           |
+| status                              | ACTIVE                                                   |
+| updated                             | 2017-09-26T19:46:56Z                                     |
+| user_id                             | fa085946c4a24c108b2a95f855344ffe                         |
+| volumes_attached                    |                                                          |
++-------------------------------------+----------------------------------------------------------+
++----+---------------------+-----------------+-----------+-------+
+| ID | Hypervisor Hostname | Hypervisor Type | Host IP   | State |
++----+---------------------+-----------------+-----------+-------+
+|  1 | juju-0574e6-14.lxd  | QEMU            | 10.0.8.74 | up    |
++----+---------------------+-----------------+-----------+-------+

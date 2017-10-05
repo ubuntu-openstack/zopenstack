@@ -1,0 +1,106 @@
+130 ubuntu@s4lpa:~/validation_artifacts> openstack server create --image xenial --flavor m2.small --key-name mykey --wait --nic net-id=$(neutron net-list | grep internal | awk '{ print $2 }')    openstack-on-lxd-ftw
+neutron CLI is deprecated and will be removed in the future. Use openstack CLI instead.
+
++-------------------------------------+----------------------------------------------------------+
+| Field                               | Value                                                    |
++-------------------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig                   | MANUAL                                                   |
+| OS-EXT-AZ:availability_zone         | nova                                                     |
+| OS-EXT-SRV-ATTR:host                | juju-0574e6-14                                           |
+| OS-EXT-SRV-ATTR:hypervisor_hostname | juju-0574e6-14.lxd                                       |
+| OS-EXT-SRV-ATTR:instance_name       | instance-00000003                                        |
+| OS-EXT-STS:power_state              | Running                                                  |
+| OS-EXT-STS:task_state               | None                                                     |
+| OS-EXT-STS:vm_state                 | active                                                   |
+| OS-SRV-USG:launched_at              | 2017-09-26T19:46:56.000000                               |
+| OS-SRV-USG:terminated_at            | None                                                     |
+| accessIPv4                          |                                                          |
+| accessIPv6                          |                                                          |
+| addresses                           | internal=192.168.20.8                                    |
+| adminPass                           | 8fK244GXGm9Q                                             |
+| config_drive                        |                                                          |
+| created                             | 2017-09-26T19:46:50Z                                     |
+| flavor                              | m2.small (4092b8cc-72e9-4e40-8233-a7c62e3603c6)          |
+| hostId                              | c49d1e03bf3d0c6b68361e345fe9b1da2ba29c2dc0ed092b146548a8 |
+| id                                  | a4b44147-e214-4fa5-a9cc-ae66691fca76                     |
+| image                               | xenial (4efe9a09-1554-451c-953d-4ce98061acf1)            |
+| key_name                            | mykey                                                    |
+| name                                | openstack-on-lxd-ftw                                     |
+| progress                            | 0                                                        |
+| project_id                          | 0d851b7c875c47d591b86363dfac974d                         |
+| properties                          |                                                          |
+| security_groups                     | name='default'                                           |
+| status                              | ACTIVE                                                   |
+| updated                             | 2017-09-26T19:46:56Z                                     |
+| user_id                             | fa085946c4a24c108b2a95f855344ffe                         |
+| volumes_attached                    |                                                          |
++-------------------------------------+----------------------------------------------------------+
+
++--------------------------------------+----------------------+--------+-----------------------------------+--------+----------+
+| ID                                   | Name                 | Status | Networks                          | Image  | Flavor   |
++--------------------------------------+----------------------+--------+-----------------------------------+--------+----------+
+| a4b44147-e214-4fa5-a9cc-ae66691fca76 | openstack-on-lxd-ftw | ACTIVE | internal=192.168.20.8, 10.0.8.206 | xenial | m2.small |
++--------------------------------------+----------------------+--------+-----------------------------------+--------+----------+
+
+ubuntu@s4lpa:~/validation_artifacts> ssh ubuntu@10.0.8.206         
+The authenticity of host '10.0.8.206 (10.0.8.206)' can't be established.
+ECDSA key fingerprint is SHA256:wmDV88pYrzsCpiRf7hpqQQi7LyFJKZhCaqwks3Aucl0.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '10.0.8.206' (ECDSA) to the list of known hosts.
+Welcome to Ubuntu 16.04.3 LTS (GNU/Linux 4.4.0-96-generic s390x)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+0 packages can be updated.
+0 updates are security updates.
+
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+**************************************************************************
+# A new feature in cloud-init identified possible datasources for        #
+# this system as:                                                        #
+#   ['Ec2', 'None']                                                      #
+# However, the datasource used was: OpenStack                            #
+#                                                                        #
+# In the future, cloud-init will only attempt to use datasources that    #
+# are identified or specifically configured.                             #
+# For more information see                                               #
+#   https://bugs.launchpad.net/bugs/1669675                              #
+#                                                                        #
+# If you are seeing this message, please file a bug against              #
+# cloud-init at                                                          #
+#    https://bugs.launchpad.net/cloud-init/+filebug?field.tags=dsid      #
+# Make sure to include the cloud provider your instance is               #
+# running on.                                                            #
+#                                                                        #
+# After you have filed a bug, you can disable this warning by launching  #
+# your instance with the cloud-config below, or putting that content     #
+# into /etc/cloud/cloud.cfg.d/99-warnings.cfg                            #
+#                                                                        #
+# #cloud-config                                                          #
+# warnings:                                                              #
+#   dsid_missing_source: off                                             #
+**************************************************************************
+
+Disable the warnings above by:
+  touch /home/ubuntu/.cloud-warnings.skip
+or
+  touch /var/lib/cloud/instance/warnings/.skip
+ubuntu@openstack-on-lxd-ftw:~$ uname -a
+Linux openstack-on-lxd-ftw 4.4.0-96-generic #119-Ubuntu SMP Tue Sep 12 14:59:56 UTC 2017 s390x s390x s390x GNU/Linux
+

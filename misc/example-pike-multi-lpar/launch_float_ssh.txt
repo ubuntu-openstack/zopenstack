@@ -1,0 +1,50 @@
+ + Keying nova and ~/testkey.pem...
+| testkey | ae:d8:ca:c8:79:43:e7:2f:c7:a4:4e:4c:5c:a7:0b:9c |
+ + Grabbing 'private' network ID...
+ + Determining flavor to use...
+ + Nova booting 1 xenial-s390x instances as flavor m1.small...
+xenial-s390x201350 xenial-s390x 98dd9696-c965-4416-8659-8421e9bd965c
++--------------------------------------+-----------------------------------------------------+
+| Property                             | Value                                               |
++--------------------------------------+-----------------------------------------------------+
+| OS-DCF:diskConfig                    | MANUAL                                              |
+| OS-EXT-AZ:availability_zone          |                                                     |
+| OS-EXT-SRV-ATTR:host                 | -                                                   |
+| OS-EXT-SRV-ATTR:hypervisor_hostname  | -                                                   |
+| OS-EXT-SRV-ATTR:instance_name        |                                                     |
+| OS-EXT-STS:power_state               | 0                                                   |
+| OS-EXT-STS:task_state                | scheduling                                          |
+| OS-EXT-STS:vm_state                  | building                                            |
+| OS-SRV-USG:launched_at               | -                                                   |
+| OS-SRV-USG:terminated_at             | -                                                   |
+| accessIPv4                           |                                                     |
+| accessIPv6                           |                                                     |
+| adminPass                            | 5Ns5GjxLzb98                                        |
+| config_drive                         |                                                     |
+| created                              | 2017-09-27T19:13:52Z                                |
+| flavor                               | m1.small (2)                                        |
+| hostId                               |                                                     |
+| id                                   | 23c0a583-1f93-411e-9334-f29007d0e0ea                |
+| image                                | xenial-s390x (6fb49343-d849-444d-9c62-a39a93b7278e) |
+| key_name                             | testkey                                             |
+| metadata                             | {}                                                  |
+| name                                 | xenial-s390x201350                                  |
+| os-extended-volumes:volumes_attached | []                                                  |
+| progress                             | 0                                                   |
+| security_groups                      | default                                             |
+| status                               | BUILD                                               |
+| tenant_id                            | dd760d39410e4729a0a1bae3b67fd305                    |
+| updated                              | 2017-09-27T19:13:52Z                                |
+| user_id                              | 31f5b498d25340d79691d23f1cc06d5c                    |
++--------------------------------------+-----------------------------------------------------+
+ + Hint:  use ssh -i ~/testkey.pem ubuntu@<ip> to access new instances (may also need a floating IP).
+ + Floating all instances.
+ + Creating 1 more floating IPs.
++--------------------------------------+-------------+-----------+----------+---------+
+| Id                                   | IP          | Server Id | Fixed IP | Pool    |
++--------------------------------------+-------------+-----------+----------+---------+
+| f3e5bd3d-2b28-4697-919e-a8851d277e05 | 10.13.3.137 | -         | -        | ext_net |
++--------------------------------------+-------------+-----------+----------+---------+
+ + Associating floating IP 10.13.3.137 to instance 23c0a583-1f93-411e-9334-f29007d0e0ea.
+ssh -i ~/testkey.pem ubuntu@10.13.3.137 "uname -a"
+Linux xenial-s390x201350 4.4.0-36-generic #55-Ubuntu SMP Thu Aug 11 18:05:09 UTC 2016 s390x s390x s390x GNU/Linux
