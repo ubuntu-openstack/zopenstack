@@ -159,9 +159,8 @@ services:
     - '2'
     - '3'
     - '4'
-    Swift instead for this scenario
   ceph-radosgw:
-    charm: cs:~openstack-charmers-next/ceph-radosgw-5
+    charm: cs:~openstack-charmers-next/ceph-radosgw
     num_units: 1
     options:
       use-embedded-webserver: true
