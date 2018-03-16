@@ -7,16 +7,16 @@ OpenStack Pike using [Juju](https://jujucharms.com) 2 on [Ubuntu Server](https:/
 
 The bundle for this deployment can be found [here](bundles/lpar/xenial-queens-stable.yaml) with deployment instructions [here](README-lpar.md)
 
-There are additionally tools to help [add](tools/1-deploy/add-lpars.sh) and [remove](tools/5-teardown/remove-lpars.sh) LPARs to and from a juju environment.
+This bundle was deployed on S390x Lpars, Configured with 5 Lpars roughtly 20 Processors each and around 49GB Ram. With at least 2 shared disks if not more. 
+
 
 ### Example Output/Artifacts
 This repo contains some [example artifacts](misc/example-queens-multi-lpar) from a validation deployment:
 
  - [misc/example-queens-multi-lpar/juju_status.txt](misc/example-queens-multi-lpar/juju_status.txt)
  - [misc/example-queens-multi-lpar/juju_status.yaml](misc/example-queens-multi-lpar/juju_status.yaml)
- - [misc/example-queens-multi-lpar/misc_output.txt](misc/example-queens-multi-lpar/misc_output.txt)
  - [misc/example-queens-multi-lpar/launch_float_ssh.txt](misc/example-queens-multi-lpar/launch_float_ssh.txt)
- - [misc/example-queens-multi-lpar/neutron_agent_list.txt](misc/example-queens-multi-lpar/neutron_agent_list.txt)
+ - [misc/example-queens-multi-lpar/catalog_list.txt](misc/example-queens-multi-lpar/catalog_list.txt)
  - [misc/example-queens-multi-lpar/hypervisor_list.txt](misc/example-queens-multi-lpar/hypervisor_list.txt)
 
 ### Known Issues and Workarounds
