@@ -14,8 +14,6 @@ This bundle was deployed on S390x Lpars, Configured with 5 Lpars roughtly 20 Pro
 This repo contains some [example artifacts](misc/example-queens-multi-lpar) from a validation deployment:
 
  - [misc/example-queens-multi-lpar/juju_status.txt](misc/example-queens-multi-lpar/juju_status.txt)
- - [misc/example-queens-multi-lpar/juju_status.yaml](misc/example-queens-multi-lpar/juju_status.yaml)
- - [misc/example-queens-multi-lpar/launch_float_ssh.txt](misc/example-queens-multi-lpar/launch_float_ssh.txt)
  - [misc/example-queens-multi-lpar/catalog_list.txt](misc/example-queens-multi-lpar/catalog_list.txt)
  - [misc/example-queens-multi-lpar/hypervisor_list.txt](misc/example-queens-multi-lpar/hypervisor_list.txt)
 
