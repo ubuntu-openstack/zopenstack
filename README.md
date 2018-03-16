@@ -26,7 +26,7 @@ Juju and the OpenStack Charms on the LXD provider.
 Multiple LPARs running Ubuntu Server natively, with OpenStack deployed via 
 Juju and the OpenStack Charmns on the Juju manual provider.
 
- - [See: README-lpar.md](README-lpar.md)
+ - [See: README-release-multi-lpar.md](README-lpar.md)
 
 #### z/KVM
 z/KVM compute nodes deployed via Juju and a proxy charm, with amd64 control 
