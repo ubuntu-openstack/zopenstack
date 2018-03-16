@@ -1,0 +1,114 @@
+Model    Controller    Cloud/Region  Version  SLA
+default  s390x_queens  manual        2.3.4    unsupported
+
+App                    Version       Status  Scale  Charm                  Store       Rev  OS      Notes
+cinder                 12.0.0        active      1  cinder                 jujucharms  314  ubuntu  
+glance                 16.0.0        active      1  glance                 jujucharms  307  ubuntu  
+keystone               13.0.0        active      1  keystone               jujucharms  336  ubuntu  
+mysql                  5.6.37-26.21  active      1  percona-cluster        jujucharms  289  ubuntu  
+neutron-api            12.0.0        active      1  neutron-api            jujucharms  335  ubuntu  
+neutron-gateway        12.0.0        active      1  neutron-gateway        jujucharms  312  ubuntu  
+neutron-openvswitch    12.0.0        active      3  neutron-openvswitch    jujucharms  294  ubuntu  
+nova-cloud-controller  17.0.0        active      1  nova-cloud-controller  jujucharms  344  ubuntu  
+nova-compute           17.0.0        active      3  nova-compute           jujucharms  361  ubuntu  
+ntp                    4.2.8p4+dfsg  active      4  ntp                    jujucharms   24  ubuntu  
+openstack-dashboard    13.0.0        active      1  openstack-dashboard    jujucharms  303  ubuntu  
+rabbitmq-server        3.5.7         active      1  rabbitmq-server        jujucharms  287  ubuntu  
+swift-proxy            2.15.1        active      1  swift-proxy            jujucharms  110  ubuntu  
+swift-storage-z1       2.15.1        active      1  swift-storage          jujucharms  280  ubuntu  
+swift-storage-z2       2.15.1        active      1  swift-storage          jujucharms  280  ubuntu  
+swift-storage-z3       2.15.1        active      1  swift-storage          jujucharms  280  ubuntu  
+swift-storage-z4       2.15.1        active      1  swift-storage          jujucharms  280  ubuntu  
+swift-storage-z5       2.15.1        active      1  swift-storage          jujucharms  280  ubuntu  
+
+Unit                      Workload  Agent  Machine  Public address  Ports              Message
+cinder/0*                 active    idle   1/lxd/0  10.13.3.218     8776/tcp           Unit is ready
+glance/0*                 active    idle   2/lxd/0  10.13.3.227     9292/tcp           Unit is ready
+keystone/0*               active    idle   3/lxd/0  10.13.3.233     5000/tcp           Unit is ready
+mysql/0*                  active    idle   0/lxd/0  10.13.3.205     3306/tcp           Unit is ready
+neutron-api/0*            active    idle   1/lxd/1  10.13.3.237     9696/tcp           Unit is ready
+neutron-gateway/0*        active    idle   0        10.13.3.10                         Unit is ready
+  ntp/3                   active    idle            10.13.3.10      123/udp            Ready
+nova-cloud-controller/0*  active    idle   2/lxd/1  10.13.3.214     8774/tcp,8778/tcp  Unit is ready
+nova-compute/0            active    idle   1        10.13.3.11                         Unit is ready
+  neutron-openvswitch/1   active    idle            10.13.3.11                         Unit is ready
+  ntp/1                   active    idle            10.13.3.11      123/udp            Ready
+nova-compute/1*           active    idle   2        10.13.3.12                         Unit is ready
+  neutron-openvswitch/2   active    idle            10.13.3.12                         Unit is ready
+  ntp/2                   active    idle            10.13.3.12      123/udp            Ready
+nova-compute/2            active    idle   3        10.13.3.13                         Unit is ready
+  neutron-openvswitch/0*  active    idle            10.13.3.13                         Unit is ready
+  ntp/0*                  active    idle            10.13.3.13      123/udp            Ready
+openstack-dashboard/0*    active    idle   3/lxd/1  10.13.3.230     80/tcp,443/tcp     Unit is ready
+rabbitmq-server/0*        active    idle   0/lxd/1  10.13.3.209     5672/tcp           Unit is ready
+swift-proxy/0*            active    idle   0/lxd/2  10.13.3.210     8080/tcp           Unit is ready
+swift-storage-z1/0*       active    idle   0        10.13.3.10                         Unit is ready
+swift-storage-z2/0*       active    idle   1        10.13.3.11                         Unit is ready
+swift-storage-z3/0*       active    idle   2        10.13.3.12                         Unit is ready
+swift-storage-z4/0*       active    idle   3        10.13.3.13                         Unit is ready
+swift-storage-z5/0*       active    idle   4        10.13.3.14                         Unit is ready
+
+Machine  State    DNS          Inst id              Series  AZ  Message
+0        started  10.13.3.10   manual:10.13.3.10    xenial      Manually provisioned machine
+0/lxd/0  started  10.13.3.205  juju-48b550-0-lxd-0  xenial      Container started
+0/lxd/1  started  10.13.3.209  juju-48b550-0-lxd-1  xenial      Container started
+0/lxd/2  started  10.13.3.210  juju-48b550-0-lxd-2  xenial      Container started
+1        started  10.13.3.11   manual:10.13.3.11    xenial      Manually provisioned machine
+1/lxd/0  started  10.13.3.218  juju-48b550-1-lxd-0  xenial      Container started
+1/lxd/1  started  10.13.3.237  juju-48b550-1-lxd-1  xenial      Container started
+2        started  10.13.3.12   manual:10.13.3.12    xenial      Manually provisioned machine
+2/lxd/0  started  10.13.3.227  juju-48b550-2-lxd-0  xenial      Container started
+2/lxd/1  started  10.13.3.214  juju-48b550-2-lxd-1  xenial      Container started
+3        started  10.13.3.13   manual:10.13.3.13    xenial      Manually provisioned machine
+3/lxd/0  started  10.13.3.233  juju-48b550-3-lxd-0  xenial      Container started
+3/lxd/1  started  10.13.3.230  juju-48b550-3-lxd-1  xenial      Container started
+4        started  10.13.3.14   manual:10.13.3.14    xenial      Manually provisioned machine
+
+Relation provider                        Requirer                                       Interface               Type         Message
+cinder:cinder-volume-service             nova-cloud-controller:cinder-volume-service    cinder                  regular      
+cinder:cluster                           cinder:cluster                                 cinder-ha               peer         
+glance:cluster                           glance:cluster                                 glance-ha               peer         
+glance:image-service                     cinder:image-service                           glance                  regular      
+glance:image-service                     nova-cloud-controller:image-service            glance                  regular      
+glance:image-service                     nova-compute:image-service                     glance                  regular      
+keystone:cluster                         keystone:cluster                               keystone-ha             peer         
+keystone:identity-service                cinder:identity-service                        keystone                regular      
+keystone:identity-service                glance:identity-service                        keystone                regular      
+keystone:identity-service                neutron-api:identity-service                   keystone                regular      
+keystone:identity-service                nova-cloud-controller:identity-service         keystone                regular      
+keystone:identity-service                openstack-dashboard:identity-service           keystone                regular      
+keystone:identity-service                swift-proxy:identity-service                   keystone                regular      
+mysql:cluster                            mysql:cluster                                  percona-cluster         peer         
+mysql:shared-db                          cinder:shared-db                               mysql-shared            regular      
+mysql:shared-db                          glance:shared-db                               mysql-shared            regular      
+mysql:shared-db                          keystone:shared-db                             mysql-shared            regular      
+mysql:shared-db                          neutron-api:shared-db                          mysql-shared            regular      
+mysql:shared-db                          nova-cloud-controller:shared-db                mysql-shared            regular      
+neutron-api:cluster                      neutron-api:cluster                            neutron-api-ha          peer         
+neutron-api:neutron-api                  nova-cloud-controller:neutron-api              neutron-api             regular      
+neutron-api:neutron-plugin-api           neutron-gateway:neutron-plugin-api             neutron-plugin-api      regular      
+neutron-api:neutron-plugin-api           neutron-openvswitch:neutron-plugin-api         neutron-plugin-api      regular      
+neutron-gateway:cluster                  neutron-gateway:cluster                        quantum-gateway-ha      peer         
+neutron-gateway:juju-info                ntp:juju-info                                  juju-info               subordinate  
+neutron-gateway:quantum-network-service  nova-cloud-controller:quantum-network-service  quantum                 regular      
+neutron-openvswitch:neutron-plugin       nova-compute:neutron-plugin                    neutron-plugin          subordinate  
+nova-cloud-controller:cluster            nova-cloud-controller:cluster                  nova-ha                 peer         
+nova-compute:cloud-compute               nova-cloud-controller:cloud-compute            nova-compute            regular      
+nova-compute:compute-peer                nova-compute:compute-peer                      nova                    peer         
+nova-compute:juju-info                   ntp:juju-info                                  juju-info               subordinate  
+ntp:ntp-peers                            ntp:ntp-peers                                  ntp                     peer         
+openstack-dashboard:cluster              openstack-dashboard:cluster                    openstack-dashboard-ha  peer         
+rabbitmq-server:amqp                     cinder:amqp                                    rabbitmq                regular      
+rabbitmq-server:amqp                     glance:amqp                                    rabbitmq                regular      
+rabbitmq-server:amqp                     neutron-api:amqp                               rabbitmq                regular      
+rabbitmq-server:amqp                     neutron-gateway:amqp                           rabbitmq                regular      
+rabbitmq-server:amqp                     neutron-openvswitch:amqp                       rabbitmq                regular      
+rabbitmq-server:amqp                     nova-cloud-controller:amqp                     rabbitmq                regular      
+rabbitmq-server:amqp                     nova-compute:amqp                              rabbitmq                regular      
+rabbitmq-server:cluster                  rabbitmq-server:cluster                        rabbitmq-ha             peer         
+swift-proxy:cluster                      swift-proxy:cluster                            swift-ha                peer         
+swift-storage-z1:swift-storage           swift-proxy:swift-storage                      swift                   regular      
+swift-storage-z2:swift-storage           swift-proxy:swift-storage                      swift                   regular      
+swift-storage-z3:swift-storage           swift-proxy:swift-storage                      swift                   regular      
+swift-storage-z4:swift-storage           swift-proxy:swift-storage                      swift                   regular      
+swift-storage-z5:swift-storage           swift-proxy:swift-storage                      swift                   regular
