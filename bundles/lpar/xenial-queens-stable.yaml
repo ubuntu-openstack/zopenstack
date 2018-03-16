@@ -67,8 +67,12 @@ relations:
   - keystone:identity-service
 - - cinder:cinder-volume-service
   - nova-cloud-controller:cinder-volume-service
-    #- - cinder-ceph:storage-backend
-    #  - cinder:storage-backend
+
+#Ceph does not work on s390x with this release, please
+#refer to Bug 1713032 or README-queens-multi-lpar.md
+
+#- - cinder-ceph:storage-backend
+#  - cinder:storage-backend
 #- - ceph-mon:client
 #  - nova-compute:ceph
 #- - nova-compute:ceph-access
@@ -85,10 +89,10 @@ relations:
   - nova-compute:juju-info
 - - ntp:juju-info
   - neutron-gateway:juju-info
-    #- - ceph-radosgw:mon
-    #  - ceph-mon:radosgw
-    #- - ceph-radosgw:identity-service
-    #  - keystone:identity-service
+#- - ceph-radosgw:mon
+#  - ceph-mon:radosgw
+#- - ceph-radosgw:identity-service
+#  - keystone:identity-service
 - - ceilometer:amqp
   - rabbitmq-server:amqp
 - - ceilometer-agent:ceilometer-service
@@ -103,8 +107,8 @@ relations:
   - keystone:identity-service
 - - aodh:amqp
   - rabbitmq-server:amqp
-    #- - gnocchi:storage-ceph
-    #  - ceph-mon:client
+#- - gnocchi:storage-ceph
+#  - ceph-mon:client
 - - gnocchi:shared-db
   - mysql:shared-db
 - - gnocchi:amqp
