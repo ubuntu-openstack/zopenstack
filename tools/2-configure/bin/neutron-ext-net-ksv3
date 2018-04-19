@@ -99,7 +99,6 @@ if __name__ == '__main__':
             network_msg['network']['provider:segmentation_id'] = 1234
         elif opts.network_type == 'vlan':
             network_msg['network']['provider:segmentation_id'] = opts.vlan_id
-           # network_msg['network']['provider:segmentation_id'] = 2
             network_msg['network']['provider:physical_network'] = 'physnet1'
         elif opts.network_type == 'flat':
             network_msg['network']['provider:physical_network'] = 'physnet1'
