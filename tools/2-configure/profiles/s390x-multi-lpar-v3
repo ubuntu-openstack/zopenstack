@@ -46,7 +46,7 @@ openstack flavor show m2.tempest || openstack flavor create --id 8 --ram 512 --d
 tools/images_s390x-v3.sh
 
 # Set security groups and rules
-tools/sec_groups-v3.sh
+tools/sec_groups.sh
 
 echo "Tempest"
 router=$(neutron router-list | grep provider-router | awk '{ print $2}')
