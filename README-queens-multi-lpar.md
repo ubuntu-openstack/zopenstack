@@ -5,7 +5,7 @@ and [s390x](https://wiki.ubuntu.com/S390X) packages to deploy
 OpenStack Pike using [Juju](https://jujucharms.com) 2 on [Ubuntu Server](https://www.ubuntu.com/server)
 16.04.
 
-The bundle for this deployment can be found [here](bundles/lpar/xenial-queens-stable.yaml) with deployment instructions [here](README-lpar.md)
+The bundles for this deployment can be found here: [xenial](bundles/lpar/xenial-queens-stable.yaml) or [bionic](bundles/lpar/bionic-queens-stable.yaml) with deployment instructions [here](README-lpar.md)
 
 This bundle was deployed on S390x Lpars, Configured with 5 Lpars roughtly 20 Processors each and around 49GB Ram. With at least 2 shared disks if not more. 
 
