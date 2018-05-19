@@ -10,7 +10,7 @@ mkdir -p ~/images
 }
 
 [ -f ~/images/bionic-server-cloudimg-s390x-disk1.img ] || {
-    wget ${WGET_MODE} -O ~/images/bionic-server-cloudimg-s390x-disk1.img http://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-s390x-disk1.img
+    wget ${WGET_MODE} -O ~/images/bionic-server-cloudimg-s390x-disk1.img http://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-s390x.img
 }
 
 # Create images
