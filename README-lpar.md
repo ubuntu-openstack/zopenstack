@@ -1,4 +1,4 @@
-# Ubuntu Native LPAR Testing with Juju 1.25.x and 2.1
+# Ubuntu Native LPAR Testing with Juju 2
 
 ## Preseeding
 
@@ -39,34 +39,11 @@ media" manually and the appropriate preseed selected
 
 ### Bootstrap juju environment
 
-#### juju 1.x
-
-To achieve this, you will need to use an existing LPAR or other machine which 
-has network connectivity to the LPARS. First, install juju (instructions?)
-
-Your ~/.juju/environments.yaml should have a 'manual' stanza which looks like
-the following:
-
-~~~~
-environments:
-  manual:
-    type: manual
-    bootstrap-host: 10.0.0.2
-~~~~
-
-To bootstrap: 
-~~~~
-juju switch manual
-juju bootstrap
-~~~~
-
-#### juju 2.1.0
-
-Currently, the easiest way to install juju 2.1.0 on z is with via a snap (at the time of writing, 2.1.0 is in the 'beta' channel', other versions can be installed by checking "snap info juju" and specifying the appropriate channel):
+Currently, the easiest way to install juju 2 on z is with via a snap: 
 
 ~~~~
 sudo apt-get install snapd
-sudo snapd install juju --devmode --beta
+sudo snapd install juju --classic
 ~~~~
 
 To bootstrap:
@@ -77,6 +54,8 @@ juju bootstrap manual/Bootstrap_host_IP controller_name --debug --verbose --cons
 e.g.
 
 juju bootstrap manual/127.0.0.1 s390x --debug --verbose --constraints arch=s390x
+
+If your controller is behind NAT, you should specify it's 'external' or 'public' IP instead of 127.0.0.1
 ~~~~
 
 
@@ -102,10 +81,9 @@ git checkout multi-lpar-native
 
 ### Deploy the openstack bundle
 
-Note: please ensure juju-deployer is version 0.9.2 or greater. 0.10 is available via pip at time of writing.
 ~~~~
 cd zopenstack
-juju-deployer -vdc bundles/lpar/xenial-mitaka-stable.yaml
+juju deploy bundles/lpar/xenial-mitaka-stable.yaml --map-machines=existing
 ~~~~
 
 ## Configuring Openstack
