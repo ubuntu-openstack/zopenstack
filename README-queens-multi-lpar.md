@@ -2,20 +2,21 @@
 
 This validation scenario exercises a basic set of [OpenStack Charms](https://jujucharms.com/u/openstack-charmers)
 and [s390x](https://wiki.ubuntu.com/S390X) packages to deploy
-OpenStack Pike using [Juju](https://jujucharms.com) 2 on [Ubuntu Server](https://www.ubuntu.com/server)
-16.04.
+OpenStack Queens using [Juju](https://jujucharms.com) 2 on [Ubuntu Server](https://www.ubuntu.com/server)
+16.04 & 18.04
 
 The bundles for this deployment can be found here: [xenial](bundles/lpar/xenial-queens-stable.yaml) or [bionic](bundles/lpar/bionic-queens-stable.yaml) with deployment instructions [here](README-lpar.md)
 
 This bundle was deployed on S390x Lpars, Configured with 5 Lpars roughtly 20 Processors each and around 49GB Ram. With at least 2 shared disks if not more. 
 
 
-### Example Output/Artifacts
-This repo contains some [example artifacts](misc/example-queens-multi-lpar) from a validation deployment:
+### Output/Artifacts
 
- - [misc/example-queens-multi-lpar/juju_status.txt](misc/example-queens-multi-lpar/juju_status.txt)
- - [misc/example-queens-multi-lpar/catalog_list.txt](misc/example-queens-multi-lpar/catalog_list.txt)
- - [misc/example-queens-multi-lpar/hypervisor_list.txt](misc/example-queens-multi-lpar/hypervisor_list.txt)
+The tested artifacts for Xenial & Bionic Queens can be found here:
+
+- [https://github.com/openstack-charmers/test-share/tree/master/s390x/2018-may/bionic-queens-multi-lpar](Bionic 18.04 Queens)
+
+- [https://github.com/openstack-charmers/test-share/tree/master/s390x/2018-mar/xenial-queens-multi-lpar](Xenial 16.04 Queens)
 
 ### Known Issues and Workarounds
 
