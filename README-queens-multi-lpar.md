@@ -14,9 +14,9 @@ This bundle was deployed on S390x Lpars, Configured with 5 Lpars roughtly 20 Pro
 
 The tested artifacts for Xenial & Bionic Queens can be found here:
 
-- [https://github.com/openstack-charmers/test-share/tree/master/s390x/2018-may/bionic-queens-multi-lpar](Bionic 18.04 Queens)
+- [Bionic 18.04 with Queens artifacts](https://github.com/openstack-charmers/test-share/tree/master/s390x/2018-may/bionic-queens-multi-lpar)
 
-- [https://github.com/openstack-charmers/test-share/tree/master/s390x/2018-mar/xenial-queens-multi-lpar](Xenial 16.04 Queens)
+- [Xenial 16.04 with Queens artifacts](https://github.com/openstack-charmers/test-share/tree/master/s390x/2018-mar/xenial-queens-multi-lpar)
 
 ### Known Issues and Workarounds
 
