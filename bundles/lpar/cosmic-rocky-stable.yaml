@@ -1,18 +1,18 @@
 machines:
   '0':
-    series: bionic
+    series: cosmic
     constraints: "arch=s390x"
   '1':
-    series: bionic
+    series: cosmic
     constraints: "arch=s390x"
   '2':
-    series: bionic
+    series: cosmic
     constraints: "arch=s390x"
   '3':
-    series: bionic
+    series: cosmic
     constraints: "arch=s390x"
   '4':
-    series: bionic
+    series: cosmic
     constraints: "arch=s390x"
 relations:
 - - nova-compute:amqp
@@ -107,17 +107,17 @@ relations:
   - swift-storage-z4:swift-storage
 - - swift-proxy:swift-storage
   - swift-storage-z5:swift-storage
-series: bionic
+series: cosmic
 services:
 #  ceph-mon:
 #    annotations:
 #      gui-x: '750'
 #      gui-y: '500'
-#    charm: cs:~openstack-charmers-next/bionic/ceph-mon
+#    charm: cs:~openstack-charmers-next/cosmic/ceph-mon
 #    num_units: 3
 #    options:
 #      expected-osd-count: 3
-#      source: cloud:bionic-queens/proposed
+#      source: cloud:cosmic-queens/proposed
 #    to:
 #    - 'lxd:1'
 #    - 'lxd:2'
@@ -126,12 +126,12 @@ services:
 #    annotations:
 #      gui-x: '1000'
 #      gui-y: '500'
-#    charm: cs:~openstack-charmers-next/bionic/ceph-osd
+#    charm: cs:~openstack-charmers-next/cosmic/ceph-osd
 #    num_units: 3
 #    options:
 #      osd-devices: /dev/sdb
 #      osd-reformat: 'yes'
-#      source: cloud:bionic-queens/proposed
+#      source: cloud:cosmic-queens/proposed
 #    to:
 #    - '1'
 #    - '2'
@@ -140,17 +140,17 @@ services:
 #    annotations:
 #      gui-x: '1000'
 #      gui-y: '250'
-#    charm: cs:~openstack-charmers-next/bionic/ceph-radosgw
+#    charm: cs:~openstack-charmers-next/cosmic/ceph-radosgw
 #    num_units: 1
 #    options:
-#      source: cloud:bionic-queens/proposed
+#      source: cloud:cosmic-queens/proposed
 #    to:
 #    - lxd:0
   cinder:
     annotations:
       gui-x: '750'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/bionic/cinder
+    charm: cs:~openstack-charmers-next/cosmic/cinder
     num_units: 1
     options:
       openstack-origin: distro
@@ -163,13 +163,13 @@ services:
 #    annotations:
 #      gui-x: '750'
 #      gui-y: '250'
-#    charm: cs:~openstack-charmers-next/bionic/cinder-ceph
+#    charm: cs:~openstack-charmers-next/cosmic/cinder-ceph
 #    num_units: 0
   glance:
     annotations:
       gui-x: '250'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/bionic/glance
+    charm: cs:~openstack-charmers-next/cosmic/glance
     num_units: 1
     options:
       openstack-origin: distro
@@ -180,7 +180,7 @@ services:
     annotations:
       gui-x: '500'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/bionic/keystone
+    charm: cs:~openstack-charmers-next/cosmic/keystone
     num_units: 1
     options:
       openstack-origin: distro
@@ -192,7 +192,7 @@ services:
     annotations:
       gui-x: '0'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/bionic/percona-cluster
+    charm: cs:~openstack-charmers-next/cosmic/percona-cluster
     num_units: 1
     options:
       max-connections: 1000
@@ -203,7 +203,7 @@ services:
     annotations:
       gui-x: '500'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/bionic/neutron-api
+    charm: cs:~openstack-charmers-next/cosmic/neutron-api
     num_units: 1
     options:
       openstack-origin: distro
@@ -216,7 +216,7 @@ services:
     annotations:
       gui-x: '0'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/bionic/neutron-gateway
+    charm: cs:~openstack-charmers-next/cosmic/neutron-gateway
     num_units: 1
     options:
       openstack-origin: distro
@@ -235,7 +235,7 @@ services:
     annotations:
       gui-x: '0'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/bionic/nova-cloud-controller
+    charm: cs:~openstack-charmers-next/cosmic/nova-cloud-controller
     num_units: 1
     options:
       openstack-origin: distro
@@ -247,7 +247,7 @@ services:
     annotations:
       gui-x: '250'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/bionic/nova-compute
+    charm: cs:~openstack-charmers-next/cosmic/nova-compute
     num_units: 3
     options:
       config-flags: default_ephemeral_format=ext4
@@ -269,7 +269,7 @@ services:
     annotations:
       gui-x: '500'
       gui-y: '-250'
-    charm: cs:~openstack-charmers-next/bionic/openstack-dashboard
+    charm: cs:~openstack-charmers-next/cosmic/openstack-dashboard
     num_units: 1
     options:
       openstack-origin: distro
@@ -279,7 +279,7 @@ services:
     annotations:
       gui-x: '500'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/bionic/rabbitmq-server
+    charm: cs:~openstack-charmers-next/cosmic/rabbitmq-server
     num_units: 1
     to:
     - lxd:0
