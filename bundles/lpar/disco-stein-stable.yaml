@@ -264,6 +264,7 @@ services:
       gui-x: '1000'
       gui-y: '0'
     charm: cs:ntp
+    series: bionic
     num_units: 0
   openstack-dashboard:
     annotations:
