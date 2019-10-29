@@ -258,6 +258,7 @@ services:
       openstack-origin: distro
       network-manager: Neutron
       worker-multiplier: 0.25
+      cache-known-hosts: false
     to:
     - lxd:2
   nova-compute:
@@ -277,6 +278,7 @@ services:
     - '2'
     - '3'
   ntp:
+    series: bionic
     annotations:
       gui-x: '1000'
       gui-y: '0'
