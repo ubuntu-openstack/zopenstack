@@ -186,9 +186,9 @@ services:
       worker-multiplier: 0.25
     to:
     - lxd:2
- keystone-mysql-router:
+  keystone-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
- keystone:
+  keystone:
     annotations:
       gui-x: '500'
       gui-y: '0'

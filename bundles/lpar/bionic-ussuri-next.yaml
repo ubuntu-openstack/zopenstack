@@ -20,7 +20,7 @@ relations:
 - - neutron-gateway:amqp
   - rabbitmq-server:amqp
 - - keystone:shared-db
-  - keystone-mysql-router:shared-db
+  - mysql:shared-db
 - - nova-cloud-controller:identity-service
   - keystone:identity-service
 - - glance:identity-service
@@ -30,13 +30,13 @@ relations:
 - - neutron-openvswitch:neutron-plugin-api
   - neutron-api:neutron-plugin-api
 - - neutron-api:shared-db
-  - neutron-mysql-router:shared-db
+  - mysql:shared-db
 - - neutron-api:amqp
   - rabbitmq-server:amqp
 - - neutron-gateway:neutron-plugin-api
   - neutron-api:neutron-plugin-api
 - - glance:shared-db
-  - glance-mysql-router:shared-db
+  - mysql:shared-db
 - - glance:amqp
   - rabbitmq-server:amqp
 - - nova-cloud-controller:image-service
@@ -56,7 +56,7 @@ relations:
 - - openstack-dashboard:identity-service
   - keystone:identity-service
 - - nova-cloud-controller:shared-db
-  - nova-mysql-router:shared-db
+  - mysql:shared-db
 - - nova-cloud-controller:neutron-api
   - neutron-api:neutron-api
 - - cinder:image-service
@@ -68,7 +68,7 @@ relations:
 - - cinder:cinder-volume-service
   - nova-cloud-controller:cinder-volume-service
 - - placement 
-  - mysql
+  - mysql:shared-db
 - - placement
   - keystone
 - - placement
@@ -84,7 +84,7 @@ relations:
 #- - nova-compute:ceph-access
 #  - cinder-ceph:ceph-access
 - - cinder:shared-db
-  - cinder-mysql-router:shared-db
+  - mysql:shared-db
 #- - ceph-mon:client
 #  - cinder-ceph:ceph
 #- - ceph-mon:client
@@ -123,7 +123,7 @@ services:
 #    num_units: 3
 #    options:
 #      expected-osd-count: 3
-#      source: distro
+#      source: cloud:bionic-ussuri/proposed
 #    to:
 #    - 'lxd:1'
 #    - 'lxd:2'
@@ -137,7 +137,7 @@ services:
 #    options:
 #      osd-devices: /dev/sdb
 #      osd-reformat: 'yes'
-#      source: distro
+#      source: cloud:bionic-ussuri/proposed
 #    to:
 #    - '1'
 #    - '2'
@@ -149,11 +149,9 @@ services:
 #    charm: cs:~openstack-charmers-next/bionic/ceph-radosgw
 #    num_units: 1
 #    options:
-#      source: distro
+#      source: cloud:bionic-ussuri/proposed
 #    to:
 #    - lxd:0
-  cinder-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
   cinder:
     annotations:
       gui-x: '750'
@@ -161,7 +159,7 @@ services:
     charm: cs:~openstack-charmers-next/bionic/cinder
     num_units: 1
     options:
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
       block-device: None
       glance-api-version: 2
       worker-multiplier: 0.25
@@ -173,8 +171,6 @@ services:
 #      gui-y: '250'
 #    charm: cs:~openstack-charmers-next/bionic/cinder-ceph
 #    num_units: 0
-  glance-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
   glance:
     annotations:
       gui-x: '250'
@@ -182,20 +178,18 @@ services:
     charm: cs:~openstack-charmers-next/bionic/glance
     num_units: 1
     options:
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
       worker-multiplier: 0.25
     to:
     - lxd:2
- keystone-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
- keystone:
+  keystone:
     annotations:
       gui-x: '500'
       gui-y: '0'
     charm: cs:~openstack-charmers-next/bionic/keystone
     num_units: 1
     options:
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
       admin-password: openstack
       worker-multiplier: 0.25
     to:
@@ -204,15 +198,13 @@ services:
     annotations:
       gui-x: '0'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/mysql-innodb-cluster
+    charm: cs:~openstack-charmers-next/percona-cluster
     num_units: 1
     options:
       max-connections: 1000
       innodb-buffer-pool-size: 256M
     to:
     - lxd:0
-  neutron-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
   neutron-api:
     annotations:
       gui-x: '500'
@@ -220,14 +212,12 @@ services:
     charm: cs:~openstack-charmers-next/bionic/neutron-api
     num_units: 1
     options:
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
       neutron-security-groups: true
       flat-network-providers: physnet1
       worker-multiplier: 0.25
     to:
     - lxd:1
-  placement-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
   placement:
     annotations:
       gui-x: '0'
@@ -235,7 +225,7 @@ services:
     charm: cs:~openstack-charmers-next/bionic/placement
     num_units: 1
     options:
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
       worker-multiplier: 0.25
     to:
     - lxd:2
@@ -246,7 +236,7 @@ services:
     charm: cs:~openstack-charmers-next/bionic/neutron-gateway
     num_units: 1
     options:
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
       bridge-mappings: physnet1:br-ex
       data-port: br-ex:encc003
       worker-multiplier: 0.25
@@ -258,8 +248,6 @@ services:
       gui-y: '500'
     charm: cs:~openstack-charmers-next/neutron-openvswitch
     num_units: 0
-  nova-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
   nova-cloud-controller:
     annotations:
       gui-x: '0'
@@ -267,7 +255,7 @@ services:
     charm: cs:~openstack-charmers-next/bionic/nova-cloud-controller
     num_units: 1
     options:
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
       network-manager: Neutron
       worker-multiplier: 0.25
     to:
@@ -280,7 +268,7 @@ services:
     num_units: 3
     options:
       config-flags: default_ephemeral_format=ext4
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
       enable-live-migration: true
       enable-resize: true
       migration-auth-type: ssh
@@ -302,7 +290,7 @@ services:
     charm: cs:~openstack-charmers-next/bionic/openstack-dashboard
     num_units: 1
     options:
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
     to:
     - lxd:3
   rabbitmq-server:
@@ -320,7 +308,7 @@ services:
       zone-assignment: manual
       replicas: 5
       swift-hash: 62ce298d-cd4a-4087-b7f3-0c71df0127e0
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
     to:
       - "lxd:0"
   swift-storage-z1:
@@ -330,7 +318,7 @@ services:
       zone: 1
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
     to:
     - '0'
   swift-storage-z2:
@@ -340,7 +328,7 @@ services:
       zone: 2
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
     to:
     - '1'
   swift-storage-z3:
@@ -350,7 +338,7 @@ services:
       zone: 3
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
     to:
     - '2'
   swift-storage-z4:
@@ -360,7 +348,7 @@ services:
       zone: 4
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
     to:
     - '3'
   swift-storage-z5:
@@ -370,6 +358,6 @@ services:
       zone: 5
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: distro
+      openstack-origin: cloud:bionic-ussuri/proposed
     to:
     - '4'
