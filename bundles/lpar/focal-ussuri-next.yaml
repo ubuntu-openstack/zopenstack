@@ -220,6 +220,7 @@ services:
     charm: cs:~openstack-charmers-next/focal/neutron-api
     num_units: 1
     options:
+      manage-neutron-plugin-legacy-mode: true
       openstack-origin: distro
       neutron-security-groups: true
       flat-network-providers: physnet1
