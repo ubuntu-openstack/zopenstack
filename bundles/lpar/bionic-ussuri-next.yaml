@@ -77,28 +77,28 @@ relations:
 #Ceph does not work on s390x with this release, please
 #refer to Bug 1713032 or README-queens-multi-lpar.md
 
-#- - cinder-ceph:storage-backend
-#  - cinder:storage-backend
-#- - ceph-mon:client
-#  - nova-compute:ceph
-#- - nova-compute:ceph-access
-#  - cinder-ceph:ceph-access
+- - cinder-ceph:storage-backend
+  - cinder:storage-backend
+- - ceph-mon:client
+  - nova-compute:ceph
+- - nova-compute:ceph-access
+  - cinder-ceph:ceph-access
 - - cinder:shared-db
   - mysql:shared-db
-#- - ceph-mon:client
-#  - cinder-ceph:ceph
-#- - ceph-mon:client
-#  - glance:ceph
-#- - ceph-osd:mon
-#  - ceph-mon:osd
+- - ceph-mon:client
+  - cinder-ceph:ceph
+- - ceph-mon:client
+  - glance:ceph
+- - ceph-osd:mon
+  - ceph-mon:osd
 - - ntp:juju-info
   - nova-compute:juju-info
 - - ntp:juju-info
   - neutron-gateway:juju-info
-#- - ceph-radosgw:mon
-#  - ceph-mon:radosgw
-#- - ceph-radosgw:identity-service
-#  - keystone:identity-service
+- - ceph-radosgw:mon
+  - ceph-mon:radosgw
+- - ceph-radosgw:identity-service
+  - keystone:identity-service
 
 # Swift relations
 - - swift-proxy:identity-service
@@ -115,43 +115,43 @@ relations:
   - swift-storage-z5:swift-storage
 series: bionic
 services:
-#  ceph-mon:
-#    annotations:
-#      gui-x: '750'
-#      gui-y: '500'
-#    charm: cs:~openstack-charmers-next/bionic/ceph-mon
-#    num_units: 3
-#    options:
-#      expected-osd-count: 3
-#      source: cloud:bionic-ussuri/proposed
-#    to:
-#    - 'lxd:1'
-#    - 'lxd:2'
-#    - 'lxd:3'
-#  ceph-osd:
-#    annotations:
-#      gui-x: '1000'
-#      gui-y: '500'
-#    charm: cs:~openstack-charmers-next/bionic/ceph-osd
-#    num_units: 3
-#    options:
-#      osd-devices: /dev/sdb
-#      osd-reformat: 'yes'
-#      source: cloud:bionic-ussuri/proposed
-#    to:
-#    - '1'
-#    - '2'
-#    - '3'
-#  ceph-radosgw:
-#    annotations:
-#      gui-x: '1000'
-#      gui-y: '250'
-#    charm: cs:~openstack-charmers-next/bionic/ceph-radosgw
-#    num_units: 1
-#    options:
-#      source: cloud:bionic-ussuri/proposed
-#    to:
-#    - lxd:0
+  ceph-mon:
+    annotations:
+      gui-x: '750'
+      gui-y: '500'
+    charm: cs:~openstack-charmers-next/bionic/ceph-mon
+    num_units: 3
+    options:
+      expected-osd-count: 3
+      source: cloud:bionic-ussuri/proposed
+    to:
+    - 'lxd:1'
+    - 'lxd:2'
+    - 'lxd:3'
+  ceph-osd:
+    annotations:
+      gui-x: '1000'
+      gui-y: '500'
+    charm: cs:~openstack-charmers-next/bionic/ceph-osd
+    num_units: 3
+    options:
+      osd-devices: /dev/disk/by-id/ccw-CEPH-part1
+      osd-reformat: 'yes'
+      source: cloud:bionic-ussuri/proposed
+    to:
+    - '1'
+    - '2'
+    - '3'
+  ceph-radosgw:
+    annotations:
+      gui-x: '1000'
+      gui-y: '250'
+    charm: cs:~openstack-charmers-next/bionic/ceph-radosgw
+    num_units: 1
+    options:
+      source: cloud:bionic-ussuri/proposed
+    to:
+    - lxd:0
   cinder:
     annotations:
       gui-x: '750'
