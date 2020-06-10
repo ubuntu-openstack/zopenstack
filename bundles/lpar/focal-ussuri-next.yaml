@@ -211,6 +211,8 @@ services:
       innodb-buffer-pool-size: 256M
     to:
     - lxd:0
+    - lxd:1
+    - lxd:2
   neutron-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
   neutron-api:
