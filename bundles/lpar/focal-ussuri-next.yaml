@@ -167,12 +167,12 @@ services:
       worker-multiplier: 0.25
     to:
     - lxd:1
-#  cinder-ceph:
-#    annotations:
-#      gui-x: '750'
-#      gui-y: '250'
-#    charm: cs:~openstack-charmers-next/focal/cinder-ceph
-#    num_units: 0
+  cinder-ceph:
+    annotations:
+      gui-x: '750'
+      gui-y: '250'
+    charm: cs:~openstack-charmers-next/focal/cinder-ceph
+    num_units: 0
   glance-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
   glance:
