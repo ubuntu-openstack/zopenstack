@@ -73,6 +73,18 @@ relations:
   - keystone
 - - placement
   - nova-cloud-controller
+- - placement-mysql-router:db-router
+  - mysql:db-router
+- - cinder-mysql-router:db-router
+  - mysql:db-router
+- - glance-mysql-router:db-router
+  - mysql:db-router
+- - keystone-mysql-router:db-router
+  - mysql:db-router
+- - nova-mysql-router:db-router
+  - mysql:db-router
+- - neutron-mysql-router:db-router
+  - mysql:db-router
 
 #Ceph does not work on s390x with this release, please
 #refer to Bug 1713032 or README-queens-multi-lpar.md
