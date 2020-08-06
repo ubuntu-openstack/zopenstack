@@ -136,7 +136,6 @@ services:
     num_units: 3
     options:
       osd-devices: /dev/disk/by-id/ccw-CEPH-part1
-      osd-reformat: 'yes'
       source: cloud:bionic-ussuri/proposed
     to:
     - '1'
