@@ -73,6 +73,20 @@ relations:
   - keystone
 - - placement
   - nova-cloud-controller
+- - keystone-mysql-router:db-router
+  - mysql:db-router
+- - cinder-mysql-router:db-router
+  - mysql:db-router
+- - nova-mysql-router:db-router
+  - mysql:db-router
+- - glance-mysql-router:db-router
+  - mysql:db-router
+- - neutron-mysql-router:db-router
+  - mysql:db-router
+- - dashboard-mysql-router:db-router
+  - mysql:db-router
+- - placement-mysql-router:db-router
+  - mysql:db-router
 
 #Ceph does not work on s390x with this release, please
 #refer to Bug 1713032 or README-queens-multi-lpar.md
@@ -297,6 +311,8 @@ services:
       gui-y: '0'
     charm: cs:ntp
     num_units: 0
+  dashboard-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
   openstack-dashboard:
     annotations:
       gui-x: '500'
