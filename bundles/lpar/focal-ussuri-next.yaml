@@ -83,7 +83,7 @@ relations:
   - nova-compute:ceph
 - - nova-compute:ceph-access
   - cinder-ceph:ceph-access
-  - cinder:shared-db
+- - cinder:shared-db
   - cinder-mysql-router:shared-db
 - - ceph-mon:client
   - cinder-ceph:ceph
