@@ -197,7 +197,7 @@ services:
       openstack-origin: distro
       worker-multiplier: 0.25
     to:
-    - lxd:2
+    - lxd:4
   keystone-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
   keystone:
@@ -223,8 +223,8 @@ services:
       innodb-buffer-pool-size: 256M
     to:
     - lxd:0
-    - lxd:1
-    - lxd:2
+    - lxd:3
+    - lxd:4
   neutron-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
   neutron-api:
@@ -321,7 +321,7 @@ services:
     options:
       openstack-origin: distro
     to:
-    - lxd:3
+    - lxd:4
   rabbitmq-server:
     annotations:
       gui-x: '500'
