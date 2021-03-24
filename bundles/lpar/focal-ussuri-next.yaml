@@ -55,6 +55,8 @@ relations:
   - rabbitmq-server:amqp
 - - openstack-dashboard:identity-service
   - keystone:identity-service
+- - openstack-dashboard:shared-db
+  - dashboard-mysql-router:shared-db
 - - nova-cloud-controller:shared-db
   - nova-mysql-router:shared-db
 - - nova-cloud-controller:neutron-api
@@ -67,8 +69,8 @@ relations:
   - keystone:identity-service
 - - cinder:cinder-volume-service
   - nova-cloud-controller:cinder-volume-service
-- - placement 
-  - mysql
+- - placement:shared-db
+  - placement-mysql-router:shared-db
 - - placement
   - keystone
 - - placement
