@@ -90,9 +90,6 @@ relations:
 - - placement-mysql-router:db-router
   - mysql:db-router
 
-#Ceph does not work on s390x with this release, please
-#refer to Bug 1713032 or README-queens-multi-lpar.md
-
 - - cinder-ceph:storage-backend
   - cinder:storage-backend
 - - ceph-mon:client
