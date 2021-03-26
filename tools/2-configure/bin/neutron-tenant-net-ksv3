@@ -68,7 +68,9 @@ if __name__ == '__main__':
         password=os.environ['OS_PASSWORD'],
         domain_name=os.environ['OS_DOMAIN_NAME'],
         auth_url=os.environ['OS_AUTH_URL'])
-    sess = session.Session(auth=auth)
+    sess = session.Session(
+        auth=auth,
+        verify=os.environ.get('OS_CACERT'))
 
     # Clients support sessions
     keystone = v3.Client(session=sess)
