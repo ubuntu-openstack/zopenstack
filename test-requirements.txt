@@ -3,4 +3,5 @@ python-keystoneclient
 python-neutronclient
 python-novaclient
 python-heatclient
+python-glanceclient
 juju-deployer
