@@ -49,11 +49,14 @@ tools/images_s390x-v3.sh
 # Set security groups and rules
 tools/sec_groups.sh
 
-echo "Tempest"
+# Gather vars for tempest template
 image_id=$(glance image-list | grep cirros | awk '{ print $2 }')
 image_alt_id=$(glance image-list | grep xenial | awk '{ print $2 }')
+# NOTE(lourot): There are no CirrOS images for s390x, see lp:1619752, so
+# image_id is probably empty and Tempest will fail. Let's use an Ubuntu image
+# for Tempest testing instead:
+image_id="$image_alt_id"
 router=$(neutron router-list | grep provider-router | awk '{ print $2}')
-# Gather vars for tempest template
 keystone_unit=$(juju status keystone|grep -i workload -A1|tail -n1|awk '{print $1}'|tr -d '*')
 dashboard_unit=$(juju status openstack-dashboard|grep -i workload -A1|tail -n1|awk '{print $1}'|tr -d '*')
 ncc_unit=$(juju status nova-cloud-controller|grep -i workload -A1|tail -n1|awk '{print $1}'|tr -d '*')
