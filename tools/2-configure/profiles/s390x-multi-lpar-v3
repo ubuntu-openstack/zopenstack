@@ -58,6 +58,9 @@ tools/images_s390x-v3.sh
 # Set security groups and rules
 tools/sec_groups.sh
 
+# Tune for higher-density testing
+#LA_TODO tools/quota_million-v3.sh  # not needed after all it seems
+
 # Gather vars for tempest template
 image_id=$(glance image-list | grep cirros | awk '{ print $2 }')
 image_alt_id=$(glance image-list | grep xenial | awk '{ print $2 }')
