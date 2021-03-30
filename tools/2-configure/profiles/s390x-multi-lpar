@@ -15,7 +15,7 @@
 net_type=${1:-"gre"}
 
 # Configure neutron networking on the deployed cloud
-source novarc
+source ../../rcs/openrc
 ./bin/neutron-ext-net --network-type vlan --vlan_id 2893 -g $GATEWAY -c $CIDR_EXT -f $FIP_RANGE ext_net 
 ./bin/neutron-tenant-net --network-type $net_type -t admin -r provider-router -N $NAMESERVER private $CIDR_PRIV
 

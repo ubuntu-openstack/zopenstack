@@ -42,7 +42,11 @@ if __name__ == '__main__':
                       dest="dns_servers", action="store",  default=None)
     parser.add_option("--network-type",
                       help="Network type.",
-                      dest="network_type", action="store", default='gre')
+                      dest="network_type", action="store", default=None)
+    parser.add_option("--physical-network",
+                      help="Physical network if network type is 'vlan'.",
+                      dest="physical_network", action="store",
+                      default='physnet1')
     (opts, args) = parser.parse_args()
 
     if len(args) != 2:
@@ -64,7 +68,9 @@ if __name__ == '__main__':
         password=os.environ['OS_PASSWORD'],
         domain_name=os.environ['OS_DOMAIN_NAME'],
         auth_url=os.environ['OS_AUTH_URL'])
-    sess = session.Session(auth=auth)
+    sess = session.Session(
+        auth=auth,
+        verify=os.environ.get('OS_CACERT'))
 
     # Clients support sessions
     keystone = v3.Client(session=sess)
@@ -89,17 +95,23 @@ if __name__ == '__main__':
                 'name': net_name,
                 'shared': opts.shared,
                 'tenant_id': project_id,
-                'provider:network_type': opts.network_type,
             }
         }
 
         if opts.network_type == 'vxlan':
             network_msg['network']['provider:segmentation_id'] = 1233
+            network_msg['network']['provider:network_type'] = opts.network_type
         elif opts.network_type == 'vlan':
             network_msg['network']['provider:segmentation_id'] = 5
-            network_msg['network']['provider:physical_network'] = 'physnet1'
+            network_msg['network']['provider:physical_network'] = \
+                opts.physical_network
+            network_msg['network']['provider:network_type'] = opts.network_type
         else:
-            network_msg['network']['provider:segmentation_id'] = 5
+            if opts.network_type:
+                network_msg['network'][
+                    'provider:network_type'] = opts.network_type
+                network_msg['network']['provider:segmentation_id'] = 5
+            # If no network type specified let neutron determine defaults
 
         network = quantum.create_network(network_msg)['network']
     else:
