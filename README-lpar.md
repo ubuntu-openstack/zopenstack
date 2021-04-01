@@ -96,7 +96,7 @@ simply run
 
 ~~~~
 cd tools/2-configure
-source novarc
+source openrc
 ./configure s390x-multi-lpar
 ~~~~
 

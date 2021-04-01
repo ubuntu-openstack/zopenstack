@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 # Expect all to exit zero
 
-. novarc
+. openrc
 
 openstack aggregate list
 openstack catalog list
