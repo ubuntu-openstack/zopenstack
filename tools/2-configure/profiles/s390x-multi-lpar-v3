@@ -11,8 +11,17 @@
 [[ -z "$CIDR_PRIV" ]] && export CIDR_PRIV="172.16.0.0/12"
 [[ -z "$SWIFT_IP" ]] && export SWIFT_IP="10.245.161.162"  # Cirros image hosted on serverstack
 
-# Accept network type as first parameter, assume gre if unspecified
-net_type=${1:-"gre"}
+juju run --unit ovn-central/leader 'echo This is an OVN setup' 2>/dev/null && is_ovn_setup=true || is_ovn_setup=false
+
+# Accept private network type as first parameter. If unspecified, assume:
+# - 'gre' for an OVS setup,
+# - 'geneve' for an OVN setup.
+if [[ "$is_ovn_setup" == "true" ]]; then
+    default_net_type=geneve
+else
+    default_net_type=gre
+fi
+net_type=${1:-"$default_net_type"}
 
 # Configure neutron networking on overcloud
 source ../../openrcv3_domain

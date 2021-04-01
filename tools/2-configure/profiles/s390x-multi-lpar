@@ -11,7 +11,7 @@
 [[ -z "$CIDR_PRIV" ]] && export CIDR_PRIV="172.16.0.0/12"
 [[ -z "$SWIFT_IP" ]] && export SWIFT_IP="10.245.161.162"  # Cirros image hosted on serverstack
 
-# Accept network type as first parameter, assume gre if unspecified
+# Accept private network type as first parameter, assume gre if unspecified
 net_type=${1:-"gre"}
 
 # Configure neutron networking on the deployed cloud
