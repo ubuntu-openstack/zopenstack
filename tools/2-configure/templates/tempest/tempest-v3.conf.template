@@ -1,6 +1,7 @@
 [auth]
 test_accounts_file=accounts.yaml
-default_credentials_domain_name=default
+# NOTE(lourot): this is used in TestDashboardBasicOps for logging into Horizon:
+default_credentials_domain_name=admin_domain
 admin_username=admin
 admin_project_name=admin
 admin_password=openstack
@@ -17,6 +18,9 @@ console_output=false
 resize=true
 live_migration=true
 block_migration_for_live_migration=true
+[dashboard]
+dashboard_url=__PROTO__://__DASHBOARD__/horizon
+login_url=__PROTO__://__DASHBOARD__/horizon/auth/login/
 [identity]
 uri_v3=__PROTO__://__KEYSTONE__:5000/v3
 auth_version=v3
