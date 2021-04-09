@@ -14,6 +14,7 @@ else
 fi
 _password=$(juju run $_juju_model_arg --unit keystone/leader 'leader-get admin_passwd')
 
+. $(dirname ${BASH_SOURCE[0]})/_openrcv3_get_root_ca
 if [ ! -z "$_root_ca" -a -s "$_root_ca" ]; then
     export OS_AUTH_PROTOCOL=https
     export OS_CACERT=${_root_ca}
@@ -21,12 +22,11 @@ fi
 export OS_AUTH_URL=${OS_AUTH_PROTOCOL:-http}://${_keystone_ip}:5000/v3
 export OS_USERNAME=admin
 export OS_PASSWORD=${_password}
-export OS_USER_DOMAIN_NAME=admin_domain
-export OS_PROJECT_DOMAIN_NAME=admin_domain
-export OS_PROJECT_NAME=admin
 export OS_REGION_NAME=RegionOne
+export OS_DOMAIN_NAME=admin_domain
+export OS_USER_DOMAIN_NAME=admin_domain
 export OS_IDENTITY_API_VERSION=3
 # Swift needs this:
 export OS_AUTH_VERSION=3
-# Gnocchi needs this
+# Gnocchi needs this:
 export OS_AUTH_TYPE=password

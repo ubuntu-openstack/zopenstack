@@ -22,7 +22,7 @@ time timeout 2700 $HOME/tools/juju-wait/juju-wait -v
 time ./tools/3-test/check-openstack-api-clients.sh
 
 # Configure OpenStack:  Tenant, Network, Images, Security Groups
-source novarc
+source openrc
 time ./tools/2-configure/configure s390x-zkvm
 
 # Launch and confirm an instance
