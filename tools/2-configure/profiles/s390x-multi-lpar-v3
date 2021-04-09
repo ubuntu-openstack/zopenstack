@@ -24,6 +24,7 @@ ext_net=$(openstack network list | awk '/ext_net/ {print $2}')
 openstack project show demo || openstack project create demo
 openstack user show demo || openstack user create --project demo --password pass --enable --email demo@dev.null demo
 openstack role show Member || openstack role create Member
+openstack role show ResellerAdmin || openstack role create ResellerAdmin  # needed for AccountQuotasTest
 openstack role add --user demo --project demo Member
 openstack project show alt_demo || openstack project create alt_demo
 openstack user show alt_demo || openstack user create --project alt_demo --password secret --enable --email alt_demo@dev.null alt_demo
