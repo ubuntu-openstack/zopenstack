@@ -62,6 +62,8 @@ dashboard=$(juju run --unit ${dashboard_unit} "unit-get private-address")
 ncc=$(juju run --unit ${ncc_unit} "unit-get private-address")
 http=${OS_AUTH_PROTOCOL:-http}
 default_domain_id=$(openstack domain list | awk '/default/ {print $2}')
+admin_password=${OS_PASSWORD:-openstack}
+root_ca_file=$OS_CACERT
 
 # Insert vars into tempest conf
 sed -e "s/__IMAGE_ID__/$image_id/g" -e "s/__IMAGE_ALT_ID__/$image_alt_id/g" \
@@ -72,6 +74,8 @@ sed -e "s/__IMAGE_ID__/$image_id/g" -e "s/__IMAGE_ALT_ID__/$image_alt_id/g" \
     -e "s/__CIDR_PRIV__/${CIDR_PRIV////\\/}/g" \
     -e "s/__NCC__/$ncc/g" -e "s/__SECRET__/$secret/g" -e "s/__ACCESS__/$access/g" \
     -e "s/__DEFAULT_DOMAIN_ID__/$default_domain_id/g" \
+    -e "s/__ADMIN_PASSWORD__/$admin_password/g" \
+    -e "s|__ROOT_CA_FILE__|$root_ca_file|g" \
     templates/tempest/tempest-v3.conf.template > tempest.conf
 
 # Git tempest, place the rendered tempest template

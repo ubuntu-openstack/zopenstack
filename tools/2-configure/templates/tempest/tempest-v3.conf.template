@@ -4,7 +4,7 @@ test_accounts_file=accounts.yaml
 default_credentials_domain_name=admin_domain
 admin_username=admin
 admin_project_name=admin
-admin_password=openstack
+admin_password=__ADMIN_PASSWORD__
 admin_domain_name=admin_domain
 [compute]
 image_ref=__IMAGE_ID__
@@ -28,6 +28,7 @@ admin_role=Admin
 region=RegionOne
 default_domain_id=__DEFAULT_DOMAIN_ID__
 admin_domain_scope=true
+ca_certificates_file=__ROOT_CA_FILE__
 [identity-feature-enabled]
 api_v2=false
 api_v3=true
