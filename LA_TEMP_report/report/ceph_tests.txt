@@ -1,0 +1,117 @@
++ juju run -u ceph-mon/leader -- sudo ceph osd lspools
+1 device_health_metrics
+2 default.rgw.buckets.data
+3 default.rgw.control
+4 default.rgw.data.root
+5 default.rgw.gc
+6 default.rgw.log
+7 default.rgw.intent-log
+8 default.rgw.meta
+9 default.rgw.otp
+10 default.rgw.usage
+11 default.rgw.users.keys
+12 default.rgw.users.email
+13 default.rgw.users.swift
+14 default.rgw.users.uid
+15 default.rgw.buckets.extra
+16 default.rgw.buckets.index
+17 .rgw.root
+18 cinder-ceph
+19 glance
++ juju run -u ceph-mon/leader -- sudo ceph osd df
+ID  CLASS  WEIGHT   REWEIGHT  SIZE    RAW USE  DATA     OMAP  META     AVAIL   %USE  VAR   PGS  STATUS
+ 0    ssd  0.02010   1.00000  21 GiB  637 MiB  599 MiB   0 B   38 MiB  20 GiB  3.02  1.00  101      up
+ 1    ssd  0.02010   1.00000  21 GiB  637 MiB  599 MiB   0 B   38 MiB  20 GiB  3.01  1.00  101      up
+ 2    ssd  0.02010   1.00000  21 GiB  633 MiB  599 MiB   0 B   33 MiB  20 GiB  2.99  1.00  101      up
+                       TOTAL  62 GiB  1.9 GiB  1.8 GiB   0 B  108 MiB  60 GiB  3.01                   
+MIN/MAX VAR: 1.00/1.00  STDDEV: 0.01
++ juju run -u ceph-mon/leader -- sudo rados -p cinder-ceph ls
+rbd_directory
+rbd_info
+rbd_trash
++ juju run -u ceph-mon/leader -- sudo rados -p glance ls
+rbd_data.13f9fde800b.0000000000000022
+rbd_data.148d6a1a1183.0000000000000015
+rbd_data.148d6a1a1183.0000000000000008
+rbd_data.148d6a1a1183.0000000000000009
+rbd_data.148d6a1a1183.000000000000000f
+rbd_data.148d6a1a1183.0000000000000011
+rbd_data.13f9fde800b.0000000000000016
+rbd_data.13f9fde800b.000000000000001a
+rbd_object_map.148d6a1a1183.0000000000000005
+rbd_data.148d6a1a1183.0000000000000016
+rbd_data.148d6a1a1183.0000000000000012
+rbd_data.148d6a1a1183.000000000000000d
+rbd_header.148d6a1a1183
+rbd_data.13f9fde800b.000000000000001f
+rbd_data.13f9fde800b.0000000000000008
+rbd_data.148d6a1a1183.000000000000001d
+rbd_data.148d6a1a1183.000000000000001c
+rbd_data.13f9fde800b.000000000000001c
+rbd_data.148d6a1a1183.0000000000000013
+rbd_data.148d6a1a1183.0000000000000003
+rbd_data.13f9fde800b.0000000000000017
+rbd_data.148d6a1a1183.0000000000000022
+rbd_data.13f9fde800b.0000000000000015
+rbd_data.13f9fde800b.0000000000000003
+rbd_directory
+rbd_data.148d6a1a1183.0000000000000019
+rbd_data.148d6a1a1183.0000000000000021
+rbd_data.13f9fde800b.000000000000000c
+rbd_data.148d6a1a1183.0000000000000023
+rbd_data.13f9fde800b.000000000000001b
+rbd_data.13f9fde800b.000000000000000f
+rbd_data.13f9fde800b.0000000000000009
+rbd_data.148d6a1a1183.0000000000000026
+rbd_data.13f9fde800b.0000000000000021
+rbd_data.13f9fde800b.000000000000001e
+rbd_data.148d6a1a1183.0000000000000004
+rbd_info
+rbd_data.148d6a1a1183.0000000000000025
+rbd_data.13f9fde800b.0000000000000020
+rbd_data.148d6a1a1183.0000000000000006
+rbd_data.148d6a1a1183.0000000000000000
+rbd_data.148d6a1a1183.0000000000000002
+rbd_object_map.13f9fde800b
+rbd_data.13f9fde800b.0000000000000006
+rbd_data.13f9fde800b.0000000000000005
+rbd_id.debe1d54-1676-42e6-8894-bda9118edb99
+rbd_id.6a4ab927-f384-47b4-adde-f2a98c5570b1
+rbd_data.148d6a1a1183.000000000000001e
+rbd_data.13f9fde800b.000000000000001d
+rbd_data.148d6a1a1183.0000000000000001
+rbd_data.13f9fde800b.0000000000000007
+rbd_data.13f9fde800b.0000000000000019
+rbd_data.148d6a1a1183.0000000000000020
+rbd_data.13f9fde800b.000000000000000d
+rbd_data.148d6a1a1183.0000000000000018
+rbd_data.148d6a1a1183.0000000000000024
+rbd_data.13f9fde800b.000000000000000e
+rbd_data.13f9fde800b.000000000000000b
+rbd_data.13f9fde800b.0000000000000004
+rbd_data.148d6a1a1183.0000000000000014
+rbd_data.13f9fde800b.0000000000000002
+rbd_data.13f9fde800b.0000000000000000
+rbd_data.13f9fde800b.0000000000000018
+rbd_data.13f9fde800b.0000000000000001
+rbd_data.148d6a1a1183.000000000000001f
+rbd_object_map.148d6a1a1183
+rbd_data.148d6a1a1183.000000000000000c
+rbd_trash
+rbd_data.13f9fde800b.0000000000000012
+rbd_data.148d6a1a1183.000000000000000e
+rbd_object_map.13f9fde800b.0000000000000004
+rbd_data.13f9fde800b.0000000000000011
+rbd_data.13f9fde800b.000000000000000a
+rbd_data.148d6a1a1183.0000000000000010
+rbd_data.148d6a1a1183.000000000000000a
+rbd_data.148d6a1a1183.0000000000000017
+rbd_data.148d6a1a1183.000000000000001a
+rbd_data.148d6a1a1183.000000000000001b
+rbd_data.13f9fde800b.0000000000000010
+rbd_data.148d6a1a1183.0000000000000007
+rbd_data.148d6a1a1183.0000000000000005
+rbd_data.13f9fde800b.0000000000000014
+rbd_data.148d6a1a1183.000000000000000b
+rbd_data.13f9fde800b.0000000000000013
+rbd_header.13f9fde800b

@@ -1,0 +1,12 @@
+++ openstack floating ip create ext_net
+++ grep floating_ip_address
+++ awk '{print $4}'
++ ip_addr=10.13.3.184
++ ssh-keygen -f /home/ubuntu/.ssh/known_hosts -R 10.13.3.184
+Host 10.13.3.184 not found in /home/ubuntu/.ssh/known_hosts
++ openstack server add floating ip my-bionic-s390x 10.13.3.184
++ sleep 30
++ ssh 10.13.3.184 -i /home/ubuntu/.ssh/id_rsa -oStrictHostKeyChecking=accept-new echo SSH works
+Warning: Permanently added '10.13.3.184' (ECDSA) to the list of known hosts.
+SSH works
++ openstack server remove floating ip my-bionic-s390x 10.13.3.184
