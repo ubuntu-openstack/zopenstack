@@ -1,0 +1,113 @@
++ cd ../tools/2-configure/tempest/
++ . .tox/tempest/bin/activate
+++ '[' .tox/tempest/bin/activate = bin/tempest_smoke.sh ']'
+++ deactivate nondestructive
+++ unset -f pydoc
+++ '[' -z '' ']'
+++ '[' -z '' ']'
+++ hash -r
+++ '[' -z '' ']'
+++ unset VIRTUAL_ENV
+++ '[' '!' nondestructive = nondestructive ']'
+++ VIRTUAL_ENV=/home/ubuntu/Documents/git/zopenstack/tools/2-configure/tempest/.tox/tempest
+++ '[' linux-gnu = cygwin ']'
+++ '[' linux-gnu = msys ']'
+++ export VIRTUAL_ENV
+++ _OLD_VIRTUAL_PATH=/home/ubuntu/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/home/ubuntu/Documents/git/zopenstack/tools/2-configure/tempest/.tox/tempest/bin:/home/ubuntu/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ export PATH
+++ '[' -z '' ']'
+++ '[' -z '' ']'
+++ _OLD_VIRTUAL_PS1=
+++ '[' x '!=' x ']'
++++ basename /home/ubuntu/Documents/git/zopenstack/tools/2-configure/tempest/.tox/tempest
+++ PS1='(tempest) '
+++ export PS1
+++ alias pydoc
+++ true
+++ hash -r
++ tempest run --serial --regex tempest.api.object_storage.test_account_quotas.AccountQuotasTest
+2021-05-08 09:56:52.287 2037672 INFO tempest [-] Using tempest config file /home/ubuntu/Documents/git/zopenstack/tools/2-configure/tempest/etc/tempest.conf[00m
+2021-05-08 09:56:52.299 2037672 WARNING oslo_config.cfg [-] Deprecated: Option "api_v2" from group "identity-feature-enabled" is deprecated for removal (The identity v2.0 API was removed in the Queens release. Tests that exercise the v2.0 API will be removed from tempest in the v22.0.0 release. They are kept only to test stable branches.).  Its value may be silently ignored in the future.[00m
+2021-05-08 09:56:52.304 2037672 WARNING oslo_config.cfg [-] Deprecated: Option "dns_servers" from group "network" is deprecated for removal (This config option is no longer used anywhere, so it can be removed.).  Its value may be silently ignored in the future.[00m
+2021-05-08 09:56:53.019 2037672 INFO tempest.lib.common.rest_client [req-9147c999-bcaf-4e27-9875-f455d0771c22 ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:5000/v3/auth/tokens 0.260s[00m
+2021-05-08 09:56:53.265 2037672 INFO tempest.lib.common.rest_client [req-72b05f17-1d63-4cd5-8875-ca117263e778 ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:5000/v3/auth/tokens 0.238s[00m
+2021-05-08 09:56:53.305 2037672 INFO tempest.lib.common.rest_client [req-06bd6d31-822c-4d06-bfae-f8bf01db816d ] Request (AccountQuotasTest:setUpClass): 200 GET http://10.13.3.200:35357/v3/domains?name=admin_domain 0.036s[00m
+2021-05-08 09:56:53.341 2037672 INFO tempest.lib.common.rest_client [req-17925e21-6642-4af0-8872-c0df3d90c159 ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:35357/v3/projects 0.030s[00m
+2021-05-08 09:56:53.606 2037672 INFO tempest.lib.common.rest_client [req-0a59b0d3-87b8-4100-b2c1-1cfdcc882101 ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:35357/v3/users 0.261s[00m
+2021-05-08 09:56:53.626 2037672 INFO tempest.lib.common.rest_client [req-ea44fda0-956a-42c5-bc15-0e308afeccfa ] Request (AccountQuotasTest:setUpClass): 200 GET http://10.13.3.200:35357/v3/roles 0.017s[00m
+2021-05-08 09:56:53.658 2037672 INFO tempest.lib.common.rest_client [req-7dbbfd42-2eff-42d2-929d-2bffc6f7dad8 ] Request (AccountQuotasTest:setUpClass): 204 PUT http://10.13.3.200:35357/v3/projects/27d1ed2137a44c009a76398ca6a0bf6e/users/cb58bd3cf07d4608b4a4f32e635e0073/roles/7e942d4e7891449e850cfc143fa5e20a 0.029s[00m
+2021-05-08 09:56:53.661 2037672 INFO tempest.lib.common.dynamic_creds [-] Roles assigned to the user cb58bd3cf07d4608b4a4f32e635e0073 are: ['member'][00m
+2021-05-08 09:56:53.661 2037672 INFO tempest.lib.common.dynamic_creds [-] Acquired dynamic creds:
+ credentials: Credentials: {'domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'domain_name': 'admin_domain', 'username': 'tempest-AccountQuotasTest-1177525088-project-member', 'project_domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'project_domain_name': 'admin_domain', 'project_id': '27d1ed2137a44c009a76398ca6a0bf6e', 'project_name': 'tempest-AccountQuotasTest-1177525088', 'tenant_id': '27d1ed2137a44c009a76398ca6a0bf6e', 'tenant_name': 'tempest-AccountQuotasTest-1177525088', 'user_domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'user_domain_name': 'admin_domain', 'user_id': 'cb58bd3cf07d4608b4a4f32e635e0073', 'system': None}, Network: None, Subnet: None, Router: None[00m
+2021-05-08 09:56:53.661 2037672 INFO tempest.lib.common.dynamic_creds [-] Created isolated network resources for:
+ credentials: Credentials: {'domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'domain_name': 'admin_domain', 'username': 'tempest-AccountQuotasTest-1177525088-project-member', 'project_domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'project_domain_name': 'admin_domain', 'project_id': '27d1ed2137a44c009a76398ca6a0bf6e', 'project_name': 'tempest-AccountQuotasTest-1177525088', 'tenant_id': '27d1ed2137a44c009a76398ca6a0bf6e', 'tenant_name': 'tempest-AccountQuotasTest-1177525088', 'user_domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'user_domain_name': 'admin_domain', 'user_id': 'cb58bd3cf07d4608b4a4f32e635e0073', 'system': None}, Network: None, Subnet: None, Router: None[00m
+2021-05-08 09:56:53.946 2037672 INFO tempest.lib.common.rest_client [req-bf228dcf-077a-4afb-9435-fa8752404ba6 ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:5000/v3/auth/tokens 0.275s[00m
+2021-05-08 09:56:54.006 2037672 INFO tempest.lib.common.rest_client [req-7e71a650-bd3e-4b41-84e7-9c5bc6263190 ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:35357/v3/projects 0.056s[00m
+2021-05-08 09:56:54.268 2037672 INFO tempest.lib.common.rest_client [req-8e200543-da2c-4946-8896-6720273f1cba ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:35357/v3/users 0.260s[00m
+2021-05-08 09:56:54.288 2037672 INFO tempest.lib.common.rest_client [req-d4d19a0b-ab2c-40a8-b395-dd59d0f26000 ] Request (AccountQuotasTest:setUpClass): 200 GET http://10.13.3.200:35357/v3/roles 0.017s[00m
+2021-05-08 09:56:54.324 2037672 INFO tempest.lib.common.rest_client [req-6bb3983b-d712-4e50-92ae-1df6830a8262 ] Request (AccountQuotasTest:setUpClass): 204 PUT http://10.13.3.200:35357/v3/projects/169b234c0d8d414f808e9a24357ef7db/users/69892e62c12a4416935fb5e9f0139019/roles/fdb51201aca44fdf96c097579f17446d 0.034s[00m
+2021-05-08 09:56:54.327 2037672 INFO tempest.lib.common.dynamic_creds [-] Roles assigned to the user 69892e62c12a4416935fb5e9f0139019 are: ['ResellerAdmin'][00m
+2021-05-08 09:56:54.328 2037672 INFO tempest.lib.common.dynamic_creds [-] Acquired dynamic creds:
+ credentials: Credentials: {'domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'domain_name': 'admin_domain', 'username': 'tempest-AccountQuotasTest-1741099585-project-ResellerAdmin', 'project_domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'project_domain_name': 'admin_domain', 'project_id': '169b234c0d8d414f808e9a24357ef7db', 'project_name': 'tempest-AccountQuotasTest-1741099585', 'tenant_id': '169b234c0d8d414f808e9a24357ef7db', 'tenant_name': 'tempest-AccountQuotasTest-1741099585', 'user_domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'user_domain_name': 'admin_domain', 'user_id': '69892e62c12a4416935fb5e9f0139019', 'system': None}, Network: None, Subnet: None, Router: None[00m
+2021-05-08 09:56:54.328 2037672 INFO tempest.lib.common.dynamic_creds [-] Created isolated network resources for:
+ credentials: Credentials: {'domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'domain_name': 'admin_domain', 'username': 'tempest-AccountQuotasTest-1741099585-project-ResellerAdmin', 'project_domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'project_domain_name': 'admin_domain', 'project_id': '169b234c0d8d414f808e9a24357ef7db', 'project_name': 'tempest-AccountQuotasTest-1741099585', 'tenant_id': '169b234c0d8d414f808e9a24357ef7db', 'tenant_name': 'tempest-AccountQuotasTest-1741099585', 'user_domain_id': '4c2b2da5b6fd49329f1813916f5d2beb', 'user_domain_name': 'admin_domain', 'user_id': '69892e62c12a4416935fb5e9f0139019', 'system': None}, Network: None, Subnet: None, Router: None[00m
+2021-05-08 09:56:54.715 2037672 INFO tempest.lib.common.rest_client [req-076de5b7-9534-4538-afdb-8931e2fef3c2 ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:5000/v3/auth/tokens 0.269s[00m
+2021-05-08 09:56:54.976 2037672 INFO tempest.lib.common.rest_client [req-f25b1bdd-9c5f-4031-99cc-38c2a129d5bf ] Request (AccountQuotasTest:setUpClass): 201 POST http://10.13.3.200:5000/v3/auth/tokens 0.258s[00m
+2021-05-08 09:56:54.989 2037672 INFO tempest.lib.common.rest_client [tx641efa0f6b514213a6285-0060966066 ] Request (AccountQuotasTest:setUpClass): 200 GET http://10.13.3.211:8080/info 0.009s[00m
+2021-05-08 09:56:55.357 2037672 INFO tempest.lib.common.rest_client [txd101b5b3ae6e4bdd9e890-0060966066 ] Request (AccountQuotasTest:setUpClass): 201 PUT http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e/tempest-TestContainer-1947186871 0.366s[00m
+2021-05-08 09:56:55.625 2037672 INFO tempest.lib.common.rest_client [txb2dcd59a1bd846919f421-0060966067 ] Request (AccountQuotasTest:setUp): 204 POST http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e 0.264s[00m
+2021-05-08 09:56:55.645 2037672 INFO tempest.lib.common.rest_client [tx026a252f63134200b85be-0060966067 ] Request (AccountQuotasTest:test_admin_modify_quota): 204 POST http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e 0.017s[00m
+2021-05-08 09:56:55.664 2037672 INFO tempest.lib.common.rest_client [tx412f3b98c1314c95a5acd-0060966067 ] Request (AccountQuotasTest:test_admin_modify_quota): 204 POST http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e 0.016s[00m
+2021-05-08 09:56:55.679 2037672 INFO tempest.lib.common.rest_client [txcb368a9e308546198c4f9-0060966067 ] Request (AccountQuotasTest:test_admin_modify_quota): 204 POST http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e 0.015s[00m
+2021-05-08 09:56:55.695 2037672 INFO tempest.lib.common.rest_client [txc7f97b0cd78d4b34bd3f8-0060966067 ] Request (AccountQuotasTest:tearDown): 204 POST http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e 0.015s[00m
+{0} tempest.api.object_storage.test_account_quotas.AccountQuotasTest.test_admin_modify_quota [0.336006s] ... ok
+2021-05-08 09:56:55.713 2037672 INFO tempest.lib.common.rest_client [tx773cb9e32d464de0933ea-0060966067 ] Request (AccountQuotasTest:setUp): 204 POST http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e 0.016s[00m
+2021-05-08 09:56:55.746 2037672 INFO tempest.lib.common.rest_client [txb3110bf93bf84c2abafd3-0060966067 ] Request (AccountQuotasTest:test_upload_valid_object): 201 PUT http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e/tempest-TestContainer-1947186871/tempest-TestObject-198916474 0.032s[00m
+2021-05-08 09:56:55.759 2037672 INFO tempest.lib.common.rest_client [tx687bf890b072439d918c7-0060966067 ] Request (AccountQuotasTest:tearDown): 204 POST http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e 0.012s[00m
+{0} tempest.api.object_storage.test_account_quotas.AccountQuotasTest.test_upload_valid_object [0.062802s] ... ok
+2021-05-08 09:56:55.783 2037672 INFO tempest.lib.common.rest_client [tx9cff05b28d714e3aa8ab0-0060966067 ] Request (AccountQuotasTest:tearDownClass): 200 GET http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e/tempest-TestContainer-1947186871?&limit=9999&format=json 0.021s[00m
+2021-05-08 09:56:55.801 2037672 INFO tempest.lib.common.rest_client [tx16b6eed624c3436e9b40a-0060966067 ] Request (AccountQuotasTest:tearDownClass): 204 DELETE http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e/tempest-TestContainer-1947186871/tempest-TestObject-198916474 0.017s[00m
+2021-05-08 09:56:55.819 2037672 INFO tempest.lib.common.rest_client [tx37390e0cf1bb46ad84736-0060966067 ] Request (AccountQuotasTest:tearDownClass): 404 GET http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e/tempest-TestContainer-1947186871/tempest-TestObject-198916474 0.018s[00m
+2021-05-08 09:56:55.841 2037672 INFO tempest.lib.common.rest_client [tx600dd5d9b4114d68b7593-0060966067 ] Request (AccountQuotasTest:tearDownClass): 204 DELETE http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e/tempest-TestContainer-1947186871 0.022s[00m
+2021-05-08 09:56:55.873 2037672 INFO tempest.lib.common.rest_client [tx4044c11371f944ca85745-0060966067 ] Request (AccountQuotasTest:tearDownClass): 404 HEAD http://10.13.3.211:8080/v1/AUTH_27d1ed2137a44c009a76398ca6a0bf6e/tempest-TestContainer-1947186871 0.032s[00m
+2021-05-08 09:56:55.956 2037672 INFO tempest.lib.common.rest_client [req-eceaba3e-e7a1-4e7d-8fd2-17c8651ea57e ] Request (AccountQuotasTest:tearDownClass): 204 DELETE http://10.13.3.200:35357/v3/users/cb58bd3cf07d4608b4a4f32e635e0073 0.083s[00m
+2021-05-08 09:56:56.216 2037672 INFO tempest.lib.common.rest_client [req-c4bd92df-6136-47f7-b910-fd55cc958538 ] Request (AccountQuotasTest:tearDownClass): 201 POST http://10.13.3.200:5000/v3/auth/tokens 0.259s[00m
+2021-05-08 09:56:56.623 2037672 INFO tempest.lib.common.rest_client [req-582c06ba-50bc-49bb-9976-b3db931876fa ] Request (AccountQuotasTest:tearDownClass): 200 GET http://10.13.3.206:9696/v2.0/security-groups?tenant_id=27d1ed2137a44c009a76398ca6a0bf6e&name=default 0.404s[00m
+2021-05-08 09:56:56.727 2037672 INFO tempest.lib.common.rest_client [req-ab535ed6-fe5d-43c5-aaf4-7538ec5c40b3 ] Request (AccountQuotasTest:tearDownClass): 204 DELETE http://10.13.3.206:9696/v2.0/security-groups/b04fd9d0-a1c9-469a-8f16-acc72a6c9d30 0.101s[00m
+2021-05-08 09:56:56.786 2037672 INFO tempest.lib.common.rest_client [req-d8936184-006d-49d0-a7e0-74e491936760 ] Request (AccountQuotasTest:tearDownClass): 204 DELETE http://10.13.3.200:35357/v3/projects/27d1ed2137a44c009a76398ca6a0bf6e 0.056s[00m
+2021-05-08 09:56:56.870 2037672 INFO tempest.lib.common.rest_client [req-af64c859-e59f-452c-a2a7-b57e2488d65c ] Request (AccountQuotasTest:tearDownClass): 204 DELETE http://10.13.3.200:35357/v3/users/69892e62c12a4416935fb5e9f0139019 0.083s[00m
+2021-05-08 09:56:56.950 2037672 INFO tempest.lib.common.rest_client [req-cc8a13bc-25ee-49b7-9785-27cebf2b945a ] Request (AccountQuotasTest:tearDownClass): 200 GET http://10.13.3.206:9696/v2.0/security-groups?tenant_id=169b234c0d8d414f808e9a24357ef7db&name=default 0.079s[00m
+2021-05-08 09:56:57.021 2037672 INFO tempest.lib.common.rest_client [req-bed14de6-7987-40c3-bfed-0798149fa5fa ] Request (AccountQuotasTest:tearDownClass): 204 DELETE http://10.13.3.206:9696/v2.0/security-groups/89d64024-d4cd-474c-9498-a1cb0501e95f 0.069s[00m
+2021-05-08 09:56:57.105 2037672 INFO tempest.lib.common.rest_client [req-a611b92a-7675-43e1-a942-049a7267014e ] Request (AccountQuotasTest:tearDownClass): 204 DELETE http://10.13.3.200:35357/v3/projects/169b234c0d8d414f808e9a24357ef7db 0.083s[00m
+
+======
+Totals
+======
+Ran: 2 tests in 0.3992 sec.
+ - Passed: 2
+ - Skipped: 0
+ - Expected Fail: 0
+ - Unexpected Success: 0
+ - Failed: 0
+Sum of execute time for each test: 0.3988 sec.
+
+==============
+Worker Balance
+==============
+ - Worker 0 (2 tests) => 0:00:00.399164
++ deactivate
++ unset -f pydoc
++ '[' -z _ ']'
++ PATH=/home/ubuntu/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ export PATH
++ unset _OLD_VIRTUAL_PATH
++ '[' -z '' ']'
++ hash -r
++ '[' -z _ ']'
++ PS1=
++ export PS1
++ unset _OLD_VIRTUAL_PS1
++ unset VIRTUAL_ENV
++ '[' '!' '' = nondestructive ']'
++ unset -f deactivate

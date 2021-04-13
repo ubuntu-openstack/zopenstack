@@ -1,0 +1,13 @@
++ openstack network agent list
++--------------------------------------+--------------------+-------+-------------------+-------+-------+---------------------------+
+| ID                                   | Agent Type         | Host  | Availability Zone | Alive | State | Binary                    |
++--------------------------------------+--------------------+-------+-------------------+-------+-------+---------------------------+
+| 0189f900-dcad-47d0-a2af-04ea33535652 | Open vSwitch agent | s4lp8 | None              | :-)   | UP    | neutron-openvswitch-agent |
+| 09a194fe-4b37-483b-b326-48f628b412e4 | Metadata agent     | s4lp5 | None              | :-)   | UP    | neutron-metadata-agent    |
+| 1191f247-1979-420e-a3f5-f7d2974464e2 | Open vSwitch agent | s4lp5 | None              | :-)   | UP    | neutron-openvswitch-agent |
+| 50b6f177-2d9d-4e44-90fb-bf57635a8c78 | Metering agent     | s4lp5 | None              | :-)   | UP    | neutron-metering-agent    |
+| 5ef16e8c-f838-45a7-a085-e54f8911336c | L3 agent           | s4lp5 | nova              | :-)   | UP    | neutron-l3-agent          |
+| b0fb5e11-dd95-450b-9c42-2d5707964163 | DHCP agent         | s4lp5 | nova              | :-)   | UP    | neutron-dhcp-agent        |
+| c5f782f2-ff1f-413e-8d2d-506ac78924c0 | Open vSwitch agent | s4lp6 | None              | :-)   | UP    | neutron-openvswitch-agent |
+| f12f3fde-f61d-4882-a970-ac081027cc3c | Open vSwitch agent | s4lp7 | None              | :-)   | UP    | neutron-openvswitch-agent |
++--------------------------------------+--------------------+-------+-------------------+-------+-------+---------------------------+

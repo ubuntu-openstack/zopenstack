@@ -1,0 +1,104 @@
++ juju status
+Model    Controller        Cloud/Region   Version  SLA          Timestamp
+hirsute  s390x-controller  s390x/default  2.8.10   unsupported  09:16:28Z
+
+App                     Version  Status  Scale  Charm                  Store       Channel  Rev  OS      Message
+ceph-mon                16.2.1   active      3  ceph-mon               charmstore           465  ubuntu  Unit is ready and clustered
+ceph-osd                16.2.1   active      3  ceph-osd               charmstore           490  ubuntu  Unit is ready (1 OSD)
+ceph-radosgw            16.2.1   active      1  ceph-radosgw           charmstore           399  ubuntu  Unit is ready
+cinder                  18.0.0   active      1  cinder                 charmstore           438  ubuntu  Unit is ready
+cinder-ceph             18.0.0   active      1  cinder-ceph            charmstore           354  ubuntu  Unit is ready
+cinder-mysql-router     8.0.23   active      1  mysql-router           charmstore            50  ubuntu  Unit is ready
+dashboard-mysql-router  8.0.23   active      1  mysql-router           charmstore            50  ubuntu  Unit is ready
+glance                  22.0.0   active      1  glance                 charmstore           451  ubuntu  Unit is ready
+glance-mysql-router     8.0.23   active      1  mysql-router           charmstore            50  ubuntu  Unit is ready
+keystone                19.0.0   active      1  keystone               charmstore           544  ubuntu  Application Ready
+keystone-mysql-router   8.0.23   active      1  mysql-router           charmstore            50  ubuntu  Unit is ready
+mysql                   8.0.23   active      3  mysql-innodb-cluster   charmstore            76  ubuntu  Unit is ready: Mode: R/O, Cluster is ONLINE and can tolerate up to ONE failure.
+neutron-api             18.0.0   active      1  neutron-api            charmstore           473  ubuntu  Unit is ready
+neutron-gateway         18.0.0   active      1  neutron-gateway        charmstore           449  ubuntu  Unit is ready
+neutron-mysql-router    8.0.23   active      1  mysql-router           charmstore            50  ubuntu  Unit is ready
+neutron-openvswitch     18.0.0   active      3  neutron-openvswitch    charmstore           435  ubuntu  Unit is ready
+nova-cloud-controller   23.0.0   active      1  nova-cloud-controller  charmstore           523  ubuntu  Unit is ready
+nova-compute            23.0.0   active      3  nova-compute           charmstore           542  ubuntu  Unit is ready
+nova-mysql-router       8.0.23   active      1  mysql-router           charmstore            50  ubuntu  Unit is ready
+ntp                     4.0      active      4  ntp                    charmstore            45  ubuntu  chrony: Ready
+openstack-dashboard     19.2.0   active      1  openstack-dashboard    charmstore           507  ubuntu  Unit is ready
+placement               5.0.0    active      1  placement              charmstore            49  ubuntu  Unit is ready
+placement-mysql-router  8.0.23   active      1  mysql-router           charmstore            50  ubuntu  Unit is ready
+rabbitmq-server         3.8.9    active      1  rabbitmq-server        charmstore           408  ubuntu  Unit is ready
+swift-proxy             2.27.0   active      1  swift-proxy            charmstore           226  ubuntu  Unit is ready
+swift-storage-z1        2.27.0   active      1  swift-storage          charmstore           387  ubuntu  Unit is ready
+swift-storage-z2        2.27.0   active      1  swift-storage          charmstore           387  ubuntu  Unit is ready
+swift-storage-z3        2.27.0   active      1  swift-storage          charmstore           387  ubuntu  Unit is ready
+swift-storage-z4        2.27.0   active      1  swift-storage          charmstore           387  ubuntu  Unit is ready
+swift-storage-z5        2.27.0   active      1  swift-storage          charmstore           387  ubuntu  Unit is ready
+
+Unit                         Workload  Agent  Machine  Public address  Ports              Message
+ceph-mon/0                   active    idle   1/lxd/0  10.13.3.208                        Unit is ready and clustered
+ceph-mon/1*                  active    idle   2/lxd/0  10.13.3.215                        Unit is ready and clustered
+ceph-mon/2                   active    idle   3/lxd/0  10.13.3.244                        Unit is ready and clustered
+ceph-osd/0*                  active    idle   1        10.13.3.6                          Unit is ready (1 OSD)
+ceph-osd/1                   active    idle   2        10.13.3.7                          Unit is ready (1 OSD)
+ceph-osd/2                   active    idle   3        10.13.3.8                          Unit is ready (1 OSD)
+ceph-radosgw/0*              active    idle   0/lxd/0  10.13.3.213     80/tcp             Unit is ready
+cinder/0*                    active    idle   1/lxd/1  10.13.3.249     8776/tcp           Unit is ready
+  cinder-ceph/0*             active    idle            10.13.3.249                        Unit is ready
+  cinder-mysql-router/0*     active    idle            10.13.3.249                        Unit is ready
+glance/0*                    active    idle   0/lxd/1  10.13.3.226     9292/tcp           Unit is ready
+  glance-mysql-router/0*     active    idle            10.13.3.226                        Unit is ready
+keystone/0*                  active    idle   3/lxd/1  10.13.3.200     5000/tcp           Unit is ready
+  keystone-mysql-router/0*   active    idle            10.13.3.200                        Unit is ready
+mysql/0                      active    idle   0/lxd/2  10.13.3.209                        Unit is ready: Mode: R/O, Cluster is ONLINE and can tolerate up to ONE failure.
+mysql/1                      active    idle   3/lxd/2  10.13.3.236                        Unit is ready: Mode: R/O, Cluster is ONLINE and can tolerate up to ONE failure.
+mysql/2*                     active    idle   4/lxd/0  10.13.3.243                        Unit is ready: Mode: R/W, Cluster is ONLINE and can tolerate up to ONE failure.
+neutron-api/0*               active    idle   1/lxd/2  10.13.3.206     9696/tcp           Unit is ready
+  neutron-mysql-router/0*    active    idle            10.13.3.206                        Unit is ready
+neutron-gateway/0*           active    idle   0        10.13.3.5                          Unit is ready
+  ntp/0*                     active    idle            10.13.3.5       123/udp            chrony: Ready
+nova-cloud-controller/0*     active    idle   2/lxd/1  10.13.3.233     8774/tcp,8775/tcp  Unit is ready
+  nova-mysql-router/0*       active    idle            10.13.3.233                        Unit is ready
+nova-compute/0               active    idle   1        10.13.3.6                          Unit is ready
+  neutron-openvswitch/2      active    idle            10.13.3.6                          Unit is ready
+  ntp/3                      active    idle            10.13.3.6       123/udp            chrony: Ready
+nova-compute/1*              active    idle   2        10.13.3.7                          Unit is ready
+  neutron-openvswitch/0*     active    idle            10.13.3.7                          Unit is ready
+  ntp/1                      active    idle            10.13.3.7       123/udp            chrony: Ready
+nova-compute/2               active    idle   3        10.13.3.8                          Unit is ready
+  neutron-openvswitch/1      active    idle            10.13.3.8                          Unit is ready
+  ntp/2                      active    idle            10.13.3.8       123/udp            chrony: Ready
+openstack-dashboard/0*       active    idle   4/lxd/1  10.13.3.250     80/tcp,443/tcp     Unit is ready
+  dashboard-mysql-router/0*  active    idle            10.13.3.250                        Unit is ready
+placement/0*                 active    idle   2/lxd/2  10.13.3.247     8778/tcp           Unit is ready
+  placement-mysql-router/0*  active    idle            10.13.3.247                        Unit is ready
+rabbitmq-server/0*           active    idle   0/lxd/3  10.13.3.232     5672/tcp           Unit is ready
+swift-proxy/0*               active    idle   0/lxd/4  10.13.3.211     8080/tcp           Unit is ready
+swift-storage-z1/0*          active    idle   0        10.13.3.5                          Unit is ready
+swift-storage-z2/0*          active    idle   1        10.13.3.6                          Unit is ready
+swift-storage-z3/0*          active    idle   2        10.13.3.7                          Unit is ready
+swift-storage-z4/0*          active    idle   3        10.13.3.8                          Unit is ready
+swift-storage-z5/0*          active    idle   4        10.13.3.9                          Unit is ready
+
+Machine  State    DNS          Inst id              Series   AZ  Message
+0        started  10.13.3.5    manual:10.13.3.5     hirsute      Manually provisioned machine
+0/lxd/0  started  10.13.3.213  juju-d7524b-0-lxd-0  hirsute      Container started
+0/lxd/1  started  10.13.3.226  juju-d7524b-0-lxd-1  hirsute      Container started
+0/lxd/2  started  10.13.3.209  juju-d7524b-0-lxd-2  hirsute      Container started
+0/lxd/3  started  10.13.3.232  juju-d7524b-0-lxd-3  hirsute      Container started
+0/lxd/4  started  10.13.3.211  juju-d7524b-0-lxd-4  hirsute      Container started
+1        started  10.13.3.6    manual:10.13.3.6     hirsute      Manually provisioned machine
+1/lxd/0  started  10.13.3.208  juju-d7524b-1-lxd-0  hirsute      Container started
+1/lxd/1  started  10.13.3.249  juju-d7524b-1-lxd-1  hirsute      Container started
+1/lxd/2  started  10.13.3.206  juju-d7524b-1-lxd-2  hirsute      Container started
+2        started  10.13.3.7    manual:10.13.3.7     hirsute      Manually provisioned machine
+2/lxd/0  started  10.13.3.215  juju-d7524b-2-lxd-0  hirsute      Container started
+2/lxd/1  started  10.13.3.233  juju-d7524b-2-lxd-1  hirsute      Container started
+2/lxd/2  started  10.13.3.247  juju-d7524b-2-lxd-2  hirsute      Container started
+3        started  10.13.3.8    manual:10.13.3.8     hirsute      Manually provisioned machine
+3/lxd/0  started  10.13.3.244  juju-d7524b-3-lxd-0  hirsute      Container started
+3/lxd/1  started  10.13.3.200  juju-d7524b-3-lxd-1  hirsute      Container started
+3/lxd/2  started  10.13.3.236  juju-d7524b-3-lxd-2  hirsute      Container started
+4        started  10.13.3.9    manual:10.13.3.9     hirsute      Manually provisioned machine
+4/lxd/0  started  10.13.3.243  juju-d7524b-4-lxd-0  hirsute      Container started
+4/lxd/1  started  10.13.3.250  juju-d7524b-4-lxd-1  hirsute      Container started
+
