@@ -76,6 +76,15 @@ http=${OS_AUTH_PROTOCOL:-http}
 default_domain_id=$(openstack domain list | awk '/default/ {print $2}')
 admin_password=${OS_PASSWORD:-openstack}
 root_ca_file=$OS_CACERT
+# NOTE(lourot): when deploying focal-ussuri-ovn,
+# 'openstack extension list --network' doesn't show 'l3_agent_scheduler' nor
+# 'dvr'. focal-wallaby-ovn also doesn't show 'dhcp_agent_scheduler'.
+if [[ "$is_ovn_setup" == "true" ]]; then
+    # Same as 'all' minus ('l3_agent_scheduler', 'dvr', 'dhcp_agent_scheduler'):
+    network_extensions=security-group,ext-gw-mode,binding,quotas,agent,provider,router,extraroute,external-net,allowed-address-pairs,extra_dhcp_opt,metering
+else
+    network_extensions=all
+fi
 
 # Insert vars into tempest conf
 sed -e "s/__IMAGE_ID__/$image_id/g" -e "s/__IMAGE_ALT_ID__/$image_alt_id/g" \
@@ -88,6 +97,7 @@ sed -e "s/__IMAGE_ID__/$image_id/g" -e "s/__IMAGE_ALT_ID__/$image_alt_id/g" \
     -e "s/__DEFAULT_DOMAIN_ID__/$default_domain_id/g" \
     -e "s/__ADMIN_PASSWORD__/$admin_password/g" \
     -e "s|__ROOT_CA_FILE__|$root_ca_file|g" \
+    -e "s/__NETWORK_EXTENSIONS__/$network_extensions/g" \
     templates/tempest/tempest-v3.conf.template > tempest.conf
 
 # Git tempest, place the rendered tempest template
