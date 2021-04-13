@@ -24,6 +24,8 @@ block_migration_for_live_migration=true
 [dashboard]
 dashboard_url=__PROTO__://__DASHBOARD__/horizon
 login_url=__PROTO__://__DASHBOARD__/horizon/auth/login/
+# NOTE(lourot): we're using self-signed certificates:
+disable_ssl_certificate_validation=true
 
 [identity]
 uri_v3=__PROTO__://__KEYSTONE__:5000/v3
