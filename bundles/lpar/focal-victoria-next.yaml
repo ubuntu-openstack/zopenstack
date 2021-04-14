@@ -1,3 +1,5 @@
+variables:
+  openstack-origin:    &openstack-origin     cloud:focal-victoria
 machines:
   '0':
     series: focal
@@ -136,7 +138,7 @@ services:
     num_units: 3
     options:
       expected-osd-count: 3
-      source: cloud:focal-victoria
+      source: *openstack-origin
     to:
     - 'lxd:1'
     - 'lxd:2'
@@ -149,7 +151,7 @@ services:
     num_units: 3
     options:
       osd-devices: /dev/sdb
-      source: cloud:focal-victoria
+      source: *openstack-origin
     to:
     - '1'
     - '2'
@@ -161,11 +163,13 @@ services:
     charm: cs:~openstack-charmers-next/focal/ceph-radosgw
     num_units: 1
     options:
-      source: cloud:focal-victoria
+      source: *openstack-origin
     to:
     - lxd:0
   cinder-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
+    options:
+      source: *openstack-origin
   cinder:
     annotations:
       gui-x: '750'
@@ -173,7 +177,7 @@ services:
     charm: cs:~openstack-charmers-next/focal/cinder
     num_units: 1
     options:
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
       block-device: None
       glance-api-version: 2
       worker-multiplier: 0.25
@@ -187,6 +191,8 @@ services:
     num_units: 0
   glance-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
+    options:
+      source: *openstack-origin
   glance:
     annotations:
       gui-x: '250'
@@ -194,12 +200,14 @@ services:
     charm: cs:~openstack-charmers-next/focal/glance
     num_units: 1
     options:
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
       worker-multiplier: 0.25
     to:
     - lxd:2
   keystone-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
+    options:
+      source: *openstack-origin
   keystone:
     annotations:
       gui-x: '500'
@@ -207,7 +215,7 @@ services:
     charm: cs:~openstack-charmers-next/focal/keystone
     num_units: 1
     options:
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
       admin-password: openstack
       worker-multiplier: 0.25
     to:
@@ -221,12 +229,15 @@ services:
     options:
       max-connections: 1000
       innodb-buffer-pool-size: 256M
+      source: *openstack-origin
     to:
     - lxd:0
     - lxd:3
     - lxd:4
   neutron-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
+    options:
+      source: *openstack-origin
   neutron-api:
     annotations:
       gui-x: '500'
@@ -235,7 +246,7 @@ services:
     num_units: 1
     options:
       manage-neutron-plugin-legacy-mode: true
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
       neutron-security-groups: true
       flat-network-providers: physnet1
       worker-multiplier: 0.25
@@ -243,6 +254,8 @@ services:
     - lxd:1
   placement-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
+    options:
+      source: *openstack-origin
   placement:
     annotations:
       gui-x: '0'
@@ -250,7 +263,7 @@ services:
     charm: cs:~openstack-charmers-next/focal/placement
     num_units: 1
     options:
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
       worker-multiplier: 0.25
     to:
     - lxd:2
@@ -261,7 +274,7 @@ services:
     charm: cs:~openstack-charmers-next/focal/neutron-gateway
     num_units: 1
     options:
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
       bridge-mappings: physnet1:br-ex
       data-port: br-ex:encc003
       worker-multiplier: 0.25
@@ -275,6 +288,8 @@ services:
     num_units: 0
   nova-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
+    options:
+      source: *openstack-origin
   nova-cloud-controller:
     annotations:
       gui-x: '0'
@@ -282,7 +297,7 @@ services:
     charm: cs:~openstack-charmers-next/focal/nova-cloud-controller
     num_units: 1
     options:
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
       network-manager: Neutron
       worker-multiplier: 0.25
     to:
@@ -295,7 +310,7 @@ services:
     num_units: 3
     options:
       config-flags: default_ephemeral_format=ext4
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
       enable-live-migration: true
       enable-resize: true
       migration-auth-type: ssh
@@ -312,6 +327,8 @@ services:
     num_units: 0
   dashboard-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
+    options:
+      source: *openstack-origin
   openstack-dashboard:
     annotations:
       gui-x: '500'
@@ -319,7 +336,7 @@ services:
     charm: cs:~openstack-charmers-next/focal/openstack-dashboard
     num_units: 1
     options:
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
     to:
     - lxd:3
   rabbitmq-server:
@@ -337,7 +354,7 @@ services:
       zone-assignment: manual
       replicas: 5
       swift-hash: 62ce298d-cd4a-4087-b7f3-0c71df0127e0
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
     to:
       - "lxd:0"
   swift-storage-z1:
@@ -347,7 +364,7 @@ services:
       zone: 1
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
     to:
     - '0'
   swift-storage-z2:
@@ -357,7 +374,7 @@ services:
       zone: 2
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
     to:
     - '1'
   swift-storage-z3:
@@ -367,7 +384,7 @@ services:
       zone: 3
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
     to:
     - '2'
   swift-storage-z4:
@@ -377,7 +394,7 @@ services:
       zone: 4
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
     to:
     - '3'
   swift-storage-z5:
@@ -387,6 +404,6 @@ services:
       zone: 5
       block-device: /mnt/swift/swift_dist.img|20G
       overwrite: "false"
-      openstack-origin: cloud:focal-victoria
+      openstack-origin: *openstack-origin
     to:
     - '4'
