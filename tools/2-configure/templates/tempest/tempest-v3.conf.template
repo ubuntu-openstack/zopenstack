@@ -51,6 +51,7 @@ project_networks_reachable = false
 
 [network-feature-enabled]
 ipv6=false
+api_extensions=__NETWORK_EXTENSIONS__
 
 [orchestration]
 stack_owner_role = Admin
