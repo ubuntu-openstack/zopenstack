@@ -1,7 +1,22 @@
 # LA_TEMP
 configure:
- - zaza.openstack.charm_tests.vault.setup.auto_initialize_no_validation
+ - zaza.openstack.charm_tests.vault.setup.auto_initialize
+ # export TEST_IMAGE_ARCH=arm64
+ - zaza.openstack.charm_tests.glance_simplestreams_sync.setup.sync_images
+ - zaza.openstack.charm_tests.octavia.setup.ensure_lts_images
+ - zaza.openstack.charm_tests.octavia.diskimage_retrofit.setup.retrofit_amphora_image
+ - zaza.openstack.charm_tests.octavia.setup.configure_octavia
 target_deploy_status:
+target_deploy_status:
+  octavia:
+    workload-status: blocked
+    workload-status-message: Awaiting
+  glance-simplestreams-sync:
+    workload-status: unknown
+    workload-status-message: ""
   ntp:
     workload-status: active
     workload-status-message: "chrony: Ready"
+  vault:
+    workload-status: blocked
+    workload-status-message: Vault needs to be initialized

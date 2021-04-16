@@ -6,6 +6,7 @@ admin_username=admin
 admin_project_name=admin
 admin_password=__ADMIN_PASSWORD__
 admin_domain_name=admin_domain
+#LA_TODO tempest_roles = load-balancer_admin
 
 [compute]
 image_ref=__IMAGE_ID__
@@ -35,6 +36,8 @@ region=RegionOne
 default_domain_id=__DEFAULT_DOMAIN_ID__
 admin_domain_scope=true
 ca_certificates_file=__ROOT_CA_FILE__
+# LA_TEMP:
+disable_ssl_certificate_validation=true
 
 [identity-feature-enabled]
 api_v2=false
@@ -54,6 +57,8 @@ project_networks_reachable = false
 [network-feature-enabled]
 ipv6=false
 api_extensions=__NETWORK_EXTENSIONS__
+#LA_TEMP:
+port_security = true
 
 [orchestration]
 stack_owner_role = Admin
@@ -99,3 +104,10 @@ api_v3=true
 # NOTE(lourot): We're using Ubuntu images for testing.
 image_ssh_user=ubuntu
 image_alt_ssh_user=ubuntu
+
+#LA_TEMP:
+[load_balancer]
+enable_security_groups = true
+test_with_ipv6 = false
+test_server_path = /home/ubuntu/Documents/git/zopenstack/test_server.bin
+build_timeout = 36000

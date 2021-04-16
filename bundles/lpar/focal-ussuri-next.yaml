@@ -1,21 +1,7 @@
+# LA_TEMP
+
 variables:
-  openstack-origin:    &openstack-origin     distro
-machines:
-  '0':
-    series: focal
-    constraints: "arch=s390x"
-  '1':
-    series: focal
-    constraints: "arch=s390x"
-  '2':
-    series: focal
-    constraints: "arch=s390x"
-  '3':
-    series: focal
-    constraints: "arch=s390x"
-  '4':
-    series: focal
-    constraints: "arch=s390x"
+  openstack-origin:    &openstack-origin     distro-proposed
 relations:
 - - nova-compute:amqp
   - rabbitmq-server:amqp
@@ -128,6 +114,54 @@ relations:
   - swift-storage-z4:swift-storage
 - - swift-proxy:swift-storage
   - swift-storage-z5:swift-storage
+- - vault:certificates
+  - swift-proxy:certificates
+
+- - octavia-mysql-router:shared-db
+  - octavia:shared-db
+- - octavia-mysql-router:db-router
+  - mysql:db-router
+- - keystone:identity-service
+  - octavia:identity-service
+- - rabbitmq-server:amqp
+  - octavia:amqp
+- - neutron-api:neutron-load-balancer
+  - octavia:neutron-api
+- - rabbitmq-server:amqp
+  - neutron-openvswitch-octavia:amqp
+- - neutron-api:neutron-plugin-api
+  - neutron-openvswitch-octavia:neutron-plugin-api
+- - neutron-openvswitch-octavia:neutron-plugin
+  - octavia:neutron-openvswitch
+- - glance-simplestreams-sync:juju-info
+  - octavia-diskimage-retrofit:juju-info
+- - keystone:identity-service
+  - glance-simplestreams-sync:identity-service
+- - keystone:identity-credentials
+  - octavia-diskimage-retrofit:identity-credentials
+- - vault:shared-db
+  - vault-mysql-router:shared-db
+- - vault-mysql-router:db-router
+  - mysql:db-router
+- - vault:certificates
+  - glance:certificates
+- - vault:certificates
+  - keystone:certificates
+- - vault:certificates
+  - neutron-api:certificates
+- - vault:certificates
+  - nova-cloud-controller:certificates
+- - vault:certificates
+  - octavia:certificates
+- - vault:certificates
+  - octavia-diskimage-retrofit:certificates
+- - vault:certificates
+  - glance-simplestreams-sync:certificates
+- - vault:certificates
+  - placement:certificates
+- - vault:certificates
+  - cinder:certificates
+
 series: focal
 services:
   ceph-mon:
@@ -139,23 +173,17 @@ services:
     options:
       expected-osd-count: 3
       source: *openstack-origin
-    to:
-    - 'lxd:1'
-    - 'lxd:2'
-    - 'lxd:3'
   ceph-osd:
     annotations:
       gui-x: '1000'
       gui-y: '500'
     charm: cs:~openstack-charmers-next/focal/ceph-osd
     num_units: 3
+    storage:
+      osd-devices: 'cinder,10G'
     options:
-      osd-devices: /dev/sdb
       source: *openstack-origin
-    to:
-    - '1'
-    - '2'
-    - '3'
+      osd-devices: /dev/test-non-existent
   ceph-radosgw:
     annotations:
       gui-x: '1000'
@@ -164,8 +192,6 @@ services:
     num_units: 1
     options:
       source: *openstack-origin
-    to:
-    - lxd:0
   cinder-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
     options:
@@ -181,8 +207,6 @@ services:
       block-device: None
       glance-api-version: 2
       worker-multiplier: 0.25
-    to:
-    - lxd:1
   cinder-ceph:
     annotations:
       gui-x: '750'
@@ -202,8 +226,6 @@ services:
     options:
       openstack-origin: *openstack-origin
       worker-multiplier: 0.25
-    to:
-    - lxd:2
   keystone-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
     options:
@@ -218,8 +240,6 @@ services:
       openstack-origin: *openstack-origin
       admin-password: openstack
       worker-multiplier: 0.25
-    to:
-    - lxd:3
   mysql:
     annotations:
       gui-x: '0'
@@ -227,13 +247,9 @@ services:
     charm: cs:~openstack-charmers-next/mysql-innodb-cluster
     num_units: 3
     options:
-      max-connections: 1000
+      max-connections: 5000  # LA_TEMP
       innodb-buffer-pool-size: 256M
       source: *openstack-origin
-    to:
-    - lxd:0
-    - lxd:3
-    - lxd:4
   neutron-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
     options:
@@ -250,8 +266,9 @@ services:
       neutron-security-groups: true
       flat-network-providers: physnet1
       worker-multiplier: 0.25
-    to:
-    - lxd:1
+      enable-ml2-port-security: true
+      #LA_TODO enable-qos: true
+      #LA_TODO enable-vlan-trunking: true  # not needed according to icey?
   placement-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
     options:
@@ -265,8 +282,6 @@ services:
     options:
       openstack-origin: *openstack-origin
       worker-multiplier: 0.25
-    to:
-    - lxd:2
   neutron-gateway:
     annotations:
       gui-x: '0'
@@ -276,10 +291,7 @@ services:
     options:
       openstack-origin: *openstack-origin
       bridge-mappings: physnet1:br-ex
-      data-port: br-ex:encc003
       worker-multiplier: 0.25
-    to:
-    - '0'
   neutron-openvswitch:
     annotations:
       gui-x: '250'
@@ -300,26 +312,20 @@ services:
       openstack-origin: *openstack-origin
       network-manager: Neutron
       worker-multiplier: 0.25
-    to:
-    - lxd:2
   nova-compute:
     annotations:
       gui-x: '250'
       gui-y: '250'
     charm: cs:~openstack-charmers-next/focal/nova-compute
     num_units: 3
+    constraints: mem=4G cores=4
     options:
       config-flags: default_ephemeral_format=ext4
       openstack-origin: *openstack-origin
       enable-live-migration: true
       enable-resize: true
       migration-auth-type: ssh
-    to:
-    - '1'
-    - '2'
-    - '3'
   ntp:
-    series: bionic
     annotations:
       gui-x: '1000'
       gui-y: '0'
@@ -337,16 +343,12 @@ services:
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    to:
-    - lxd:3
   rabbitmq-server:
     annotations:
       gui-x: '500'
       gui-y: '250'
     charm: cs:~openstack-charmers-next/focal/rabbitmq-server
     num_units: 1
-    to:
-    - lxd:0
   swift-proxy:
     charm: cs:~openstack-charmers-next/swift-proxy
     num_units: 1
@@ -355,55 +357,90 @@ services:
       replicas: 5
       swift-hash: 62ce298d-cd4a-4087-b7f3-0c71df0127e0
       openstack-origin: *openstack-origin
-    to:
-      - "lxd:0"
   swift-storage-z1:
     charm: cs:~openstack-charmers-next/swift-storage
     num_units: 1
+    storage:
+      block-devices: 'cinder,25G'
     options:
       zone: 1
-      block-device: /mnt/swift/swift_dist.img|20G
+      block-device: /mnt/LA_TEMP_swift_dist.img|20G
       overwrite: "false"
       openstack-origin: *openstack-origin
-    to:
-    - '0'
   swift-storage-z2:
     charm: cs:~openstack-charmers-next/swift-storage
     num_units: 1
+    storage:
+      block-devices: 'cinder,25G'
     options:
       zone: 2
-      block-device: /mnt/swift/swift_dist.img|20G
+      block-device: /mnt/LA_TEMP_swift_dist.img|20G
       overwrite: "false"
       openstack-origin: *openstack-origin
-    to:
-    - '1'
   swift-storage-z3:
     charm: cs:~openstack-charmers-next/swift-storage
     num_units: 1
+    storage:
+      block-devices: 'cinder,25G'
     options:
       zone: 3
-      block-device: /mnt/swift/swift_dist.img|20G
+      block-device: /mnt/LA_TEMP_swift_dist.img|20G
       overwrite: "false"
       openstack-origin: *openstack-origin
-    to:
-    - '2'
   swift-storage-z4:
     charm: cs:~openstack-charmers-next/swift-storage
     num_units: 1
+    storage:
+      block-devices: 'cinder,25G'
     options:
       zone: 4
-      block-device: /mnt/swift/swift_dist.img|20G
+      block-device: /mnt/LA_TEMP_swift_dist.img|20G
       overwrite: "false"
       openstack-origin: *openstack-origin
-    to:
-    - '3'
   swift-storage-z5:
     charm: cs:~openstack-charmers-next/swift-storage
     num_units: 1
+    storage:
+      block-devices: 'cinder,25G'
     options:
       zone: 5
-      block-device: /mnt/swift/swift_dist.img|20G
+      block-device: /mnt/LA_TEMP_swift_dist.img|20G
       overwrite: "false"
       openstack-origin: *openstack-origin
-    to:
-    - '4'
+
+  neutron-openvswitch-octavia:
+    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    num_units: 0
+    options:
+      debug: True
+      prevent-arp-spoofing: False
+      firewall-driver: openvswitch
+  octavia:
+    charm: cs:~openstack-charmers-next/octavia
+    num_units: 1
+    options:
+      openstack-origin: *openstack-origin
+      spare-pool-size: 2
+      loadbalancer-topology: 'ACTIVE_STANDBY'
+  octavia-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+  glance-simplestreams-sync:
+    charm: cs:~openstack-charmers-next/glance-simplestreams-sync
+    num_units: 1
+    options:
+      source: ppa:simplestreams-dev/trunk
+      use_swift: true
+  octavia-diskimage-retrofit:
+    charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
+    options:
+      amp-image-tag: 'octavia-amphora'
+      retrofit-uca-pocket: rocky
+      retrofit-series: bionic
+      debug: true
+  vault:
+    charm: cs:~openstack-charmers-next/vault
+    num_units: 1
+  vault-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+    options:
+      source: *openstack-origin
