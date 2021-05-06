@@ -9,7 +9,7 @@
 local_overlay_enabled: true
 series: hirsute
 variables:
-  openstack-origin:    &openstack-origin     distro
+  openstack-origin:    &openstack-origin     distro-proposed  # LA_TEMP work around lp:1925347
   data-port:           &data-port            br-ex:9e:5d:5f:52:4e:b0
   worker-multiplier:   &worker-multiplier    0.25
   osd-devices:         &osd-devices          /dev/disk/by-label/ceph
