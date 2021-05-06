@@ -1,6 +1,6 @@
 #!/bin/sh
 
-valid="s390x-multi-lpar s390x-multi-lpar-v3 s390x-zkvm"
+valid="s390x-multi-lpar s390x-multi-lpar-v3"
 
 usage() {
   echo "$0 <profile>"
