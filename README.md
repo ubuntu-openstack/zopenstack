@@ -28,12 +28,6 @@ Juju and the OpenStack Charmns on the Juju manual provider.
 
  - [See: README-release-multi-lpar.md](README-lpar.md)
 
-#### z/KVM
-z/KVM compute nodes deployed via Juju and a proxy charm, with amd64 control 
-plane deployed via Juju and MAAS.
-
-  - [See: README-zkvm.md](README-zkvm.md)
-
 #### Validating Bundle Yaml Files
 
 When adjusting bundles, be sure to check validity with the following:

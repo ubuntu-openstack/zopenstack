@@ -1,5 +1,0 @@
-* lpar ins file for zkvm_1
-images/kernel.img 0x00000000
-images/initrd.img 0x02000000
-images/zkvm_1.prm 0x00010480
-images/initrd.addrsize 0x00010408
