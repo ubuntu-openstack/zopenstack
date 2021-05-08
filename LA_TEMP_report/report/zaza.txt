@@ -1,0 +1,47 @@
+$ functest-test -m hirsute
+2021-05-06 15:11:42 [INFO] ## Running Test zaza.openstack.charm_tests.ceph.osd.tests.SecurityTest ##
+2021-05-06 15:11:43 [INFO] test_osd_security_checklist (zaza.openstack.charm_tests.ceph.osd.tests.SecurityTest)
+2021-05-06 15:11:43 [INFO] Verify expected state with security-checklist.
+2021-05-06 15:11:43 [INFO]  ... 
+2021-05-06 15:11:43 [INFO] Running `security-checklist` action on Ceph OSD leader unit
+2021-05-06 15:11:48 [INFO] ok
+2021-05-06 15:11:48 [INFO] ----------------------------------------------------------------------
+2021-05-06 15:11:48 [INFO] Ran 1 test in 4.885s
+2021-05-06 15:11:48 [INFO] OK
+2021-05-06 15:11:48 [INFO] ## Running Test zaza.openstack.charm_tests.ceph.osd.tests.ServiceTest ##
+2021-05-06 15:11:48 [INFO] test_start_specific (zaza.openstack.charm_tests.ceph.osd.tests.ServiceTest)
+2021-05-06 15:11:48 [INFO] Start only specified ceph-osd service.
+2021-05-06 15:11:48 [INFO]  ... 
+2021-05-06 15:11:53 [INFO] skipped "This test can be performed only if there's more than one ceph-osd service present on the tested unit"
+2021-05-06 15:11:53 [INFO] test_start_stop_all_by_keyword (zaza.openstack.charm_tests.ceph.osd.tests.ServiceTest)
+2021-05-06 15:11:53 [INFO] Start and Stop all ceph-osd services using keyword 'all'.
+2021-05-06 15:11:53 [INFO]  ... 
+2021-05-06 15:11:56 [INFO] Running 'service stop=all' action on ceph-osd/0 unit
+2021-05-06 15:11:58 [INFO] Running 'service start=all' action on ceph-osd/0 unit
+2021-05-06 15:12:03 [INFO] ok
+2021-05-06 15:12:03 [INFO] test_start_stop_all_by_list (zaza.openstack.charm_tests.ceph.osd.tests.ServiceTest)
+2021-05-06 15:12:03 [INFO] Start and Stop all ceph-osd services using explicit list.
+2021-05-06 15:12:03 [INFO]  ... 
+2021-05-06 15:12:06 [INFO] Running 'service stop=0' action on ceph-osd/0 unit
+2021-05-06 15:12:09 [INFO] Running 'service start=0' action on ceph-osd/0 unit
+2021-05-06 15:12:13 [INFO] ok
+2021-05-06 15:12:13 [INFO] test_stop_specific (zaza.openstack.charm_tests.ceph.osd.tests.ServiceTest)
+2021-05-06 15:12:13 [INFO] Stop only specified ceph-osd service.
+2021-05-06 15:12:13 [INFO]  ... 
+2021-05-06 15:12:16 [INFO] skipped "This test can be performed only if there's more than one ceph-osd service present on the tested unit"
+2021-05-06 15:12:16 [INFO] ----------------------------------------------------------------------
+2021-05-06 15:12:16 [INFO] Ran 4 tests in 27.820s
+2021-05-06 15:12:16 [INFO] OK
+2021-05-06 15:12:16 [INFO]  (skipped=2)
+2021-05-06 15:12:16 [INFO] Events:
+  Test zaza.openstack.charm_tests.ceph.osd.tests.SecurityTest:
+    Start: 1620313902.9254801
+    Finish: 1620313908.5764906
+    Elapsed Time: 5.651010513305664
+    PCT Of Run Time: 17
+  Test zaza.openstack.charm_tests.ceph.osd.tests.ServiceTest:
+    Start: 1620313908.5765173
+    Finish: 1620313936.3986
+    Elapsed Time: 27.82208275794983
+    PCT Of Run Time: 84
+Metadata: {}
