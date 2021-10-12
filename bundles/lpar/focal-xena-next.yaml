@@ -338,7 +338,7 @@ services:
     options:
       openstack-origin: *openstack-origin
     to:
-    - lxd:3
+    - lxd:4
   rabbitmq-server:
     annotations:
       gui-x: '500'
