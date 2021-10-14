@@ -318,7 +318,7 @@ applications:
       enable-live-migration: true
       enable-resize: true
       migration-auth-type: ssh
-      openstack-origin: *openstack-origin
+      openstack-origin: ppa:corey.bryant/focal-xena  # LA_TEMP Workaround for lp:1947003
     to:
     - '0'
     - '1'
@@ -369,7 +369,7 @@ applications:
     charm: cs:~openstack-charmers-next/ovn-central
     num_units: 3
     options:
-      source: *openstack-origin
+      source: ppa:corey.bryant/focal-xena  # LA_TEMP Workaround for lp:1947003
     to:
     - 'lxd:0'
     - 'lxd:1'
