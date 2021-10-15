@@ -224,7 +224,7 @@ services:
       admin-password: openstack
       worker-multiplier: 0.25
     to:
-    - lxd:3
+    - lxd:0
   mysql:
     annotations:
       gui-x: '0'
@@ -256,7 +256,7 @@ services:
       flat-network-providers: physnet1
       worker-multiplier: 0.25
     to:
-    - lxd:1
+    - lxd:4
   placement-mysql-router:
     charm: cs:~openstack-charmers-next/mysql-router
     options:
@@ -271,7 +271,7 @@ services:
       openstack-origin: *openstack-origin
       worker-multiplier: 0.25
     to:
-    - lxd:2
+    - lxd:4
   neutron-gateway:
     annotations:
       gui-x: '0'
@@ -343,7 +343,7 @@ services:
     options:
       openstack-origin: *openstack-origin
     to:
-    - lxd:4
+    - lxd:0
   rabbitmq-server:
     annotations:
       gui-x: '500'
