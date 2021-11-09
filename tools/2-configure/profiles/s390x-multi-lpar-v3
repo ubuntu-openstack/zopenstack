@@ -73,7 +73,7 @@ keystone=$(juju run --unit ${keystone_unit} "unit-get private-address")
 dashboard=$(juju run --unit ${dashboard_unit} "unit-get private-address")
 ncc=$(juju run --unit ${ncc_unit} "unit-get private-address")
 http=${OS_AUTH_PROTOCOL:-http}
-default_domain_id=$(openstack domain list | awk '/default/ {print $2}')
+default_domain_id=$(openstack domain list | awk '/admin_domain/ {print $2}')
 admin_password=${OS_PASSWORD:-openstack}
 root_ca_file=$OS_CACERT
 # NOTE(lourot): when deploying focal-ussuri-ovn,
