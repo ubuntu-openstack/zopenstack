@@ -8,45 +8,45 @@
 | is_deleted  | None                                            |
 | name        | mykey                                           |
 | type        | ssh                                             |
-| user_id     | 1369ad140be04511b33bad13ce016582                |
+| user_id     | 3d816f8c72de401ebc0c4deef063ef4d                |
 +-------------+-------------------------------------------------+
 ++ openstack network list
 ++ awk '{print $2}'
 ++ grep private
-+ private_network_id=44d8ad9e-c004-485a-9a1d-1073967ed9c8
-+ openstack server create --wait --image bionic-s390x --flavor m1.small --key-name mykey --nic net-id=44d8ad9e-c004-485a-9a1d-1073967ed9c8 my-bionic-s390x
++ private_network_id=150537be-fa52-4b11-af50-5ce6dee4f937
++ openstack server create --wait --image bionic-s390x --flavor m1.small --key-name mykey --nic net-id=150537be-fa52-4b11-af50-5ce6dee4f937 my-bionic-s390x
 
 +-------------------------------------+----------------------------------------------------------+
 | Field                               | Value                                                    |
 +-------------------------------------+----------------------------------------------------------+
 | OS-DCF:diskConfig                   | MANUAL                                                   |
 | OS-EXT-AZ:availability_zone         | nova                                                     |
-| OS-EXT-SRV-ATTR:host                | s4lp7                                                    |
-| OS-EXT-SRV-ATTR:hypervisor_hostname | s4lp7                                                    |
+| OS-EXT-SRV-ATTR:host                | s4lp6                                                    |
+| OS-EXT-SRV-ATTR:hypervisor_hostname | s4lp6                                                    |
 | OS-EXT-SRV-ATTR:instance_name       | instance-0000000e                                        |
 | OS-EXT-STS:power_state              | Running                                                  |
 | OS-EXT-STS:task_state               | None                                                     |
 | OS-EXT-STS:vm_state                 | active                                                   |
-| OS-SRV-USG:launched_at              | 2021-11-02T13:44:17.000000                               |
+| OS-SRV-USG:launched_at              | 2022-01-04T15:51:20.000000                               |
 | OS-SRV-USG:terminated_at            | None                                                     |
 | accessIPv4                          |                                                          |
 | accessIPv6                          |                                                          |
-| addresses                           | private=172.16.3.108                                     |
-| adminPass                           | B29KusMKfu66                                             |
+| addresses                           | private=172.16.0.73                                      |
+| adminPass                           | 8XDsfRWiaFPc                                             |
 | config_drive                        |                                                          |
-| created                             | 2021-11-02T13:43:28Z                                     |
+| created                             | 2022-01-04T15:50:36Z                                     |
 | flavor                              | m1.small (2)                                             |
-| hostId                              | 7f07d881481f8b29f3ae9c0a66a833a1ae0eb7c8c215c59cfeff648e |
-| id                                  | 9aff1cca-bb31-4b3d-a5d2-5fe9345b4983                     |
-| image                               | bionic-s390x (6a4ab927-f384-47b4-adde-f2a98c5570b1)      |
+| hostId                              | b589fcb1bf6e67a3ce0a6204212fade60f10277d42648be389b52fc2 |
+| id                                  | 095a141a-2238-4e17-bf78-ba5df5ea6c74                     |
+| image                               | bionic-s390x (ea11caf2-bc1b-42d0-8441-f5098a92802d)      |
 | key_name                            | mykey                                                    |
 | name                                | my-bionic-s390x                                          |
 | progress                            | 0                                                        |
-| project_id                          | c357a294460e4794ae7bc1ed3d361662                         |
+| project_id                          | f3ac5b14d17948c8b93ac03f395f37f0                         |
 | properties                          |                                                          |
 | security_groups                     | name='default'                                           |
 | status                              | ACTIVE                                                   |
-| updated                             | 2021-11-02T13:44:17Z                                     |
-| user_id                             | 1369ad140be04511b33bad13ce016582                         |
+| updated                             | 2022-01-04T15:51:21Z                                     |
+| user_id                             | 3d816f8c72de401ebc0c4deef063ef4d                         |
 | volumes_attached                    |                                                          |
 +-------------------------------------+----------------------------------------------------------+

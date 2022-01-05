@@ -2,12 +2,12 @@
 +--------------------------------------+--------------------+-------+-------------------+-------+-------+---------------------------+
 | ID                                   | Agent Type         | Host  | Availability Zone | Alive | State | Binary                    |
 +--------------------------------------+--------------------+-------+-------------------+-------+-------+---------------------------+
-| 04f289dc-123c-4aae-a6c0-8ae283a19883 | Metadata agent     | s4lp5 | None              | :-)   | UP    | neutron-metadata-agent    |
-| 2042669c-d223-4416-b749-0ccddff63374 | Open vSwitch agent | s4lp5 | None              | :-)   | UP    | neutron-openvswitch-agent |
-| 3bbddf85-0f4a-4b9d-90d0-f621fcf609bb | Open vSwitch agent | s4lp8 | None              | :-)   | UP    | neutron-openvswitch-agent |
-| 41f73ce8-65e5-4f76-aeb8-420f9681aeaf | Open vSwitch agent | s4lp7 | None              | :-)   | UP    | neutron-openvswitch-agent |
-| 5eee5cc0-f033-4f05-b7cf-2436cc5063b2 | DHCP agent         | s4lp5 | nova              | :-)   | UP    | neutron-dhcp-agent        |
-| 816ef69b-4c06-4e70-9073-a44bce10317a | L3 agent           | s4lp5 | nova              | :-)   | UP    | neutron-l3-agent          |
-| 994a9598-7e49-445a-84da-804a1d91842d | Metering agent     | s4lp5 | None              | :-)   | UP    | neutron-metering-agent    |
-| be3f8a45-43f7-4a0c-89ad-6582a4054062 | Open vSwitch agent | s4lp6 | None              | :-)   | UP    | neutron-openvswitch-agent |
+| 0f5e7810-a4df-4365-8ea2-fe35bcae88b7 | Open vSwitch agent | s4lp7 | None              | :-)   | UP    | neutron-openvswitch-agent |
+| 106dce67-23ac-4c58-89d2-4049ebea8d54 | Open vSwitch agent | s4lp5 | None              | :-)   | UP    | neutron-openvswitch-agent |
+| 619819b6-de8e-4855-8281-1557bc70e795 | Metadata agent     | s4lp5 | None              | :-)   | UP    | neutron-metadata-agent    |
+| 90aed47b-846f-4f38-a8a9-a99162c944d1 | Metering agent     | s4lp5 | None              | :-)   | UP    | neutron-metering-agent    |
+| 9f4aca00-db4f-4361-9d0f-1699c48ce9d6 | Open vSwitch agent | s4lp8 | None              | :-)   | UP    | neutron-openvswitch-agent |
+| b56b15e1-f4a3-4466-b956-02d1eb849631 | DHCP agent         | s4lp5 | nova              | :-)   | UP    | neutron-dhcp-agent        |
+| c30b08a0-ee18-43ee-b4f4-c06ec9cac310 | Open vSwitch agent | s4lp6 | None              | :-)   | UP    | neutron-openvswitch-agent |
+| d7099761-870f-455e-bb19-aa4835422507 | L3 agent           | s4lp5 | nova              | :-)   | UP    | neutron-l3-agent          |
 +--------------------------------------+--------------------+-------+-------------------+-------+-------+---------------------------+
