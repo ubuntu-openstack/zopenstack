@@ -26,7 +26,7 @@ fi
  
 printf "`date` : Waiting for SSH on all LPARS before proceeding...\n\n"
 for lpar in ${LPARS[@]}
-        do ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $lpar >/dev/null
+        do ssh-keygen -f "$HOME/.ssh/known_hosts" -R $lpar >/dev/null
 done
 for lpar in ${LPARS[@]}
         do printf "Waiting for $lpar"
