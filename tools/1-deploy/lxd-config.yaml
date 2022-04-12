@@ -1,0 +1,39 @@
+config:
+  core.proxy_ignore_hosts: 10.13.3.14,127.0.0.1,::1,localhost
+networks:
+- config:
+    ipv4.address: 10.174.84.1/24
+    ipv4.nat: "true"
+    ipv6.address: none
+    ipv6.nat: "false"
+  description: ""
+  name: lxdbr0
+  type: bridge
+  project: default
+storage_pools:
+- config:
+    source: /mnt/swift/lxd/storage-pools/default
+  description: ""
+  name: default
+  driver: dir
+profiles:
+- config: {}
+  description: Default LXD profile
+  devices:
+    eth0:
+      nictype: bridged
+      parent: lxdbr0
+      type: nic
+    root:
+      path: /
+      pool: default
+      type: disk
+  name: default
+projects:
+- config:
+    features.images: "true"
+    features.networks: "true"
+    features.profiles: "true"
+    features.storage.volumes: "true"
+  description: Default LXD project
+  name: default
