@@ -46,9 +46,12 @@ done
 
 if [ "$2" == "ADD" ]; then
   for lpar in ${LPARS[@]}; do
-    scp ${SCRIPT_DIR}/lxd-config.yaml ubuntu@${lpar}:/tmp/lxd-config.yaml
-    ssh ubuntu@${lpar} "sudo snap install --channel ${LXD_CHANNEL} lxd && sudo adduser ubuntu lxd && sudo mkdir -p /mnt/swift/lxd/storage-pools/default"
-    ssh ubuntu@${lpar} "cat /tmp/lxd-config.yaml | sudo lxd init --preseed"
+    LPAR_IP=${lpar}
+    if ! ssh ubuntu@${lpar} "sudo lxc storage info default"; then
+        scp ${SCRIPT_DIR}/lxd-config.yaml ubuntu@${lpar}:/tmp/lxd-config.yaml
+        ssh ubuntu@${lpar} "sudo snap install --channel ${LXD_CHANNEL} lxd && sudo adduser ubuntu lxd && sudo mkdir -p /mnt/swift/lxd/storage-pools/default"
+        ssh ubuntu@${lpar} "cat /tmp/lxd-config.yaml | sudo lxd init --preseed"
+    fi
     juju add-machine ssh:ubuntu@${lpar}
   done
 fi
