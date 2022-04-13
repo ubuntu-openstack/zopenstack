@@ -55,3 +55,10 @@ if [ "$2" == "ADD" ]; then
     juju add-machine ssh:ubuntu@${lpar}
   done
 fi
+
+juju set-model-constraints arch=s390x
+juju sync-agent-binaries
+
+MACHINES=$(juju machines --format json | jq -r '.machines|keys| @tsv' | sed 's/\t/,/g')
+SERIES="$(ssh ubuntu@$LPAR_IP -- lsb_release -c -s)"
+juju deploy --series $SERIES -n 5 --to $MACHINES --force ch:ubuntu keep
