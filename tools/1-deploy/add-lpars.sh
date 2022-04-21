@@ -52,13 +52,14 @@ if [ "$2" == "ADD" ]; then
         ssh ubuntu@${lpar} "sudo snap install --channel ${LXD_CHANNEL} lxd && sudo adduser ubuntu lxd && sudo mkdir -p /mnt/swift/lxd/storage-pools/default"
         ssh ubuntu@${lpar} "cat /tmp/lxd-config.yaml | sudo lxd init --preseed"
     fi
+    ssh ubuntu@${lpar} "sudo mkdir -p /mnt/swift/nova/instances"
     juju add-machine ssh:ubuntu@${lpar}
   done
+
+  juju set-model-constraints arch=s390x
+  juju sync-agent-binaries
+
+  MACHINES=$(juju machines --format json | jq -r '.machines|keys| @tsv' | sed 's/\t/,/g')
+  SERIES="$(ssh ubuntu@$LPAR_IP -- lsb_release -c -s)"
+  juju deploy --series $SERIES -n 5 --to $MACHINES --force ch:ubuntu keep
 fi
-
-juju set-model-constraints arch=s390x
-juju sync-agent-binaries
-
-MACHINES=$(juju machines --format json | jq -r '.machines|keys| @tsv' | sed 's/\t/,/g')
-SERIES="$(ssh ubuntu@$LPAR_IP -- lsb_release -c -s)"
-juju deploy --series $SERIES -n 5 --to $MACHINES --force ch:ubuntu keep
