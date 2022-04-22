@@ -130,6 +130,29 @@ relations:
   - swift-storage-z4:swift-storage
 - - swift-proxy:swift-storage
   - swift-storage-z5:swift-storage
+
+# Vault
+- - vault:shared-db
+  - vault-mysql-router:shared-db
+- - vault-mysql-router:db-router
+  - mysql:db-router
+- - neutron-api:certificates
+  - vault:certificates
+- - vault:certificates
+  - cinder:certificates
+- - vault:certificates
+  - glance:certificates
+- - vault:certificates
+  - keystone:certificates
+- - vault:certificates
+  - nova-cloud-controller:certificates
+- - vault:certificates
+  - openstack-dashboard:certificates
+- - vault:certificates
+  - placement:certificates
+- - vault:certificates
+  - swift-proxy:certificates
+
 series: focal
 services:
   ceph-mon:
@@ -372,6 +395,17 @@ services:
     to:
     - lxd:0
     channel: 3.8/edge
+  vault-mysql-router:
+    charm: ch:mysql-router
+    options:
+      source: *openstack-origin
+    channel: 8.0.19/edge
+  vault:
+    charm: ch:vault
+    num_units: 1
+    to:
+    - 'lxd:4'
+    channel: 1.7/edge
   swift-proxy:
     charm: ch:swift-proxy
     num_units: 1
