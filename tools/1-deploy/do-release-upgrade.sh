@@ -11,6 +11,7 @@ for LPAR in ${LPARS[@]}; do
     else
       EXTRA_OPTS=""
     fi
-    ssh ubuntu@${LPAR} "sudo  do-release-upgrade $EXTRA_OPTS -f DistUpgradeViewNonInteractive"
+    ssh ubuntu@${LPAR} "sudo do-release-upgrade $EXTRA_OPTS -f DistUpgradeViewNonInteractive"
+    ssh ubuntu@${LPAR} "sudo reboot"
   fi
 done
