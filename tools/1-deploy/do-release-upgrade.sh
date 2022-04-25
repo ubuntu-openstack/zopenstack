@@ -6,12 +6,12 @@ for LPAR in ${LPARS[@]}; do
   ssh-keyscan -t rsa -H ${LPAR} >> $HOME/.ssh/known_hosts
   # upgrade from focal to jammy needs `-d` until jammy is GA.
   if [ "x$(ssh ubuntu@${LPAR} -- lsb_release -c -s)" != "xjammy" ]; then
-    if (( $(distro-info --series=jammy --days) > 0 )); then
+    if ! curl -s "http://changelogs.ubuntu.com/meta-release-lts" | grep -q "Dist: jammy"; then
       EXTRA_OPTS="-d"
     else
       EXTRA_OPTS=""
     fi
     ssh ubuntu@${LPAR} "sudo do-release-upgrade $EXTRA_OPTS -f DistUpgradeViewNonInteractive"
-    ssh ubuntu@${LPAR} "sudo reboot"
+    ssh ubuntu@${LPAR} "sudo reboot" || echo -n ""
   fi
 done
