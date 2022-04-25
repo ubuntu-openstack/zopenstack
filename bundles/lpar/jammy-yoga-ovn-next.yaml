@@ -209,7 +209,7 @@ applications:
     charm: ch:mysql-router
     options:
       source: *openstack-origin
-    channel: 8.0.19/edge
+    channel: latest/edge
   cinder:
     annotations:
       gui-x: '750'
@@ -235,7 +235,7 @@ applications:
     charm: ch:mysql-router
     options:
       source: *openstack-origin
-    channel: 8.0.19/edge
+    channel: latest/edge
   glance:
     annotations:
       gui-x: '250'
@@ -252,7 +252,7 @@ applications:
     charm: ch:mysql-router
     options:
       source: *openstack-origin
-    channel: 8.0.19/edge
+    channel: latest/edge
   keystone:
     annotations:
       gui-x: '500'
@@ -269,7 +269,7 @@ applications:
     charm: ch:mysql-router
     options:
       source: *openstack-origin
-    channel: 8.0.19/edge
+    channel: latest/edge
   neutron-api:
     annotations:
       gui-x: '500'
@@ -292,7 +292,7 @@ applications:
     charm: ch:mysql-router
     options:
       source: *openstack-origin
-    channel: 8.0.19/edge
+    channel: latest/edge
   placement:
     annotations:
       gui-x: '0'
@@ -309,7 +309,7 @@ applications:
     charm: ch:mysql-router
     options:
       source: *openstack-origin
-    channel: 8.0.19/edge
+    channel: latest/edge
   nova-cloud-controller:
     annotations:
       gui-x: '0'
@@ -335,6 +335,7 @@ applications:
       enable-resize: true
       migration-auth-type: ssh
       openstack-origin: *openstack-origin
+      instances-path: /mnt/swift/nova/instances
     to:
     - '0'
     - '1'
@@ -351,7 +352,7 @@ applications:
     charm: ch:mysql-router
     options:
       source: *openstack-origin
-    channel: 8.0.19/edge
+    channel: latest/edge
   openstack-dashboard:
     annotations:
       gui-x: '500'
@@ -383,7 +384,7 @@ applications:
     - 'lxd:0'
     - 'lxd:1'
     - 'lxd:2'
-    channel: 8.0.19/edge
+    channel: latest/edge
   neutron-api-plugin-ovn:
     charm: ch:neutron-api-plugin-ovn
     channel: yoga/edge
@@ -411,13 +412,13 @@ applications:
     charm: ch:mysql-router
     options:
       source: *openstack-origin
-    channel: 8.0.19/edge
+    channel: latest/edge
   vault:
     charm: ch:vault
     num_units: 1
     to:
     - 'lxd:4'
-    channel: 1.7/edge
+    channel: latest/edge
   swift-proxy:
     charm: ch:swift-proxy
     num_units: 1
