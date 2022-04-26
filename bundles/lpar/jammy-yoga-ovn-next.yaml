@@ -10,7 +10,7 @@ local_overlay_enabled: False
 series: jammy
 variables:
   openstack-origin:    &openstack-origin     distro
-  data-port:           &data-port            br-ex:9e:5d:5f:52:4e:b0
+  data-port:           &data-port            br-ex:5a:b2:24:20:d5:81
   worker-multiplier:   &worker-multiplier    0.25
   osd-devices:         &osd-devices          /dev/disk/by-label/ceph
   expected-osd-count:  &expected-osd-count   3
