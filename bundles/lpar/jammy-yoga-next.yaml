@@ -108,10 +108,6 @@ relations:
   - glance:ceph
 - - ceph-osd:mon
   - ceph-mon:osd
-- - ntp:juju-info
-  - nova-compute:juju-info
-- - ntp:juju-info
-  - neutron-gateway:juju-info
 - - ceph-radosgw:mon
   - ceph-mon:radosgw
 - - ceph-radosgw:identity-service
@@ -368,13 +364,6 @@ services:
     - '2'
     - '3'
     channel: yoga/edge
-  ntp:
-    series: bionic
-    annotations:
-      gui-x: '1000'
-      gui-y: '0'
-    charm: ch:ntp
-    num_units: 0
   dashboard-mysql-router:
     charm: ch:mysql-router
     options:
