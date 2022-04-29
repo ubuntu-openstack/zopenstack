@@ -1,3 +1,5 @@
+local_overlay_enabled: False
+
 variables:
   openstack-origin:    &openstack-origin     distro
 machines:
@@ -106,10 +108,6 @@ relations:
   - glance:ceph
 - - ceph-osd:mon
   - ceph-mon:osd
-- - ntp:juju-info
-  - nova-compute:juju-info
-- - ntp:juju-info
-  - neutron-gateway:juju-info
 - - ceph-radosgw:mon
   - ceph-mon:radosgw
 - - ceph-radosgw:identity-service
@@ -128,13 +126,36 @@ relations:
   - swift-storage-z4:swift-storage
 - - swift-proxy:swift-storage
   - swift-storage-z5:swift-storage
+
+# Vault
+- - vault:shared-db
+  - vault-mysql-router:shared-db
+- - vault-mysql-router:db-router
+  - mysql:db-router
+- - neutron-api:certificates
+  - vault:certificates
+- - vault:certificates
+  - cinder:certificates
+- - vault:certificates
+  - glance:certificates
+- - vault:certificates
+  - keystone:certificates
+- - vault:certificates
+  - nova-cloud-controller:certificates
+- - vault:certificates
+  - openstack-dashboard:certificates
+- - vault:certificates
+  - placement:certificates
+- - vault:certificates
+  - swift-proxy:certificates
+
 series: jammy
 services:
   ceph-mon:
     annotations:
       gui-x: '750'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/ceph-mon
+    charm: ch:ceph-mon
     num_units: 3
     options:
       expected-osd-count: 3
@@ -147,11 +168,12 @@ services:
     - 'lxd:1'
     - 'lxd:2'
     - 'lxd:3'
+    channel: quincy/edge
   ceph-osd:
     annotations:
       gui-x: '1000'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/ceph-osd
+    charm: ch:ceph-osd
     num_units: 3
     options:
       osd-devices: /dev/sdb
@@ -160,25 +182,28 @@ services:
     - '1'
     - '2'
     - '3'
+    channel: quincy/edge
   ceph-radosgw:
     annotations:
       gui-x: '1000'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/ceph-radosgw
+    charm: ch:ceph-radosgw
     num_units: 1
     options:
       source: *openstack-origin
     to:
     - lxd:0
+    channel: quincy/edge
   cinder-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
     options:
       source: *openstack-origin
+    channel: 8.0.19/edge
   cinder:
     annotations:
       gui-x: '750'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/cinder
+    charm: ch:cinder
     num_units: 1
     options:
       openstack-origin: *openstack-origin
@@ -187,36 +212,41 @@ services:
       worker-multiplier: 0.25
     to:
     - lxd:1
+    channel: yoga/edge
   cinder-ceph:
     annotations:
       gui-x: '750'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/cinder-ceph
+    charm: ch:cinder-ceph
     num_units: 0
+    channel: yoga/edge
   glance-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
     options:
       source: *openstack-origin
+    channel: 8.0.19/edge
   glance:
     annotations:
       gui-x: '250'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/glance
+    charm: ch:glance
     num_units: 1
     options:
       openstack-origin: *openstack-origin
       worker-multiplier: 0.25
     to:
     - lxd:0
+    channel: yoga/edge
   keystone-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
     options:
       source: *openstack-origin
+    channel: 8.0.19/edge
   keystone:
     annotations:
       gui-x: '500'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/keystone
+    charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
@@ -224,11 +254,12 @@ services:
       worker-multiplier: 0.25
     to:
     - lxd:0
+    channel: yoga/edge
   mysql:
     annotations:
       gui-x: '0'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/mysql-innodb-cluster
+    charm: ch:mysql-innodb-cluster
     num_units: 3
     options:
       max-connections: 1000
@@ -238,15 +269,17 @@ services:
     - lxd:0
     - lxd:3
     - lxd:4
+    channel: 8.0.19/edge
   neutron-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
     options:
       source: *openstack-origin
+    channel: 8.0.19/edge
   neutron-api:
     annotations:
       gui-x: '500'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/neutron-api
+    charm: ch:neutron-api
     num_units: 1
     options:
       manage-neutron-plugin-legacy-mode: true
@@ -256,26 +289,29 @@ services:
       worker-multiplier: 0.25
     to:
     - lxd:4
+    channel: yoga/edge
   placement-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
     options:
       source: *openstack-origin
+    channel: 8.0.19/edge
   placement:
     annotations:
       gui-x: '0'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/placement
+    charm: ch:placement
     num_units: 1
     options:
       openstack-origin: *openstack-origin
       worker-multiplier: 0.25
     to:
     - lxd:4
+    channel: yoga/edge
   neutron-gateway:
     annotations:
       gui-x: '0'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/neutron-gateway
+    charm: ch:neutron-gateway
     num_units: 1
     options:
       openstack-origin: *openstack-origin
@@ -284,21 +320,24 @@ services:
       worker-multiplier: 0.25
     to:
     - '0'
+    channel: yoga/edge
   neutron-openvswitch:
     annotations:
       gui-x: '250'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    charm: ch:neutron-openvswitch
     num_units: 0
+    channel: yoga/edge
   nova-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
     options:
       source: *openstack-origin
+    channel: 8.0.19/edge
   nova-cloud-controller:
     annotations:
       gui-x: '0'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    charm: ch:nova-cloud-controller
     num_units: 1
     options:
       openstack-origin: *openstack-origin
@@ -306,11 +345,12 @@ services:
       worker-multiplier: 0.25
     to:
     - lxd:2
+    channel: yoga/edge
   nova-compute:
     annotations:
       gui-x: '250'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/nova-compute
+    charm: ch:nova-compute
     num_units: 3
     options:
       config-flags: default_ephemeral_format=ext4
@@ -322,37 +362,45 @@ services:
     - '1'
     - '2'
     - '3'
-  ntp:
-    series: bionic
-    annotations:
-      gui-x: '1000'
-      gui-y: '0'
-    charm: cs:ntp
-    num_units: 0
+    channel: yoga/edge
   dashboard-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
     options:
       source: *openstack-origin
+    channel: 8.0.19/edge
   openstack-dashboard:
     annotations:
       gui-x: '500'
       gui-y: '-250'
-    charm: cs:~openstack-charmers-next/openstack-dashboard
+    charm: ch:openstack-dashboard
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
     - lxd:0
+    channel: yoga/edge
   rabbitmq-server:
     annotations:
       gui-x: '500'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: ch:rabbitmq-server
     num_units: 1
     to:
     - lxd:0
+    channel: 3.9/edge
+  vault-mysql-router:
+    charm: ch:mysql-router
+    options:
+      source: *openstack-origin
+    channel: 8.0.19/edge
+  vault:
+    charm: ch:vault
+    num_units: 1
+    to:
+    - 'lxd:4'
+    channel: 1.7/edge
   swift-proxy:
-    charm: cs:~openstack-charmers-next/swift-proxy
+    charm: ch:swift-proxy
     num_units: 1
     options:
       zone-assignment: manual
@@ -361,8 +409,9 @@ services:
       openstack-origin: *openstack-origin
     to:
       - "lxd:0"
+    channel: yoga/edge
   swift-storage-z1:
-    charm: cs:~openstack-charmers-next/swift-storage
+    charm: ch:swift-storage
     num_units: 1
     options:
       zone: 1
@@ -371,8 +420,9 @@ services:
       openstack-origin: *openstack-origin
     to:
     - '0'
+    channel: yoga/edge
   swift-storage-z2:
-    charm: cs:~openstack-charmers-next/swift-storage
+    charm: ch:swift-storage
     num_units: 1
     options:
       zone: 2
@@ -381,8 +431,9 @@ services:
       openstack-origin: *openstack-origin
     to:
     - '1'
+    channel: yoga/edge
   swift-storage-z3:
-    charm: cs:~openstack-charmers-next/swift-storage
+    charm: ch:swift-storage
     num_units: 1
     options:
       zone: 3
@@ -391,8 +442,9 @@ services:
       openstack-origin: *openstack-origin
     to:
     - '2'
+    channel: yoga/edge
   swift-storage-z4:
-    charm: cs:~openstack-charmers-next/swift-storage
+    charm: ch:swift-storage
     num_units: 1
     options:
       zone: 4
@@ -401,8 +453,9 @@ services:
       openstack-origin: *openstack-origin
     to:
     - '3'
+    channel: yoga/edge
   swift-storage-z5:
-    charm: cs:~openstack-charmers-next/swift-storage
+    charm: ch:swift-storage
     num_units: 1
     options:
       zone: 5
@@ -411,3 +464,4 @@ services:
       openstack-origin: *openstack-origin
     to:
     - '4'
+    channel: yoga/edge
