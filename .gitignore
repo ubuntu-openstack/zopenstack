@@ -11,3 +11,4 @@ func-results.json
 *tempest.conf
 tools/*/tempest/
 tools/1-deploy/simplestreams
+report/report/**
