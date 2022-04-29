@@ -1,0 +1,10 @@
+configure:
+ - zaza.openstack.charm_tests.vault.setup.auto_initialize_no_validation
+
+target_deploy_status:
+  ntp:
+    workload-status: active
+    workload-status-message: "chrony: Ready"
+  keep:
+    workload-status: active
+    workload-status-message: ""
