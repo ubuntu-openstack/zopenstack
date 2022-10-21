@@ -333,6 +333,8 @@ applications:
       enable-resize: true
       migration-auth-type: ssh
       openstack-origin: *openstack-origin
+      # Workaround for bug http://pad.lv/1962381
+      config-flags: "pointer_model=ps2mouse,default_ephemeral_format=ext4"
     to:
     - '0'
     - '1'

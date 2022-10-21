@@ -356,6 +356,8 @@ applications:
       enable-live-migration: true
       enable-resize: true
       migration-auth-type: ssh
+      # Workaround for bug http://pad.lv/1962381
+      config-flags: "pointer_model=ps2mouse,default_ephemeral_format=ext4"
     to:
     - '1'
     - '2'
