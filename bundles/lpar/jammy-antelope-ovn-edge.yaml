@@ -10,7 +10,7 @@ local_overlay_enabled: False
 series: jammy
 variables:
   openstack-origin:        &openstack-origin        cloud:jammy-antelope
-  openstack-charm-channel: &openstack-charm-channel antelope/edge
+  openstack-charm-channel: &openstack-charm-channel 2023.1/edge
   ovn-charm-channel:       &ovn-charm-channel       23.03/edge
   ceph-charm-channel:      &ceph-charm-channel      quincy/edge
   mysql-charm-channel:     &mysql-charm-channel     8.0/edge
