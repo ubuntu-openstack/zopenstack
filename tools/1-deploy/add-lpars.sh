@@ -1,9 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
-# Use edge until this fix gets available in a release
-# https://github.com/lxc/lxd/issues/10231
-LXD_CHANNEL="latest/edge"
+LXD_CHANNEL="5.0/stable"
 
 readarray LPARS < ./lpars
 if [[ $LPARS == *"EDIT"* ]] 
@@ -57,7 +55,7 @@ if [ "$2" == "ADD" ]; then
   done
 
   juju set-model-constraints arch=s390x
-  juju sync-agent-binaries
+  juju sync-agent-binary
 
   MACHINES=$(juju machines --format json | jq -r '.machines|keys| @tsv' | sed 's/\t/,/g')
   SERIES="$(ssh ubuntu@$LPAR_IP -- lsb_release -c -s)"
