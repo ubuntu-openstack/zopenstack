@@ -99,3 +99,7 @@ api_v3=true
 # NOTE(lourot): We're using Ubuntu images for testing.
 image_ssh_user=ubuntu
 image_alt_ssh_user=ubuntu
+
+[service-clients]
+# Default is 60s which is not enough for resource constrained environments.
+http_timeout = 120
