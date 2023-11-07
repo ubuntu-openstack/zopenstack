@@ -11,7 +11,7 @@
 [[ -z "$CIDR_PRIV" ]] && export CIDR_PRIV="172.16.0.0/12"
 [[ -z "$SWIFT_IP" ]] && export SWIFT_IP="10.245.161.162"  # Cirros image hosted on serverstack
 
-juju run --unit ovn-central/leader 'echo This is an OVN setup' 2>/dev/null && is_ovn_setup=true || is_ovn_setup=false
+juju exec --unit ovn-central/leader 'echo This is an OVN setup' 2>/dev/null && is_ovn_setup=true || is_ovn_setup=false
 
 # Accept private network type as first parameter. If unspecified, assume:
 # - 'gre' for an OVS setup,
@@ -69,9 +69,9 @@ router=$(neutron router-list | grep provider-router | awk '{ print $2}')
 keystone_unit=$(juju status keystone|grep -i workload -A1|tail -n1|awk '{print $1}'|tr -d '*')
 dashboard_unit=$(juju status openstack-dashboard|grep -i workload -A1|tail -n1|awk '{print $1}'|tr -d '*')
 ncc_unit=$(juju status nova-cloud-controller|grep -i workload -A1|tail -n1|awk '{print $1}'|tr -d '*')
-keystone=$(juju run --unit ${keystone_unit} "unit-get private-address")
-dashboard=$(juju run --unit ${dashboard_unit} "unit-get private-address")
-ncc=$(juju run --unit ${ncc_unit} "unit-get private-address")
+keystone=$(juju exec --unit ${keystone_unit} "unit-get private-address")
+dashboard=$(juju exec --unit ${dashboard_unit} "unit-get private-address")
+ncc=$(juju exec --unit ${ncc_unit} "unit-get private-address")
 http=${OS_AUTH_PROTOCOL:-http}
 default_domain_id=$(openstack domain list | awk '/admin_domain/ {print $2}')
 admin_password=${OS_PASSWORD:-openstack}

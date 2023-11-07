@@ -3,4 +3,4 @@
 set -xe
 
 cd ../tools/2-configure/tempest/
-tox -e smoke
+env https_proxy="http://squid.internal:3128" tox -e smoke

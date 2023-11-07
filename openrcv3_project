@@ -10,9 +10,9 @@ _keystone_vip=$(juju config $_juju_model_arg keystone vip)
 if [ -n "$_keystone_vip" ]; then
     _keystone_ip=$(echo $_keystone_vip | awk '{print $1}')
 else
-    _keystone_ip=$(juju run $_juju_model_arg --unit keystone/leader -- 'network-get --bind-address public')
+    _keystone_ip=$(juju exec $_juju_model_arg --unit keystone/leader -- 'network-get --bind-address public')
 fi
-_password=$(juju run $_juju_model_arg --unit keystone/leader 'leader-get admin_passwd')
+_password=$(juju exec $_juju_model_arg --unit keystone/leader 'leader-get admin_passwd')
 
 . $(dirname ${BASH_SOURCE[0]})/_openrcv3_get_root_ca
 if [ ! -z "$_root_ca" -a -s "$_root_ca" ]; then

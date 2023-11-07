@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 output=''
-for application in $(juju status | grep charms | awk '{print $1}'); do
+for application in $(juju status --format json | jq -r '.applications|keys|@tsv'); do
     for config in openstack-origin source; do
         set -x
         origin="$(juju config $application $config 2>/dev/null)"
