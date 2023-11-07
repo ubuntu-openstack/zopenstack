@@ -5,6 +5,7 @@ set -x
 
 rm -rf report/
 mkdir report/
+bin/remove_all_instances.sh
 
 bin/tempest_smoke.sh > report/tempest_smoke.txt 2>&1
 
