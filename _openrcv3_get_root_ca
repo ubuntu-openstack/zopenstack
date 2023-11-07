@@ -5,4 +5,4 @@ if [ -d ~/snap/openstackclients/common/ ]; then
 else
   _root_ca=/tmp/root-ca.crt
 fi
-juju run $_juju_model_arg --unit vault/leader 'leader-get root-ca' | tee $_root_ca >/dev/null 2>&1
+juju exec $_juju_model_arg --unit vault/leader 'leader-get root-ca' | tee $_root_ca >/dev/null 2>&1

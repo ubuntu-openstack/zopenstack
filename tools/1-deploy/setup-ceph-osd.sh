@@ -21,10 +21,11 @@ for UNIT in $CEPH_OSD_UNITS; do
   PARTITION="${DEVICE}1"
 
   if [[ "$SERIES" > "bionic" ]]; then
-    juju run -u $UNIT "sudo fdasd -a $DEVICE -l ceph && sudo partprobe"
-    juju run -u $UNIT "test -e $PARTITION"
+    juju ssh $UNIT "sudo fdasd -a $DEVICE -l ceph && sudo partprobe"
+    juju ssh $UNIT "test -e $PARTITION"
   fi
 
-  juju run-action --wait $UNIT zap-disk devices=$PARTITION i-really-mean-it=true
-  juju run-action --wait $UNIT add-disk osd-devices=$PARTITION
+  # `juju run` runs actions on juju-3.x
+  juju run $UNIT zap-disk devices=$PARTITION i-really-mean-it=true
+  juju run $UNIT add-disk osd-devices=$PARTITION
 done
