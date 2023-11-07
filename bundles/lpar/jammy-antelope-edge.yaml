@@ -195,8 +195,6 @@ applications:
     channel: *ceph-charm-channel
   cinder-mysql-router:
     charm: ch:mysql-router
-    options:
-      source: *openstack-origin
     channel: *mysql-charm-channel
   cinder:
     annotations:
@@ -221,8 +219,6 @@ applications:
     channel: *openstack-charm-channel
   glance-mysql-router:
     charm: ch:mysql-router
-    options:
-      source: *openstack-origin
     channel: *mysql-charm-channel
   glance:
     annotations:
@@ -238,8 +234,6 @@ applications:
     channel: *openstack-charm-channel
   keystone-mysql-router:
     charm: ch:mysql-router
-    options:
-      source: *openstack-origin
     channel: *mysql-charm-channel
   keystone:
     annotations:
@@ -270,8 +264,6 @@ applications:
     channel: *mysql-charm-channel
   neutron-mysql-router:
     charm: ch:mysql-router
-    options:
-      source: *openstack-origin
     channel: *mysql-charm-channel
   neutron-api:
     annotations:
@@ -290,8 +282,6 @@ applications:
     channel: *openstack-charm-channel
   placement-mysql-router:
     charm: ch:mysql-router
-    options:
-      source: *openstack-origin
     channel: *mysql-charm-channel
   placement:
     annotations:
@@ -328,8 +318,6 @@ applications:
     channel: *openstack-charm-channel
   nova-mysql-router:
     charm: ch:mysql-router
-    options:
-      source: *openstack-origin
     channel: *mysql-charm-channel
   nova-cloud-controller:
     annotations:
@@ -363,8 +351,6 @@ applications:
     channel: *openstack-charm-channel
   dashboard-mysql-router:
     charm: ch:mysql-router
-    options:
-      source: *openstack-origin
     channel: *mysql-charm-channel
   openstack-dashboard:
     annotations:
@@ -388,8 +374,6 @@ applications:
     channel: 3.9/edge
   vault-mysql-router:
     charm: ch:mysql-router
-    options:
-      source: *openstack-origin
     channel: *mysql-charm-channel
   vault:
     charm: ch:vault
