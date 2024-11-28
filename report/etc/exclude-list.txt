@@ -1,0 +1,3 @@
+# Not compatible with default Keystone policy provided in charms
+tempest.api.identity.admin
+tempest.api.identity.v3.test_domains.DefaultDomainTestJSON
