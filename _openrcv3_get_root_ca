@@ -3,6 +3,6 @@ if [ -d ~/snap/openstackclients/common/ ]; then
   # placed in a location reachable by the clients in the snap.
   _root_ca=~/snap/openstackclients/common/root-ca.crt
 else
-  _root_ca=/tmp/root-ca.crt
+  _root_ca=~/root-ca.crt
 fi
 juju exec $_juju_model_arg --unit vault/leader 'leader-get root-ca' | tee $_root_ca >/dev/null 2>&1
