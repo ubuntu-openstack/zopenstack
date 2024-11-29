@@ -42,7 +42,7 @@ for lpar in ${LPARS[@]}
         fi
 done
 
-if [ "$2" == "ADD" ]; then
+if [ "$2" == "LXD" ]; then
   for lpar in ${LPARS[@]}; do
     LPAR_IP=${lpar}
     if ! ssh ubuntu@${lpar} "sudo lxc storage info default"; then
@@ -51,13 +51,11 @@ if [ "$2" == "ADD" ]; then
         ssh ubuntu@${lpar} "cat /tmp/lxd-config.yaml | sudo lxd init --preseed"
     fi
     ssh ubuntu@${lpar} "sudo mkdir -p /mnt/swift/nova/instances"
+  done
+fi
+if [ "$2" == "JUJU" ]; then
+  for lpar in ${LPARS[@]}; do
     juju add-machine ssh:ubuntu@${lpar}
   done
-
   juju set-model-constraints arch=s390x
-  juju sync-agent-binary
-
-  MACHINES=$(juju machines --format json | jq -r '.machines|keys| @tsv' | sed 's/\t/,/g')
-  SERIES="$(ssh ubuntu@$LPAR_IP -- lsb_release -c -s)"
-  juju deploy --series $SERIES -n 5 --to $MACHINES --force ch:ubuntu keep
 fi
