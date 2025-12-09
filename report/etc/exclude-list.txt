@@ -1,3 +1,5 @@
 # Not compatible with default Keystone policy provided in charms
 tempest.api.identity.admin
 tempest.api.identity.v3.test_domains.DefaultDomainTestJSON
+# When using Tempest snap, it always tries to run Octavia, even if not deployed
+octavia_tempest_plugin.*

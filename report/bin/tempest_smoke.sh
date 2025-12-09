@@ -12,5 +12,5 @@ tempest.discover \
     compute.flavor_ref_alt 3 \
     auth.admin_domain_name admin_domain
 
-
-tempest run --smoke --concurrency 8 --config-file etc/tempest.conf --exclude-list etc/exclude-list.txt
+# Stability issues when concurrency higher than 1
+tempest run --smoke --concurrency 1 --config-file etc/tempest.conf --exclude-list etc/exclude-list.txt
