@@ -1,0 +1,23 @@
+diff --git a/snap/snapcraft.yaml b/snap/snapcraft.yaml
+index 231fa5f..1424c65 100644
+--- a/snap/snapcraft.yaml
++++ b/snap/snapcraft.yaml
+@@ -113,6 +113,7 @@ apps:
+       - dm-multipath
+       - nvme-control
+       - iscsi-initiator
++      - mdevctl-config
+     # Make sure KillMode=process is set in the resulting systemd unit instead of
+     # the default KillMode=control-group to avoid the situation where stopping
+     # libvirtd causes the forced power off scenario for all VMs; it also affects
+@@ -969,6 +970,10 @@ hooks:
+       - microstack-support
+ 
+ plugs:
++  mdevctl-config:
++    interface: system-files
++    read:
++      - /etc/mdevctl.d
+   epa-info:
+     interface: content
+     content: epa-info

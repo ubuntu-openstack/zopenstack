@@ -1,0 +1,127 @@
+# Sunbeam MACHINE-plane bundle — LOCAL-CHARM variant for s390x.
+#
+# Same topology, saas consumption, relations and offer as
+# manifests/machine-lpar-s390x.yaml, but the machine charms WE build for s390x are
+# deployed from local ./charms/<name>_s390x.charm paths. Machine charms are
+# snap-based and have NO oci-image resources, so there is nothing to pin — the
+# real workload comes from the snap channels below. Use it via:
+#
+#   CHARM_SOURCE=local ./run.sh 03b
+#
+# Deploy is run with cwd = repo root so `charm: ./charms/...` resolves; stage the
+# .charm files there first (see charms/README.md).
+#
+# LOCAL  (our s390x builds): sunbeam-machine, cinder-volume, hypervisor
+#        (openstack-hypervisor).
+# CHARMHUB (not built by us): microceph.
+#
+# cinder-microceph (cinder-volume-ceph): we did NOT build an s390x revision (it was
+# dropped from the s390x charm work), so it is left on charmhub here. If the
+# charmhub 2026.1/edge revision has no s390x build it will block — in that case
+# comment out the `cinder-microceph` application AND its two relations below
+# (microceph:ceph<->cinder-microceph:ceph and cinder-volume:cinder-volume<->
+# cinder-microceph:cinder-volume and hypervisor:ceph-access<->cinder-microceph:
+# ceph-access) and accept cinder block storage stays unwired.
+#
+# NOTE: the `saas:`, `relations:` and trailing `offers:` blocks are copied VERBATIM
+# from machine-lpar-s390x.yaml. Keep the two files in sync by hand.
+
+machines:
+  "0": {}
+
+applications:
+  # ── local s390x builds ──
+  sunbeam-machine:
+    charm: ./charms/sunbeam-machine_s390x.charm
+    scale: 1
+    to:
+      - "0"
+  cinder-volume:
+    charm: ./charms/cinder-volume_s390x.charm
+    scale: 1
+    to:
+      - "0"
+    options:
+      snap-channel: 2026.1/edge
+  hypervisor:
+    charm: ./charms/openstack-hypervisor_s390x.charm
+    scale: 1
+    to:
+      - "0"
+    options:
+      snap-channel: 2026.1/edge
+      external-bridge-address: 0.0.0.0/0
+
+  # ── charmhub (external / not built for s390x) ──
+  microceph:
+    charm: microceph
+    channel: squid/stable
+    scale: 1
+    to:
+      - "0"
+    options:
+      snap-channel: squid/stable
+      default-pool-size: 1
+    storage:
+      osd-standalone: loop,3,2G
+  cinder-microceph:
+    charm: cinder-volume-ceph
+    channel: 2026.1/edge
+    options:
+      ceph-osd-replication-count: 1
+
+saas:
+  amqp:
+    url: admin/openstack.amqp
+  identity-credentials:
+    url: admin/openstack.identity-credentials
+  cinder-database:
+    url: admin/openstack.cinder-database
+  send-ca-cert:
+    url: admin/openstack.send-ca-cert
+  ovsdb-cms:
+    url: admin/openstack.ovsdb-cms
+  certificates:
+    url: admin/openstack.certificates
+  nova-service:
+    url: admin/openstack.nova-service
+
+relations:
+  - - cinder-volume:amqp
+    - amqp:amqp
+  - - cinder-volume:identity-credentials
+    - identity-credentials:identity-credentials
+  - - cinder-volume:database
+    - cinder-database
+  - - cinder-volume:receive-ca-cert
+    - send-ca-cert:send-ca-cert
+
+  - - microceph:ceph
+    - cinder-microceph:ceph
+  - - cinder-volume:cinder-volume
+    - cinder-microceph:cinder-volume
+  - - microceph:receive-ca-cert
+    - send-ca-cert:send-ca-cert
+
+  - - amqp:amqp
+    - hypervisor:amqp
+  - - identity-credentials:identity-credentials
+    - hypervisor:identity-credentials
+  - - send-ca-cert:send-ca-cert
+    - hypervisor:receive-ca-cert
+  - - ovsdb-cms
+    - hypervisor:ovsdb-cms
+  - - certificates
+    - hypervisor:certificates
+  - - nova-service
+    - hypervisor:nova-service
+  - - hypervisor:ceph-access
+    - cinder-microceph:ceph-access
+
+---
+applications:
+  cinder-volume:
+    offers:
+      storage-backend:
+        endpoints:
+          - storage-backend

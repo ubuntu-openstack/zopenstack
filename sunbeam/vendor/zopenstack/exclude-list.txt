@@ -1,0 +1,9 @@
+# Not compatible with default Keystone policy provided in charms
+tempest.api.identity.admin
+tempest.api.identity.v3.test_domains.DefaultDomainTestJSON
+
+# Requires the Tempest runner to have working L3 reachability to floating IPs
+# allocated from EXT_SUBNET_POOL. On LPAR lab networks this is often not true:
+# the cloud can create routers, ports, floating IPs, and volume-backed guests,
+# but the validation host cannot ping the floating IP range directly.
+tempest.scenario.test_network_basic_ops.TestNetworkBasicOps.test_network_basic_ops

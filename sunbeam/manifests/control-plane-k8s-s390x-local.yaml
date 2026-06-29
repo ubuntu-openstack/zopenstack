@@ -1,0 +1,282 @@
+# Sunbeam CORE control-plane bundle — LOCAL-CHARM variant for s390x.
+#
+# Same topology, relations and cross-model offers as
+# manifests/control-plane-k8s-s390x.yaml, but the charms WE build for s390x are
+# deployed from local ./charms/<name>_s390x.charm paths with their workload OCI
+# images pinned to s390x rocks, instead of pulled from charmhub. Use it via:
+#
+#   CHARM_SOURCE=local ./run.sh 03
+#   # or directly:
+#   juju deploy -m sunbeam-controller:openstack \
+#       ./manifests/control-plane-k8s-s390x-local.yaml --trust
+#
+# Deploy is run with cwd = repo root, so the `charm: ./charms/...` paths resolve.
+# Stage the .charm files there first (see charms/README.md).
+#
+# ─── what is local vs charmhub ───────────────────────────────────────────────
+# LOCAL  (our s390x builds): ovn-central, ovn-relay, keystone, glance, placement,
+#        nova, neutron, cinder.
+# CHARMHUB (external deps we do not build): mysql (mysql-k8s), rabbitmq
+#        (rabbitmq-k8s), tls-operator (self-signed-certificates), traefik
+#        (traefik-k8s), cinder-router (mysql-router-k8s). These still pull their
+#        own images from charmhub and therefore need their OWN s390x builds —
+#        check with tools/check_oci_arch.sh before relying on this.
+#
+# ─── s390x rock image refs — REPLACE the placeholders below ──────────────────
+# Each `resources:` value must point at an s390x build of the workload image.
+# Replace every `REPLACE-ME/...:s390x` with the real rock ref from the rocks work.
+# Resources required, per charm:
+#   keystone-k8s     : keystone-image
+#   glance-k8s       : glance-api-image
+#   placement-k8s    : placement-api-image
+#   neutron-k8s      : neutron-server-image
+#   nova-k8s         : nova-api-image, nova-scheduler-image,
+#                      nova-conductor-image, nova-spiceproxy-image
+#   cinder-k8s       : cinder-api-image, cinder-scheduler-image
+#   ovn-central-k8s  : ovn-sb-db-server-image, ovn-nb-db-server-image,
+#                      ovn-northd-image
+#   ovn-relay-k8s    : ovn-sb-db-server-image
+#
+# NOTE: the `relations:` and the trailing `offers:` document below are copied
+# VERBATIM from control-plane-k8s-s390x.yaml. If you change wiring in one file,
+# change it in the other — they are kept in sync by hand.
+bundle: kubernetes
+
+applications:
+  # ── charmhub (external dependencies) ──
+  mysql:
+    charm: mysql-k8s
+    channel: 8.0/stable
+    base: ubuntu@22.04
+    scale: 1
+    trust: true
+    options:
+      profile-limit-memory: 6202
+      experimental-max-connections: 466
+  rabbitmq:
+    charm: rabbitmq-k8s
+    channel: 3.12/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    options:
+      minimum-replicas: 1
+  tls-operator:
+    charm: self-signed-certificates
+    channel: 1/beta
+    base: ubuntu@22.04
+    scale: 1
+    options:
+      ca-common-name: internal-ca
+  traefik:
+    charm: traefik-k8s
+    channel: latest/candidate
+    base: ubuntu@20.04
+    scale: 1
+    trust: true
+    options:
+      kubernetes-service-annotations: metallb.universe.tf/address-pool=public
+  cinder-router:
+    charm: mysql-router-k8s
+    channel: 8.0/edge
+    base: ubuntu@22.04
+    scale: 1
+    trust: true
+    options:
+      expose-external: loadbalancer
+
+  # ── local s390x builds ──
+  ovn-central:
+    charm: ./charms/ovn-central-k8s_s390x.charm
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    resources:
+      ovn-sb-db-server-image: REPLACE-ME/ovn-sb-db-server:s390x
+      ovn-nb-db-server-image: REPLACE-ME/ovn-nb-db-server:s390x
+      ovn-northd-image: REPLACE-ME/ovn-northd:s390x
+  ovn-relay:
+    charm: ./charms/ovn-relay-k8s_s390x.charm
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    resources:
+      ovn-sb-db-server-image: REPLACE-ME/ovn-sb-db-server:s390x
+  keystone:
+    charm: ./charms/keystone-k8s_s390x.charm
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    storage:
+      fernet-keys: 5M
+      credential-keys: 5M
+    resources:
+      keystone-image: REPLACE-ME/keystone-consolidated:s390x
+  glance:
+    charm: ./charms/glance-k8s_s390x.charm
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    storage:
+      local-repository: 10G
+    resources:
+      glance-api-image: REPLACE-ME/glance-api:s390x
+  placement:
+    charm: ./charms/placement-k8s_s390x.charm
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    resources:
+      placement-api-image: REPLACE-ME/placement-api:s390x
+  nova:
+    charm: ./charms/nova-k8s_s390x.charm
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    resources:
+      nova-api-image: REPLACE-ME/nova-api:s390x
+      nova-scheduler-image: REPLACE-ME/nova-scheduler:s390x
+      nova-conductor-image: REPLACE-ME/nova-conductor:s390x
+      nova-spiceproxy-image: REPLACE-ME/nova-spiceproxy:s390x
+  neutron:
+    charm: ./charms/neutron-k8s_s390x.charm
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    options:
+      debug: true
+    resources:
+      neutron-server-image: REPLACE-ME/neutron-server:s390x
+  cinder:
+    charm: ./charms/cinder-k8s_s390x.charm
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    resources:
+      cinder-api-image: REPLACE-ME/cinder-api:s390x
+      cinder-scheduler-image: REPLACE-ME/cinder-scheduler:s390x
+
+relations:
+  - - tls-operator:certificates
+    - ovn-central:certificates
+  - - tls-operator:certificates
+    - ovn-relay:certificates
+  - - ovn-relay:ovsdb-cms
+    - ovn-central:ovsdb-cms
+
+  - - mysql:database
+    - keystone:database
+  - - traefik:ingress
+    - keystone:ingress-internal
+  - - rabbitmq:amqp
+    - keystone:amqp
+
+  - - mysql:database
+    - glance:database
+  - - keystone:identity-service
+    - glance:identity-service
+  - - rabbitmq:amqp
+    - glance:amqp
+  - - traefik:ingress
+    - glance:ingress-internal
+  - - keystone:send-ca-cert
+    - glance:receive-ca-cert
+
+  - - mysql:database
+    - nova:database
+  - - mysql:database
+    - nova:api-database
+  - - mysql:database
+    - nova:cell-database
+  - - rabbitmq:amqp
+    - nova:amqp
+  - - keystone:identity-service
+    - nova:identity-service
+  - - traefik:ingress
+    - nova:ingress-internal
+  - - traefik:ingress
+    - nova:ingress-metadata
+  - - traefik:traefik-route
+    - nova:traefik-route-internal
+  - - keystone:send-ca-cert
+    - nova:receive-ca-cert
+  - - placement:placement
+    - nova:placement
+
+  - - mysql:database
+    - placement:database
+  - - keystone:identity-service
+    - placement:identity-service
+  - - traefik:ingress
+    - placement:ingress-internal
+  - - keystone:send-ca-cert
+    - placement:receive-ca-cert
+
+  - - mysql:database
+    - neutron:database
+  - - rabbitmq:amqp
+    - neutron:amqp
+  - - keystone:identity-service
+    - neutron:identity-service
+  - - traefik:ingress
+    - neutron:ingress-internal
+  - - tls-operator:certificates
+    - neutron:certificates
+  - - neutron:ovsdb-cms
+    - ovn-central:ovsdb-cms
+  - - keystone:send-ca-cert
+    - neutron:receive-ca-cert
+
+  - - mysql:database
+    - cinder-router:backend-database
+  - - cinder:database
+    - cinder-router:database
+  - - cinder:amqp
+    - rabbitmq:amqp
+  - - keystone:identity-service
+    - cinder:identity-service
+  - - traefik:ingress
+    - cinder:ingress-internal
+  - - keystone:send-ca-cert
+    - cinder:receive-ca-cert
+  - - glance:image-service
+    - cinder:image-service
+
+---
+applications:
+  rabbitmq:
+    offers:
+      amqp:
+        endpoints:
+          - amqp
+  tls-operator:
+    offers:
+      certificates:
+        endpoints:
+          - certificates
+  ovn-relay:
+    offers:
+      ovsdb-cms:
+        endpoints:
+          - ovsdb-cms-relay
+  keystone:
+    offers:
+      identity-service:
+        endpoints:
+          - identity-service
+      identity-credentials:
+        endpoints:
+          - identity-credentials
+      send-ca-cert:
+        endpoints:
+          - send-ca-cert
+  nova:
+    offers:
+      nova-service:
+        endpoints:
+          - nova-service
+  cinder-router:
+    offers:
+      cinder-database:
+        endpoints:
+          - database

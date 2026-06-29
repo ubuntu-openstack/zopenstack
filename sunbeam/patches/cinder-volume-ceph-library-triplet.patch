@@ -1,0 +1,13 @@
+diff --git a/snap/snapcraft.yaml b/snap/snapcraft.yaml
+index e467613..621f5bd 100644
+--- a/snap/snapcraft.yaml
++++ b/snap/snapcraft.yaml
+@@ -37,7 +37,7 @@ apps:
+     environment:
+       # Standard library components must have priority in module name resolution: https://storyboard.openstack.org/#!/story/2007806
+       PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.14:$SNAP/lib/python3.14/site-packages
+-      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu:$SNAP/usr/lib/x86_64-linux-gnu/ceph
++      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ceph
+     command: bin/cinder_volume
+     daemon: simple
+     plugs:

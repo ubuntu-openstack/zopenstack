@@ -1,0 +1,15 @@
+diff --git a/snap/snapcraft.yaml b/snap/snapcraft.yaml
+index 231fa5f..5bc9d31 100644
+--- a/snap/snapcraft.yaml
++++ b/snap/snapcraft.yaml
+@@ -32,6 +32,10 @@ platforms:
+   arm64:
+   s390x:
+ 
++package-repositories:
++  - type: apt
++    ppa: mylesjp/nova-acpi-patch
++
+ system-usernames:
+   snap_daemon: shared
+ 
