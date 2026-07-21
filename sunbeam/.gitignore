@@ -1,0 +1,7 @@
+artifacts/
+*.tar.zst
+*.swp
+.DS_Store
+
+# Local s390x charm artifacts (staged for CHARM_SOURCE=local); keep charms/README.md
+charms/*.charm

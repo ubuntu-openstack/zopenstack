@@ -1,0 +1,15 @@
+diff --git a/snap/snapcraft.yaml b/snap/snapcraft.yaml
+index 231fa5f..7bb2694 100644
+--- a/snap/snapcraft.yaml
++++ b/snap/snapcraft.yaml
+@@ -749,6 +749,10 @@ parts:
+       if [ -f $CRAFT_PART_INSTALL/usr/lib/openvswitch-switch-dpdk/ovs-vswitchd-dpdk ]; then
+           mv $CRAFT_PART_INSTALL/usr/lib/openvswitch-switch-dpdk/ovs-vswitchd-dpdk $CRAFT_PART_INSTALL/usr/sbin/ovs-vswitchd
+       fi
++      if [ ! -e $CRAFT_PART_INSTALL/usr/sbin/ovs-vswitchd ] && \
++          [ -x $CRAFT_PART_INSTALL/usr/lib/openvswitch-switch/ovs-vswitchd ]; then
++          ln -s ../lib/openvswitch-switch/ovs-vswitchd $CRAFT_PART_INSTALL/usr/sbin/ovs-vswitchd
++      fi
+ 
+   apache2-webdav:
+     plugin: nil

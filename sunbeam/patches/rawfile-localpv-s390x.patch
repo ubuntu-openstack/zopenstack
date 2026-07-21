@@ -1,0 +1,56 @@
+diff --git a/requirements.in b/requirements.in
+index e3de098..385b576 100644
+--- a/requirements.in
++++ b/requirements.in
+@@ -1,5 +1,5 @@
+-grpcio-tools
+ grpcio
++protobuf
+ click
+ pyyaml
+ pykube-ng
+diff --git a/requirements.txt b/requirements.txt
+index 2155767..48a7a0a 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -11,10 +11,6 @@ charset-normalizer==3.4.4
+ click==8.1.8
+     # via -r requirements.in
+ grpcio==1.70.0
+-    # via
+-    #   -r requirements.in
+-    #   grpcio-tools
+-grpcio-tools==1.70.0
+     # via -r requirements.in
+ idna==3.10
+     # via requests
+@@ -23,7 +19,7 @@ munch==4.0.0
+ prometheus-client==0.21.1
+     # via -r requirements.in
+ protobuf==5.29.6
+-    # via grpcio-tools
++    # via -r requirements.in
+ pykube-ng==23.6.0
+     # via -r requirements.in
+ pyyaml==6.0.2
+diff --git a/rockcraft.yaml b/rockcraft.yaml
+index d24cbdd..3c268a5 100644
+--- a/rockcraft.yaml
++++ b/rockcraft.yaml
+@@ -27,0 +28 @@ platforms:
++  s390x:
+@@ -61,8 +62,13 @@ parts:
+   rawfile-deps:
+     after: [btrfsutil]
+     plugin: python
+     source: .
++    build-packages:
++      - libssl-dev
+     build-environment:
+       - PIP_NO_CACHE_DIR: "1"
++      # grpcio's bundled BoringSSL does not recognize s390x. Link against
++      # Ubuntu's OpenSSL instead.
++      - GRPC_PYTHON_BUILD_SYSTEM_OPENSSL: "1"
+     python-requirements:
+       - $CRAFT_STAGE/wheels/wheels.txt
+       - ./requirements.txt

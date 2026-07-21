@@ -1,0 +1,251 @@
+# Sunbeam CORE control-plane bundle for single-LPAR s390x verification.
+#
+# Hand-rolled equivalent of snap-openstack's `deploy-openstack` Terraform plan,
+# derived verbatim from the upstream zaza functional-test bundle
+# sunbeam-charms/tests/openstack/smoke.yaml.j2 with every feature charm removed
+# (no horizon/heat/octavia/magnum/manila/barbican/designate/ironic/telemetry/
+# images-sync/ldap, and no in-bundle tempest-k8s -- tempest-k8s has no s390x OCI
+# image so Tempest runs via upstream tox in phase 06 instead).
+#
+# This is the K8s half of a two-model deployment. Deploy it into the `openstack`
+# CAAS model on the Canonical K8s cloud:
+#
+#   juju add-model openstack <k8s-cloud>
+#   juju deploy ./control-plane-k8s-s390x.yaml --trust
+#
+# It EXPORTS the cross-model offers (amqp, identity-*, send-ca-cert, ovsdb-cms,
+# certificates, nova-service, cinder-database) that the machine-plane bundle
+# (machine-lpar-s390x.yaml) consumes for the hypervisor + cinder-volume +
+# microceph. It also requires the `storage-backend` offer that the machine bundle
+# exports back -- phase 03b wires that one up after both models exist.
+#
+# Channels match manifests/sunbeam-2026.1-s390x.yaml. Resources are intentionally
+# omitted: deploying from charmhub makes Juju pull each revision's published OCI
+# image, which is exactly how phase 05 surfaces the per-image s390x gaps.
+bundle: kubernetes
+
+applications:
+  mysql:
+    charm: mysql-k8s
+    channel: 8.0/stable
+    base: ubuntu@22.04
+    scale: 1
+    trust: true
+    options:
+      profile-limit-memory: 6202
+      experimental-max-connections: 466
+  rabbitmq:
+    charm: rabbitmq-k8s
+    channel: 3.12/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    options:
+      minimum-replicas: 1
+  tls-operator:
+    charm: self-signed-certificates
+    channel: 1/beta
+    base: ubuntu@22.04
+    scale: 1
+    options:
+      ca-common-name: internal-ca
+  traefik:
+    charm: traefik-k8s
+    channel: latest/candidate
+    base: ubuntu@20.04
+    scale: 1
+    trust: true
+    # NOTE: this annotation targets MetalLB. The Canonical K8s load-balancer
+    # addon configured in phase 02b may not honour it; if traefik stays pending
+    # without an external IP, drop this option or match the addon's pool name.
+    # See README "Load-balancer".
+    options:
+      kubernetes-service-annotations: metallb.universe.tf/address-pool=public
+  ovn-central:
+    charm: ovn-central-k8s
+    channel: 26.03/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+  ovn-relay:
+    charm: ovn-relay-k8s
+    channel: 26.03/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+  keystone:
+    charm: keystone-k8s
+    channel: 2026.1/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    storage:
+      fernet-keys: 5M
+      credential-keys: 5M
+  glance:
+    charm: glance-k8s
+    channel: 2026.1/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    storage:
+      local-repository: 10G
+  placement:
+    charm: placement-k8s
+    channel: 2026.1/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+  nova:
+    charm: nova-k8s
+    channel: 2026.1/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+  neutron:
+    charm: neutron-k8s
+    channel: 2026.1/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+    options:
+      debug: true
+  cinder-router:
+    charm: mysql-router-k8s
+    channel: 8.0/edge
+    base: ubuntu@22.04
+    scale: 1
+    trust: true
+    options:
+      expose-external: loadbalancer
+  cinder:
+    charm: cinder-k8s
+    channel: 2026.1/edge
+    base: ubuntu@24.04
+    scale: 1
+    trust: true
+
+relations:
+  - - tls-operator:certificates
+    - ovn-central:certificates
+  - - tls-operator:certificates
+    - ovn-relay:certificates
+  - - ovn-relay:ovsdb-cms
+    - ovn-central:ovsdb-cms
+
+  - - mysql:database
+    - keystone:database
+  - - traefik:ingress
+    - keystone:ingress-internal
+  - - rabbitmq:amqp
+    - keystone:amqp
+
+  - - mysql:database
+    - glance:database
+  - - keystone:identity-service
+    - glance:identity-service
+  - - rabbitmq:amqp
+    - glance:amqp
+  - - traefik:ingress
+    - glance:ingress-internal
+  - - keystone:send-ca-cert
+    - glance:receive-ca-cert
+
+  - - mysql:database
+    - nova:database
+  - - mysql:database
+    - nova:api-database
+  - - mysql:database
+    - nova:cell-database
+  - - rabbitmq:amqp
+    - nova:amqp
+  - - keystone:identity-service
+    - nova:identity-service
+  - - traefik:ingress
+    - nova:ingress-internal
+  - - traefik:ingress
+    - nova:ingress-metadata
+  - - traefik:traefik-route
+    - nova:traefik-route-internal
+  - - keystone:send-ca-cert
+    - nova:receive-ca-cert
+  - - placement:placement
+    - nova:placement
+
+  - - mysql:database
+    - placement:database
+  - - keystone:identity-service
+    - placement:identity-service
+  - - traefik:ingress
+    - placement:ingress-internal
+  - - keystone:send-ca-cert
+    - placement:receive-ca-cert
+
+  - - mysql:database
+    - neutron:database
+  - - rabbitmq:amqp
+    - neutron:amqp
+  - - keystone:identity-service
+    - neutron:identity-service
+  - - traefik:ingress
+    - neutron:ingress-internal
+  - - tls-operator:certificates
+    - neutron:certificates
+  - - neutron:ovsdb-cms
+    - ovn-central:ovsdb-cms
+  - - keystone:send-ca-cert
+    - neutron:receive-ca-cert
+
+  - - mysql:database
+    - cinder-router:backend-database
+  - - cinder:database
+    - cinder-router:database
+  - - cinder:amqp
+    - rabbitmq:amqp
+  - - keystone:identity-service
+    - cinder:identity-service
+  - - traefik:ingress
+    - cinder:ingress-internal
+  - - keystone:send-ca-cert
+    - cinder:receive-ca-cert
+  - - glance:image-service
+    - cinder:image-service
+
+---
+applications:
+  rabbitmq:
+    offers:
+      amqp:
+        endpoints:
+          - amqp
+  tls-operator:
+    offers:
+      certificates:
+        endpoints:
+          - certificates
+  ovn-relay:
+    offers:
+      ovsdb-cms:
+        endpoints:
+          - ovsdb-cms-relay
+  keystone:
+    offers:
+      identity-service:
+        endpoints:
+          - identity-service
+      identity-credentials:
+        endpoints:
+          - identity-credentials
+      send-ca-cert:
+        endpoints:
+          - send-ca-cert
+  nova:
+    offers:
+      nova-service:
+        endpoints:
+          - nova-service
+  cinder-router:
+    offers:
+      cinder-database:
+        endpoints:
+          - database

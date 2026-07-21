@@ -1,0 +1,13 @@
+diff --git a/snap/snapcraft.yaml b/snap/snapcraft.yaml
+index 231fa5f..9ae91fb 100644
+--- a/snap/snapcraft.yaml
++++ b/snap/snapcraft.yaml
+@@ -513,7 +513,7 @@ parts:
+       - ninja-build
+     autotools-configure-parameters:
+       - --enable-system
+-      - --target-list=x86_64-softmmu,aarch64-softmmu
++      - --target-list=x86_64-softmmu,aarch64-softmmu,s390x-softmmu
+       - --disable-install-blobs
+       - --disable-user
+       - --disable-linux-user

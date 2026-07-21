@@ -1,0 +1,89 @@
+# Sunbeam manifest for single-node s390x deployment on 2026.1/edge (Gazpacho).
+# Works on both Ubuntu 24.04 LTS (Noble) and 26.04 LTS (Resolute) hosts;
+# Sunbeam 2026.1 publishes charm revisions for both ubuntu@24.04 and
+# ubuntu@26.04 bases.
+#
+# IMPORTANT: Sunbeam manifest schemas drift across cycles. Before relying on this
+# verbatim, regenerate a current-shape skeleton with:
+#
+#     sunbeam manifest generate > /tmp/sunbeam-generated.yaml
+#
+# then diff against this file and reconcile any new/renamed keys.
+#
+# This manifest:
+#   - pins snap channels for k8s + openstack-hypervisor matched to 2026.1
+#   - pins every CORE charm (keystone, glance, nova, neutron, placement,
+#     horizon, cinder, ovn-*, mysql, rabbitmq, tls, traefik) to 2026.1/edge
+#     and expects the charm revisions to resolve to ubuntu@26.04 bases
+#   - does NOT enable any feature plans (heat/octavia/magnum/barbican/...)
+#     so `sunbeam validation run` exercises only core-service Tempest plugins.
+#
+# NOTE on Resolute support: 2026.1/edge charms may still publish only
+# ubuntu@24.04 revisions at the time of writing. Phase 03 will surface that
+# as a bootstrap failure; the arch_report.md from phases 01/05 will tell you
+# which charms have a 26.04 revision and which don't.
+#
+# NOTE on K8s bootstrap: this manifest assumes Canonical K8s has ALREADY been
+# bootstrapped by phase 02b (scripts/02b_setup_s390x_cni.sh), which disables
+# cilium and installs Calico because cilium does not run on s390x. If Sunbeam
+# 2026.1 insists on running its own `k8s bootstrap` and refuses to use the
+# existing one, you'll see phase 03 fail with a "k8s already bootstrapped"
+# or "node not ready" error. Mitigations in order of preference:
+#   1. Look for a `software.k8s.bootstrap: false` or equivalent manifest key
+#      in `sunbeam manifest generate` output and add it here.
+#   2. Patch the Sunbeam Terraform plan that runs k8s bootstrap (see
+#      $SNAP_DATA/openstack/terraform/... after the snap is installed) to
+#      skip the bootstrap step.
+#   3. File an issue against openstack-snap upstream.
+
+deployment:
+  bootstrap:
+    management_cidr: 10.20.20.0/24
+
+software:
+  juju:
+    bootstrap_args:
+      - --debug
+  charms:
+    keystone-k8s:
+      channel: 2026.1/edge
+    glance-k8s:
+      channel: 2026.1/edge
+    nova-k8s:
+      channel: 2026.1/edge
+    placement-k8s:
+      channel: 2026.1/edge
+    neutron-k8s:
+      channel: 2026.1/edge
+    horizon-k8s:
+      channel: 2026.1/edge
+    cinder-k8s:
+      channel: 2026.1/edge
+    cinder-ceph-k8s:
+      channel: 2026.1/edge
+    ovn-central-k8s:
+      channel: 26.03/edge
+    ovn-relay-k8s:
+      channel: 26.03/edge
+    mysql-k8s:
+      channel: 8.0/stable
+    rabbitmq-k8s:
+      channel: 3.12/edge
+    traefik-k8s:
+      channel: latest/candidate
+    self-signed-certificates:
+      channel: 1/beta
+    openstack-hypervisor:
+      channel: 2026.1/edge
+    sunbeam-machine:
+      channel: 2026.1/edge
+    sunbeam-clusterd:
+      channel: 2026.1/edge
+    microceph:
+      channel: squid/stable
+  core:
+    config:
+      # Single-node sizing: keep mysql memory profile modest.
+      mysql:
+        profile-limit-memory: 6202
+        experimental-max-connections: 466

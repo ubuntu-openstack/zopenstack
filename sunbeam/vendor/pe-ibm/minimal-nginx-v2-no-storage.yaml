@@ -1,0 +1,56 @@
+# microk8s-single-node-workload-test
+#
+# We don't really need an filesystem for this test, so let's take the
+# simpler path and use a ConfigMap mount its contents into the pods.
+#
+# Test will download URL http://xxxx/microk8s-test-result.txt
+# and check if the contents is "OK".
+#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: single-static-site-config
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Single-node static Nginx test</title>
+    </head>
+    <body>
+        <h1>Single-node static Nginx test</h1>
+        <p> debug-single-node-workload-ok </p>
+    </body>
+    </html>
+  microk8s-test-result.txt: "OK\n"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: single-nginx-static-site
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: static-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: static-content
+        configMap:
+          name: single-static-site-config

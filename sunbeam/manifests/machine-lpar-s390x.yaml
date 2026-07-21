@@ -1,0 +1,128 @@
+# Sunbeam MACHINE-plane bundle for single-LPAR s390x verification.
+#
+# Hand-rolled equivalent of snap-openstack's machine-side Terraform plans
+# (deploy-sunbeam-machine, deploy-openstack-hypervisor, deploy-microceph,
+# deploy-cinder-volume), derived verbatim from the upstream zaza test bundle
+# sunbeam-charms/tests/openstack/machines.yaml.j2 with the feature charms removed
+# (no epa-orchestrator, no manila-data, no microceph RGW).
+#
+# This is the IAAS half of a two-model deployment. Deploy it into a `machines`
+# model on a MANUAL cloud whose only machine ("0") is this LPAR itself, AFTER the
+# control-plane bundle is up (its offers must already exist):
+#
+#   juju add-model machines <manual-cloud>
+#   juju add-machine ssh:<user>@<lpar>     # becomes machine 0
+#   juju deploy ./machine-lpar-s390x.yaml
+#
+# The `saas:` block CONSUMES the cross-model offers exported by
+# control-plane-k8s-s390x.yaml. URLs assume the K8s control-plane model is named
+# `openstack` (admin/openstack.<offer>); adjust if you used a different name.
+#
+# cinder-volume EXPORTS a `storage-backend` offer; phase 03b consumes it back into
+# the openstack model and integrates it with cinder-k8s (cinder:storage-backend).
+#
+# The hypervisor runs on bare metal (machine 0) for /dev/kvm. microceph uses three
+# 2G loop OSDs (single-node profile). Channels match control-plane-k8s-s390x.yaml
+# / manifests/sunbeam-2026.1-s390x.yaml.
+
+# Machine 0 is this s390x host (manual cloud). Juju infers the architecture from
+# the enrolled machine.
+machines:
+  "0": {}
+
+applications:
+  sunbeam-machine:
+    charm: sunbeam-machine
+    channel: 2026.1/edge
+    scale: 1
+    to:
+      - "0"
+  microceph:
+    charm: microceph
+    channel: squid/stable
+    scale: 1
+    to:
+      - "0"
+    options:
+      snap-channel: squid/stable
+      default-pool-size: 1
+    storage:
+      osd-standalone: loop,3,2G
+  cinder-volume:
+    charm: cinder-volume
+    channel: 2026.1/edge
+    scale: 1
+    to:
+      - "0"
+    options:
+      snap-channel: 2026.1/edge
+  cinder-microceph:
+    charm: cinder-volume-ceph
+    channel: 2026.1/edge
+    options:
+      ceph-osd-replication-count: 1
+  hypervisor:
+    charm: openstack-hypervisor
+    channel: 2026.1/edge
+    scale: 1
+    to:
+      - "0"
+    options:
+      snap-channel: 2026.1/edge
+      external-bridge-address: 0.0.0.0/0
+
+saas:
+  amqp:
+    url: admin/openstack.amqp
+  identity-credentials:
+    url: admin/openstack.identity-credentials
+  cinder-database:
+    url: admin/openstack.cinder-database
+  send-ca-cert:
+    url: admin/openstack.send-ca-cert
+  ovsdb-cms:
+    url: admin/openstack.ovsdb-cms
+  certificates:
+    url: admin/openstack.certificates
+  nova-service:
+    url: admin/openstack.nova-service
+
+relations:
+  - - cinder-volume:amqp
+    - amqp:amqp
+  - - cinder-volume:identity-credentials
+    - identity-credentials:identity-credentials
+  - - cinder-volume:database
+    - cinder-database
+  - - cinder-volume:receive-ca-cert
+    - send-ca-cert:send-ca-cert
+
+  - - microceph:ceph
+    - cinder-microceph:ceph
+  - - cinder-volume:cinder-volume
+    - cinder-microceph:cinder-volume
+  - - microceph:receive-ca-cert
+    - send-ca-cert:send-ca-cert
+
+  - - amqp:amqp
+    - hypervisor:amqp
+  - - identity-credentials:identity-credentials
+    - hypervisor:identity-credentials
+  - - send-ca-cert:send-ca-cert
+    - hypervisor:receive-ca-cert
+  - - ovsdb-cms
+    - hypervisor:ovsdb-cms
+  - - certificates
+    - hypervisor:certificates
+  - - nova-service
+    - hypervisor:nova-service
+  - - hypervisor:ceph-access
+    - cinder-microceph:ceph-access
+
+---
+applications:
+  cinder-volume:
+    offers:
+      storage-backend:
+        endpoints:
+          - storage-backend
