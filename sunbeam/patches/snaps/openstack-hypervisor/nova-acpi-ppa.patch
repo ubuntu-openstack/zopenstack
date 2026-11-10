@@ -1,0 +1,23 @@
+Description: Stage Nova from ppa:himax16/s390x-nova-acpi for the s390x ACPI fix.
+Author: Myles Penner <myles.penner@canonical.com>
+Origin: zopenstack/sunbeam commit e2c74c977350a47e3710eb167a673a4ace13c84b
+Bug: https://bugs.launchpad.net/bugs/2043987
+Last-Update: 2026-11-11
+Forwarded: not-needed
+---
+diff --git a/snap/snapcraft.yaml b/snap/snapcraft.yaml
+index 231fa5f..5bc9d31 100644
+--- a/snap/snapcraft.yaml
++++ b/snap/snapcraft.yaml
+@@ -32,6 +32,10 @@ platforms:
+   arm64:
+   s390x:
+ 
++package-repositories:
++  - type: apt
++    ppa: himax16/s390x-nova-acpi
++    priority: 1001
++
+ system-usernames:
+   snap_daemon: shared
+ 

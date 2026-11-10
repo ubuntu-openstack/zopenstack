@@ -6,7 +6,7 @@ tmp=$(mktemp -d)
 trap 'rm -rf "${tmp}"' EXIT
 
 mkdir -p "${tmp}/.status" "${tmp}/tempest"
-touch "${tmp}/.status/06_validate_tempest.done"
+touch "${tmp}/.status/09_validate_tempest.done"
 cat > "${tmp}/tempest/smoke_output.txt" <<'EOF'
 Totals
 ======
@@ -30,7 +30,8 @@ required=(
 for f in "${required[@]}"; do
     test -f "${tmp}/test-share/${f}"
 done
-grep -q 'Tempest smoke: PASSED' "${tmp}/test-share/README.md"
+grep -q 'All selected Tempest smoke tests passed.' "${tmp}/test-share/README.md"
+grep -q 'hibiscus' "${tmp}/test-share/README.md"
 grep -q '<redacted>' "${tmp}/test-share/instance_launch.txt"
 ! grep -q 'secret' "${tmp}/test-share/instance_launch.txt"
 

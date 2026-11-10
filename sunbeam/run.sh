@@ -2,7 +2,7 @@
 # Driver for the s390x single-node Sunbeam reproducer.
 # Usage:
 #   ./run.sh all          # run all phases in order
-#   ./run.sh 03           # run only phase 03 (prefix-match against script filenames)
+#   ./run.sh 04           # run only phase 04 (prefix-match against script filenames)
 #   ./run.sh --run-id <id> all   # resume into an existing artifacts/<id>/ dir
 set -euo pipefail
 
@@ -42,9 +42,8 @@ echo "run_id=${RUN_ID}"
 echo "artifact_dir=${ARTIFACT_DIR}"
 
 # -------- phase dispatch --------
-# Glob: any script starting with two digits. Force LC_ALL=C sort so `02_*`
-# precedes `02b_*` -- some locales treat `_` as a non-letter and would reverse
-# the order, which would run phase 02b before phase 02.
+# Glob: any script starting with two digits. Force LC_ALL=C sort so numeric
+# phase prefixes run in order, with phase 99 last.
 shopt -s nullglob
 PHASES_DIR="${PHASES_DIR:-${REPO_ROOT}/scripts}"
 mapfile -t all_phases < <(
@@ -56,8 +55,8 @@ if [[ "${PHASE_ARG}" == "all" ]]; then
     select_phases=("${all_phases[@]}")
 else
     # Prefer an exact script name or phase identifier (the filename portion
-    # before the first underscore). Thus `04` selects 04_configure only, while
-    # `04b` selects 04b_smoke_cloud.
+    # before the first underscore). Thus `06` selects 06_configure only, while
+    # `07` selects 07_smoke_cloud.
     for p in "${all_phases[@]}"; do
         base=$(basename "$p")
         phase_id="${base%%_*}"
@@ -81,15 +80,15 @@ if (( ${#select_phases[@]} == 0 )); then
     exit 2
 fi
 
-# Phase 05 (capture) is special: if we're running 'all' and any earlier phase
-# fails, we still want to run 05 + 99 for the post-mortem.
+# Phase 08 (capture) is special: if we're running 'all' and any earlier phase
+# fails, we still want to run 08 + 99 for the post-mortem.
 overall_rc=0
 capture_only=0
 for script in "${select_phases[@]}"; do
     base=$(basename "$script")
     if (( capture_only )); then
         case "${base}" in
-            05_capture_state.sh|99_collect_artifacts.sh) ;;
+            08_capture_state.sh|99_collect_artifacts.sh) ;;
             *)
                 echo ">>> ${base} skipped after blocking phase failure"
                 continue
@@ -111,10 +110,10 @@ for script in "${select_phases[@]}"; do
         # For 'all', continue into capture+collect so we still get artifacts.
         if [[ "${PHASE_ARG}" == "all" ]]; then
             case "${base}" in
-                05_capture_state.sh|99_collect_artifacts.sh) continue ;;
+                08_capture_state.sh|99_collect_artifacts.sh) continue ;;
                 *)
                     capture_only=1
-                    echo "skipping dependent phases; continuing to 05/99 for post-mortem capture"
+                    echo "skipping dependent phases; continuing to 08/99 for post-mortem capture"
                     ;;
             esac
         else

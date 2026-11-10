@@ -1,3 +1,10 @@
+Description: Pin the rawfile-localpv s390x build.
+Author: Myles Penner <myles.penner@canonical.com>
+Author: Himawan Winarto <himawan.winarto@canonical.com>
+Origin: zopenstack/sunbeam commits e2c74c977350a47e3710eb167a673a4ace13c84b and 2cb540f594d6699a1e35fff452057633bded463b
+Last-Update: 2026-11-10
+Forwarded: not-needed
+---
 diff --git a/requirements.in b/requirements.in
 index e3de098..385b576 100644
 --- a/requirements.in
@@ -34,12 +41,24 @@ index 2155767..48a7a0a 100644
      # via -r requirements.in
  pyyaml==6.0.2
 diff --git a/rockcraft.yaml b/rockcraft.yaml
-index d24cbdd..3c268a5 100644
+index d24cbdd..ada20b1 100644
 --- a/rockcraft.yaml
 +++ b/rockcraft.yaml
-@@ -27,0 +28 @@ platforms:
+@@ -25,6 +25,7 @@ build-base: ubuntu@22.04
+ platforms:
+   amd64:
+   arm64:
 +  s390x:
-@@ -61,8 +62,13 @@ parts:
+ 
+ services:
+   rawfile:
+@@ -55,14 +56,18 @@ parts:
+   openssl:
+     plugin: nil
+     stage-packages:
+-      - openssl-fips-module-3 # a Pro only FIPS package for openssl
+-      - openssl # now automatically selected from fips-preview
++      - openssl # the FIPS module is not published for s390x
    rawfile-deps:
      after: [btrfsutil]
      plugin: python

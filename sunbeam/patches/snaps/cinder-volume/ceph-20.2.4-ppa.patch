@@ -1,0 +1,14 @@
+diff --git a/snap/snapcraft.yaml b/snap/snapcraft.yaml
+index ca3051c..aebd675 100644
+--- a/snap/snapcraft.yaml
++++ b/snap/snapcraft.yaml
+@@ -20,6 +20,9 @@ platforms:
+   s390x:
+ 
+ package-repositories:
++  - type: apt
++    ppa: lmlogiudice/ceph-lp2166817-updates
++    priority: always
+   - type: apt
+     # Hibiscus 2026.2 is only in the UCA -proposed pocket so far.
+     # Switch pocket to updates once it is promoted.

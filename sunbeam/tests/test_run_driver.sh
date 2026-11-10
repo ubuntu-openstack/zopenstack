@@ -6,7 +6,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "${tmp}"' EXIT
 mkdir -p "${tmp}/phases" "${tmp}/artifacts"
 
-for phase in 00_ok 01_fail 02_must_skip 05_capture_state 06_must_skip 99_collect_artifacts; do
+for phase in 00_ok 01_fail 02_must_skip 08_capture_state 09_must_skip 99_collect_artifacts; do
     rc=0
     [[ "${phase}" == "01_fail" ]] && rc=7
     cat > "${tmp}/phases/${phase}.sh" <<EOF
@@ -27,7 +27,7 @@ set -e
 cat > "${tmp}/expected" <<'EOF'
 00_ok
 01_fail
-05_capture_state
+08_capture_state
 99_collect_artifacts
 EOF
 diff -u "${tmp}/expected" "${tmp}/executed"

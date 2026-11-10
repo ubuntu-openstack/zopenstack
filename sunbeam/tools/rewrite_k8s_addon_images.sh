@@ -45,6 +45,38 @@ ns="${ADDON_NAMESPACE[${addon}]:-}"
 ns_flag="-A"
 [[ -n "${ns}" ]] && ns_flag="-n ${ns}"
 
+# The upstream MetalLB images serve metrics/health on their configured port,
+# while the Canonical images use different probe paths and ports. Rewriting
+# only the image leaves the probes pointing at the old endpoints, so the
+# controller/speaker restart-loop even though the upstream binary is healthy.
+align_metallb_probes() {
+    local resource metrics_port patch
+    for resource in deployment/metallb-controller daemonset/metallb-speaker; do
+        metrics_port="$(
+            sudo k8s kubectl -n metallb-system get "${resource}" \
+                -o jsonpath='{range .spec.template.spec.containers[0].args[*]}{@}{"\n"}{end}' 2>/dev/null \
+                | awk -F= '/^--port=/{print $2; exit}'
+        )"
+        metrics_port="${metrics_port:-9120}"
+        log_step "aligning ${resource} probes to upstream /metrics port ${metrics_port}"
+        # The Canonical speaker chart probes 127.0.0.1, but the upstream
+        # speaker binds metrics on the node IP (hostNetwork). Clear the probe
+        # host so kubelet uses the pod IP.
+        speaker_host_ops=""
+        if [[ "${resource}" == "daemonset/metallb-speaker" ]]; then
+            speaker_host_ops=',{"op":"replace","path":"/spec/template/spec/containers/0/livenessProbe/httpGet/host","value":""},{"op":"replace","path":"/spec/template/spec/containers/0/readinessProbe/httpGet/host","value":""}'
+        fi
+        patch="$(
+            printf '[{"op":"replace","path":"/spec/template/spec/containers/0/livenessProbe/httpGet/path","value":"/metrics"},{"op":"replace","path":"/spec/template/spec/containers/0/livenessProbe/httpGet/port","value":%s},{"op":"replace","path":"/spec/template/spec/containers/0/readinessProbe/httpGet/path","value":"/metrics"},{"op":"replace","path":"/spec/template/spec/containers/0/readinessProbe/httpGet/port","value":%s}%s]' \
+                "${metrics_port}" "${metrics_port}" "${speaker_host_ops}"
+        )"
+        if ! sudo k8s kubectl -n metallb-system patch "${resource}" --type=json -p "${patch}" 2>&1 \
+                | tee -a "${PHASE_LOG:-/dev/null}"; then
+            log "WARN: could not align ${resource} probes; inspect its probe configuration"
+        fi
+    done
+}
+
 log_step "scanning ${addon} workloads (${ns_flag}) for ghcr.io/canonical/* images"
 
 # Collect (kind, namespace, name, container, image) tuples for every workload
@@ -70,6 +102,9 @@ for item in data.get("items", []):
 if (( ${#hits[@]} == 0 )); then
     log "no ghcr.io/canonical/* images found for addon ${addon}; nothing to rewrite"
     arch_report_append k8s-addon "${addon}" "" yes "no rewrite needed"
+    if [[ "${addon}" == "load-balancer" ]]; then
+        align_metallb_probes
+    fi
     exit 0
 fi
 
@@ -87,10 +122,18 @@ for line in "${hits[@]}"; do
         continue
     fi
     log_step "rewriting ${kind}/${w_name} container=${container}: ${image} -> ${target}"
-    sudo k8s kubectl -n "${w_ns}" set image "${kind}/${w_name}" "${container}=${target}"
+    if ! sudo k8s kubectl -n "${w_ns}" set image "${kind}/${w_name}" "${container}=${target}" 2>&1 \
+            | tee -a "${PHASE_LOG:-/dev/null}"; then
+        log "FATAL: failed to rewrite ${kind}/${w_name} container=${container} to ${target}"
+        exit 1
+    fi
     arch_report_append k8s-addon "${w_name}/${container}" "${target}" yes "rewritten from ${base}"
     rewrote=$((rewrote + 1))
 done
+
+if [[ "${addon}" == "load-balancer" ]]; then
+    align_metallb_probes
+fi
 
 log "addon ${addon}: rewrote ${rewrote} container(s), ${unmapped} unmapped"
 exit $(( unmapped > 0 ? 2 : 0 ))
