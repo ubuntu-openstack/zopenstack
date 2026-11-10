@@ -62,9 +62,9 @@ if [[ -n "${RAWFILE_ROCK}" ]]; then
         sudo /snap/k8s/current/bin/ctr \
           --address /run/containerd/containerd.sock \
           --namespace k8s.io images import '${remote_rock}'
-        # Rockcraft archives may import with an auto-generated ref such as
-        # import-2026-06-26:0.8.3. Kubernetes/containerd can still look for the
-        # original normalized ref after tagging, so keep both aliases present.
+        # Rockcraft archives may import with an auto-generated ref.
+        # Kubernetes/containerd can still look for the original normalized ref
+        # after tagging, so keep both aliases present.
         raw_ref=\"\$(sudo /snap/k8s/current/bin/ctr \
           --address /run/containerd/containerd.sock \
           --namespace k8s.io images ls \

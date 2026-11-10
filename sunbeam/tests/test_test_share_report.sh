@@ -30,7 +30,8 @@ required=(
 for f in "${required[@]}"; do
     test -f "${tmp}/test-share/${f}"
 done
-grep -q 'Tempest smoke: PASSED' "${tmp}/test-share/README.md"
+grep -q 'All selected Tempest smoke tests passed.' "${tmp}/test-share/README.md"
+grep -q 'hibiscus' "${tmp}/test-share/README.md"
 grep -q '<redacted>' "${tmp}/test-share/instance_launch.txt"
 ! grep -q 'secret' "${tmp}/test-share/instance_launch.txt"
 

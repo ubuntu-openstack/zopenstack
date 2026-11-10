@@ -1,4 +1,8 @@
 # Sunbeam manifest for single-node s390x deployment on 2026.1/edge (Gazpacho).
+# This file is kept as a channel-pin reference for the retired Sunbeam CLI path.
+# The live bundle path uses manifests/control-plane-k8s-s390x.yaml +
+# manifests/machine-lpar-s390x.yaml, and `OPENSTACK_SERIES=hibiscus` renders the
+# Hibiscus/Resolute profile through tools/render_release_bundles.py.
 # Works on both Ubuntu 24.04 LTS (Noble) and 26.04 LTS (Resolute) hosts;
 # Sunbeam 2026.1 publishes charm revisions for both ubuntu@24.04 and
 # ubuntu@26.04 bases.
@@ -61,10 +65,14 @@ software:
       channel: 2026.1/edge
     cinder-ceph-k8s:
       channel: 2026.1/edge
-    ovn-central-k8s:
+    # ovn-central-k8s/ovn-relay-k8s are retired; use microovn on the machine
+    # plane plus sunbeam-ovn-proxy to bridge ovsdb-cms.
+    microovn:
       channel: 26.03/edge
-    ovn-relay-k8s:
-      channel: 26.03/edge
+    sunbeam-ovn-proxy:
+      channel: 2026.1/edge
+    microcluster-token-distributor:
+      channel: v1/stable
     mysql-k8s:
       channel: 8.0/stable
     rabbitmq-k8s:

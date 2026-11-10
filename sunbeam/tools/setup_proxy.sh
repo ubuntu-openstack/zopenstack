@@ -7,18 +7,36 @@
 # script logs that and exits 0 so it's safe to call unconditionally from
 # phase scripts on hosts that don't need a proxy.
 #
-# Usage: PROXY_URL=http://squid.ps6.internal:3128 ./tools/setup_proxy.sh
+# Usage: PROXY_URL=http://proxy.example:3128 ./tools/setup_proxy.sh
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export REPO_ROOT="${REPO_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 export RUN_ID="${RUN_ID:-proxy-setup}"
 export ARTIFACT_DIR="${ARTIFACT_DIR:-${REPO_ROOT}/artifacts/${RUN_ID}}"
+
+# Optional shell manifest. This keeps host-specific proxy settings out of
+# individual phase invocations; see proxy.env.example.
+proxy_env_file="${PROXY_ENV_FILE:-}"
+if [[ -z "${proxy_env_file}" && -r "${REPO_ROOT}/proxy.env" ]]; then
+    proxy_env_file="${REPO_ROOT}/proxy.env"
+fi
+if [[ -n "${proxy_env_file}" ]]; then
+    if [[ ! -r "${proxy_env_file}" ]]; then
+        echo "setup_proxy: cannot read ${proxy_env_file}" >&2
+        exit 1
+    fi
+    set -a
+    # shellcheck disable=SC1090
+    . "${proxy_env_file}"
+    set +a
+fi
+
 # shellcheck source=lib.sh
 source "${SCRIPT_DIR}/lib.sh"
 
 PROXY_URL="${PROXY_URL:-${http_proxy:-}}"
-NO_PROXY_VAL="${NO_PROXY_DEFAULT:-localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local}"
+NO_PROXY_VAL="${NO_PROXY_DEFAULT:-localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local,ubuntu-cloud.archive.canonical.com}"
 
 if [[ -z "${PROXY_URL}" ]]; then
     log "no PROXY_URL or http_proxy set; nothing to configure"
@@ -122,3 +140,4 @@ if [[ "${restart_k8s_services}" == "1" ]] && systemctl is-active --quiet "${cont
 fi
 
 log_step "proxy setup complete"
+log "for interactive juju in this shell, run: source ${SCRIPT_DIR}/proxy_env.sh"

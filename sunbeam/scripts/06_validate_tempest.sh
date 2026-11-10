@@ -7,10 +7,12 @@
 #   3. Use python-tempestconf (upstream, deployment-agnostic) to generate
 #      tempest.conf from the live cloud's catalog.
 #   4. Drop in the vendor/zopenstack/exclude-list.txt.
-#   5. Run upstream smoke tests directly with `tempest run --smoke --serial`
-#      by default. Set TEMPEST_USE_TOX=1 to exercise upstream tox explicitly.
-#      Set TEMPEST_PLUGIN_MODE=distro to run the distro Tempest + plugin set
-#      used by the legacy charmed-openstack validation reports.
+#   5. Run Tempest smoke tests directly with `tempest run --smoke --serial`.
+#      The default `TEMPEST_PLUGIN_MODE=distro` installs the distribution
+#      Tempest + plugin set used by the legacy charmed-openstack reports.
+#      Set TEMPEST_PLUGIN_MODE=upstream to use the isolated upstream Tempest
+#      virtualenv without distro plugin packages. Set TEMPEST_USE_TOX=1 to
+#      exercise upstream tox explicitly (upstream mode only).
 #   7. Save FAILED lines into failures.txt.
 #   8. Dump diagnostic state (openstack CLI: catalog, image list, etc.) into
 #      a tempest_report/ directory.
@@ -18,6 +20,9 @@
 # Single-test re-runs are not driven by this phase; use
 # tools/run_tempest_test.sh once setup is complete.
 set -euo pipefail
+
+TEMPEST_PLUGIN_MODE="${TEMPEST_PLUGIN_MODE:-distro}"
+export TEMPEST_PLUGIN_MODE
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../tools/lib.sh
@@ -29,6 +34,7 @@ init_phase "${PHASE}"
 phase_skip_if_done "${PHASE}" && exit 0
 
 OPENRC="${ARTIFACT_DIR}/cloud-admin-openrc"
+EXT_NET_NAME="${EXT_NET_NAME:-external-network}"
 if [[ ! -r "${OPENRC}" ]]; then
     log "FATAL: ${OPENRC} not found. Phase 04 (configure) must succeed first."
     exit 1
@@ -40,7 +46,10 @@ mkdir -p "${TEMPEST_DIR}" "${REPORT_DIR}"
 
 # Guest image for discover-tempest-config. Overridable.
 ARCH="$(target_arch)"
-TEMPEST_IMAGE_URL="${TEMPEST_IMAGE_URL:-https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-${ARCH}.img}"
+# Use the guest series for the selected OpenStack release (Resolute for
+# 2026.2/Hibiscus); TEMPEST_IMAGE_URL or GUEST_SERIES can override it.
+IMAGE_SERIES="${GUEST_SERIES:-$(guest_series)}"
+TEMPEST_IMAGE_URL="${TEMPEST_IMAGE_URL:-https://cloud-images.ubuntu.com/${IMAGE_SERIES}/current/${IMAGE_SERIES}-server-cloudimg-${ARCH}.img}"
 
 EXCLUDE_LIST="${REPO_ROOT}/vendor/zopenstack/exclude-list.txt"
 if [[ ! -s "${EXCLUDE_LIST}" ]]; then
@@ -71,7 +80,7 @@ if ((${#missing_tempestconf_debs[@]})); then
     run_logged "apt install tempestconf python deps" -- \
         sudo apt-get install -y "${missing_tempestconf_debs[@]}"
 fi
-if [[ "${TEMPEST_PLUGIN_MODE:-upstream}" == "distro" ]]; then
+if [[ "${TEMPEST_PLUGIN_MODE}" == "distro" ]]; then
     run_logged "apt install distro tempest plugins" -- sudo apt-get install -y \
         tempest \
         barbican-tempest-plugin \
@@ -129,7 +138,7 @@ log_step "generating tempest.conf via python-tempestconf"
         --out "${TEMPEST_DIR}/tempest/etc/tempest.conf"
         --create
         --image "${TEMPEST_IMAGE_URL}"
-        --network-id "$("${OSC}" network show external-network -f value -c id 2>/dev/null || true)"
+        --network-id "$("${OSC}" network show "${EXT_NET_NAME}" -f value -c id 2>/dev/null || true)"
     )
     if [[ "${TEMPESTCONF_DEBUG:-0}" == "1" ]]; then
         tempestconf_args+=(--debug)
@@ -139,8 +148,8 @@ log_step "generating tempest.conf via python-tempestconf"
 ) 2>&1 | tee "${TEMPEST_DIR}/tempestconf.log" || \
     log "WARN: discover-tempest-config returned non-zero; check ${TEMPEST_DIR}/tempestconf.log"
 
-# python-tempestconf defaults to 1 GiB test flavors and volumes. Ubuntu Noble's
-# cloud image has a 3.5 GiB virtual size, so those defaults make every
+# python-tempestconf defaults to 1 GiB test flavors and volumes. The selected
+# Ubuntu cloud image has a larger virtual size, so those defaults make every
 # server/boot-from-volume smoke test fail before it reaches the hypervisor.
 # Reuse the phase-04 flavors and size test volumes to fit the selected image.
 log_step "sizing Tempest resources for the guest image"
@@ -193,7 +202,7 @@ fi
 smoke_out="${TEMPEST_DIR}/smoke_output.txt"
 rc=0
 (
-    if [[ "${TEMPEST_PLUGIN_MODE:-upstream}" == "distro" ]]; then
+    if [[ "${TEMPEST_PLUGIN_MODE}" == "distro" ]]; then
         # Resolute currently carries a neutron-tempest-plugin module that still
         # calls testtools.try_import during discovery, while Resolute's
         # testtools package no longer provides that helper. Discovery imports

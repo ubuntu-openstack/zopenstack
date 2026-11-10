@@ -22,11 +22,15 @@ K8S_MODEL="${K8S_MODEL:-openstack}"
 # s390x .charm builds from ./charms with s390x rock images pinned, via the
 # *-local.yaml bundle. An explicit BUNDLE=... override still wins.
 CHARM_SOURCE="${CHARM_SOURCE:-charmhub}"
+# Release profile: OPENSTACK_SERIES selects the release base and charm
+# channel set. It defaults to hibiscus (2026.2) in tools/release_env.sh.
+BASE_OS="${BASE_OS:-}"
+release="$(openstack_release)"
 case "${CHARM_SOURCE}" in
     charmhub) _cp_bundle="control-plane-k8s-s390x.yaml" ;;
     local)    _cp_bundle="control-plane-k8s-s390x-local.yaml" ;;
     hybrid)
-        python3 "${REPO_ROOT}/tools/render_hybrid_bundles.py" \
+        run_python_tool "${REPO_ROOT}/tools/render_hybrid_bundles.py" \
             --repo "${REPO_ROOT}" --output-dir "${ARTIFACT_DIR}"
         _cp_bundle="${ARTIFACT_DIR}/control-plane-k8s-s390x-hybrid.yaml"
         ;;
@@ -44,17 +48,31 @@ if [[ ! -r "${BUNDLE}" ]]; then
     log "FATAL: control-plane bundle missing at ${BUNDLE}"
     exit 1
 fi
+
+if [[ -n "${OPENSTACK_SERIES}" || -n "${BASE_OS}" ]]; then
+    release_bundle="${ARTIFACT_DIR}/$(basename "${BUNDLE}" .yaml)-release.yaml"
+    render_args=(
+        --source "${BUNDLE}"
+        --output "${release_bundle}"
+        --kind control-plane
+        --release "${release}"
+    )
+    [[ -n "${BASE_OS}" ]] && render_args+=(--base "${BASE_OS}")
+    run_logged "render control-plane release profile" -- \
+        run_python_tool "${REPO_ROOT}/tools/render_release_bundles.py" "${render_args[@]}"
+    BUNDLE="${release_bundle}"
+    log "using release profile ${OPENSTACK_SERIES} (${release}, base ${BASE_OS:-profile default}): ${BUNDLE}"
+fi
+
 command -v juju >/dev/null 2>&1 || { log "FATAL: juju CLI missing (phase 01)"; exit 1; }
 command -v k8s  >/dev/null 2>&1 || { log "FATAL: k8s CLI missing (phase 02b)"; exit 1; }
 
 # `juju add-k8s` talks directly to the API endpoint from `k8s config`.
 # setup_proxy.sh runs as a subprocess and cannot export into this shell, so
-# enforce the caller-provided bypass list here as well.
-if [[ -n "${PROXY_URL:-}" && -n "${NO_PROXY_DEFAULT:-}" ]]; then
-    export NO_PROXY="${NO_PROXY_DEFAULT}"
-    export no_proxy="${NO_PROXY_DEFAULT}"
-    log "using NO_PROXY=${NO_PROXY_DEFAULT} for Juju/Kubernetes API access"
-fi
+# enforce the bypass list here as well. NO_PROXY_DEFAULT is always defined by
+# tools/lib.sh; append the API server host in case the caller's default list
+# does not cover the cluster address.
+kubeconfig_file=""
 
 # Background juju status watcher so a wedge during deploy is visible in artifacts
 # even if this phase times out.
@@ -68,15 +86,38 @@ status_log="${ARTIFACT_DIR}/juju_status_watch.log"
   done ) &
 watcher_pid=$!
 log_step "background juju status watcher started (pid ${watcher_pid}, log: ${status_log})"
-trap '[[ -n "${watcher_pid:-}" ]] && kill "${watcher_pid}" 2>/dev/null || true' EXIT
+trap '[[ -n "${watcher_pid:-}" ]] && kill "${watcher_pid}" 2>/dev/null || true; [[ -n "${kubeconfig_file:-}" ]] && rm -f "${kubeconfig_file}"' EXIT
+
+# Capture the admin kubeconfig once. Piping `k8s config` directly into
+# `juju add-k8s` hides a failed/empty producer: Juju then falls back to
+# ~/.kube/config and reports a misleading permission error.
+kubeconfig_file="$(mktemp -t juju-k8s-kubeconfig.XXXXXX)"
+if ! sudo k8s config > "${kubeconfig_file}" 2>>"${PHASE_LOG}"; then
+    log "FATAL: 'sudo k8s config' failed; see ${PHASE_LOG}"
+    exit 1
+fi
+if [[ ! -s "${kubeconfig_file}" ]]; then
+    log "FATAL: 'sudo k8s config' returned an empty kubeconfig"
+    exit 1
+fi
+k8s_server="$(awk '$1 == "server:" { print $2; exit }' "${kubeconfig_file}")"
+k8s_host="${k8s_server#*://}"
+k8s_host="${k8s_host%%/*}"
+k8s_host="${k8s_host%%:*}"
+no_proxy_effective="${NO_PROXY_DEFAULT}"
+[[ -n "${k8s_host}" ]] && no_proxy_effective+=",${k8s_host}"
+export NO_PROXY="${no_proxy_effective}"
+export no_proxy="${no_proxy_effective}"
+log "using NO_PROXY=${NO_PROXY} for Juju/Kubernetes API access"
 
 # 1. Register the Canonical K8s cluster with the juju client.
 if juju clouds --client 2>/dev/null | grep -qw "${K8S_CLOUD}"; then
     log "k8s cloud ${K8S_CLOUD} already registered with juju client"
 else
     log_step "registering Canonical K8s with juju as cloud '${K8S_CLOUD}'"
-    if ! sudo k8s config 2>>"${PHASE_LOG}" | juju add-k8s "${K8S_CLOUD}" --client 2>&1 | tee -a "${PHASE_LOG}"; then
+    if ! juju add-k8s "${K8S_CLOUD}" --client < "${kubeconfig_file}" 2>&1 | tee -a "${PHASE_LOG}"; then
         log "FATAL: juju add-k8s failed. Is the k8s cluster healthy (phase 02b)?"
+        log "If the error is 'Forbidden', verify NO_PROXY includes ${k8s_host:-the API host}."
         exit 1
     fi
 fi
@@ -96,10 +137,11 @@ else
 fi
 
 # 3. Add the control-plane model.
-if juju models --format=json 2>/dev/null | jq -e ".models[] | select(.\"short-name\"==\"${K8S_MODEL}\")" >/dev/null 2>&1; then
+if juju models -c "${CONTROLLER}" --format=json 2>/dev/null | jq -e ".models[] | select(.\"short-name\"==\"${K8S_MODEL}\")" >/dev/null 2>&1; then
     log "model ${K8S_MODEL} already exists"
 else
-    run_logged "juju add-model ${K8S_MODEL}" -- juju add-model "${K8S_MODEL}" "${K8S_CLOUD}"
+    run_logged "juju add-model ${K8S_MODEL}" -- \
+        juju add-model -c "${CONTROLLER}" "${K8S_MODEL}" "${K8S_CLOUD}"
 fi
 
 # Pin CAAS application constraints to s390x so Juju does not create pods with an
@@ -111,7 +153,7 @@ run_logged "set ${K8S_MODEL} architecture constraint" -- \
 # apt, snapd and containerd proxy setup alone is not sufficient. Configure both
 # the controller model and workload model when PROXY_URL is in use.
 if [[ -n "${PROXY_URL:-}" ]]; then
-    NO_PROXY_VAL="${NO_PROXY_DEFAULT:-localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local}"
+    NO_PROXY_VAL="${NO_PROXY_DEFAULT:-localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local,ubuntu-cloud.archive.canonical.com}"
     proxy_settings=(
         "juju-http-proxy=${PROXY_URL}" "juju-https-proxy=${PROXY_URL}"
         "apt-http-proxy=${PROXY_URL}" "apt-https-proxy=${PROXY_URL}"
@@ -138,24 +180,36 @@ if (( rc != 0 )); then
     exit "${rc}"
 fi
 
-# Traefik revision 341 (ubuntu@26.04/s390x) currently packages a protobuf UPB
-# extension that segfaults under Python 3.14 while importing OpenTelemetry.
+# The selected s390x Traefik revision currently packages a protobuf UPB
+# extension that segfaults under the current Python while importing OpenTelemetry.
 # Disabling the optional accelerator makes protobuf use its pure-Python
-# implementation; Juju then retries the install hook automatically.
+# implementation; the install hook is then resolved so Juju retries it.
 if [[ "${ARCH}" == "s390x" && "${TRAEFIK_DISABLE_BROKEN_UPB:-1}" == "1" ]]; then
     log_step "applying Traefik Python 3.14/s390x protobuf workaround"
-    if sudo k8s kubectl -n "${K8S_MODEL}" wait --for=condition=PodScheduled \
-            pod/traefik-0 --timeout=180s 2>&1 | tee -a "${PHASE_LOG}"; then
-        sudo k8s kubectl -n "${K8S_MODEL}" exec traefik-0 -c charm -- sh -c '
-            for so in /var/lib/juju/agents/unit-traefik-0/charm/venv/lib/python*/site-packages/google/_upb/_message.abi3.so; do
-                [ -f "$so" ] || continue
+    applied=0
+    for _ in $(seq 1 90); do
+        if sudo k8s kubectl -n "${K8S_MODEL}" exec traefik-0 -c charm -- sh -c '
+            found=0
+            for so in /var/lib/juju/agents/unit-traefik-0/charm/venv/lib/python*/site-packages/google/_upb/_message.abi3.so*; do
+                [ -e "$so" ] || continue
+                found=1
+                case "$so" in
+                    *.disabled) continue ;;
+                esac
                 mv "$so" "$so.disabled"
                 echo "disabled crashing UPB extension: $so"
             done
-        ' 2>&1 | tee -a "${PHASE_LOG}" || \
-            log "WARN: could not apply Traefik UPB workaround"
+            [ "$found" = 1 ]
+        ' 2>&1 | tee -a "${PHASE_LOG}"; then
+            applied=1
+            break
+        fi
+        sleep 2
+    done
+    if (( applied )); then
+        juju resolved -m "${CONTROLLER}:${K8S_MODEL}" traefik/0 >/dev/null 2>&1 || true
     else
-        log "WARN: traefik-0 was not scheduled in time for the UPB workaround"
+        log "WARN: could not apply Traefik UPB workaround"
     fi
 fi
 

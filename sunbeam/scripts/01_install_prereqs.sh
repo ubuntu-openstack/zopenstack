@@ -25,13 +25,34 @@ phase_skip_if_done "${PHASE}" && exit 0
 # Channels for the snaps we actually install here + the machine-side snaps whose
 # s390x availability we want recorded in arch_report.md before deploying.
 JUJU_CHANNEL="${JUJU_CHANNEL:-3/stable}"
-# NOTE: 1.32-classic/stable etc. do NOT publish for s390x as of 2026-06.
-# Only latest/edge is published for s390x (v1.35.3+). Override if a more
-# stable s390x track appears.
+# NOTE: some published snap channels do not include s390x revisions.
+# latest/edge currently carries the s390x revisions; override if another
+# track appears.
 K8S_CHANNEL="${K8S_CHANNEL:-latest/edge}"
-HYPERVISOR_CHANNEL="${HYPERVISOR_CHANNEL:-2026.1/edge}"
-MICROCEPH_CHANNEL="${MICROCEPH_CHANNEL:-squid/stable}"
-CINDER_VOLUME_CHANNEL="${CINDER_VOLUME_CHANNEL:-2026.1/edge}"
+case "${OPENSTACK_SERIES}" in
+    hibiscus)
+        default_hypervisor="2026.2/edge"
+        default_cinder_volume="2026.2/edge"
+        default_microceph="tentacle/edge"
+        ;;
+    gazpacho)
+        default_hypervisor="2026.1/edge"
+        default_cinder_volume="2026.1/edge"
+        default_microceph="squid/stable"
+        ;;
+    *)
+        default_hypervisor="2026.2/edge"
+        default_cinder_volume="2026.2/edge"
+        default_microceph="tentacle/edge"
+        ;;
+esac
+HYPERVISOR_CHANNEL="${HYPERVISOR_CHANNEL:-${default_hypervisor}}"
+MICROCEPH_CHANNEL="${MICROCEPH_CHANNEL:-${default_microceph}}"
+CINDER_VOLUME_CHANNEL="${CINDER_VOLUME_CHANNEL:-${default_cinder_volume}}"
+NETWORK_AGENTS_CHANNEL="${NETWORK_AGENTS_CHANNEL:-${default_hypervisor}}"
+MICROOVN_SNAP_CHANNEL="${MICROOVN_SNAP_CHANNEL:-26.03/stable}"
+OVN_EXPORTER_CHANNEL="${OVN_EXPORTER_CHANNEL:-stable}"
+SNAP_INSTALL_TIMEOUT="${SNAP_INSTALL_TIMEOUT:-600}"
 
 ARCH="$(target_arch)"
 log_step "diagnosing ${ARCH} availability for required snaps (records appended to ${ARCH_REPORT})"
@@ -43,6 +64,9 @@ log_step "diagnosing ${ARCH} availability for required snaps (records appended t
 "${SCRIPT_DIR}/../tools/check_snap_arch.sh" openstack-hypervisor "${HYPERVISOR_CHANNEL}"     "${ARCH}" || true
 "${SCRIPT_DIR}/../tools/check_snap_arch.sh" microceph            "${MICROCEPH_CHANNEL}"      "${ARCH}" || true
 "${SCRIPT_DIR}/../tools/check_snap_arch.sh" cinder-volume        "${CINDER_VOLUME_CHANNEL}"  "${ARCH}" || true
+"${SCRIPT_DIR}/../tools/check_snap_arch.sh" openstack-network-agents "${NETWORK_AGENTS_CHANNEL}" "${ARCH}" || true
+"${SCRIPT_DIR}/../tools/check_snap_arch.sh" microovn             "${MICROOVN_SNAP_CHANNEL}"  "${ARCH}" || true
+"${SCRIPT_DIR}/../tools/check_snap_arch.sh" ovn-exporter         "${OVN_EXPORTER_CHANNEL}"   "${ARCH}" || true
 
 log_step "refreshing apt package metadata"
 run_logged "apt update" -- sudo apt-get update || \
@@ -62,11 +86,11 @@ fi
 log_step "installing juju snap from ${JUJU_CHANNEL}"
 if snap list juju >/dev/null 2>&1; then
     log "juju snap already installed; refreshing to ${JUJU_CHANNEL}"
-    run_logged "snap refresh juju" -- sudo snap refresh juju --channel="${JUJU_CHANNEL}" || \
-        log "WARN: snap refresh juju failed (may be no s390x revision in ${JUJU_CHANNEL})"
+    run_logged "snap refresh juju" -- timeout "${SNAP_INSTALL_TIMEOUT}" sudo snap refresh juju --channel="${JUJU_CHANNEL}" || \
+        log "WARN: snap refresh juju failed or timed out (may be no s390x revision in ${JUJU_CHANNEL} or Snap Store unavailable)"
 else
-    if ! run_logged "snap install juju" -- sudo snap install juju --channel="${JUJU_CHANNEL}"; then
-        log "FATAL: snap install juju failed (no s390x revision in ${JUJU_CHANNEL}?). Cannot deploy bundles without juju."
+    if ! run_logged "snap install juju" -- timeout "${SNAP_INSTALL_TIMEOUT}" sudo snap install juju --channel="${JUJU_CHANNEL}"; then
+        log "FATAL: snap install juju failed or timed out (no s390x revision in ${JUJU_CHANNEL}, or Snap Store unavailable). Cannot deploy bundles without juju."
         exit 1
     fi
 fi

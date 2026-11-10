@@ -98,10 +98,6 @@ series_name() {
     fi
 }
 
-openstack_series_name() {
-    echo "${OPENSTACK_SERIES:-gazpacho}"
-}
-
 tempest_result_text() {
     if [[ -s "${ARTIFACT_DIR}/tempest/failures.txt" ]]; then
         echo "The Tempest smoke tests detected the following failures:"

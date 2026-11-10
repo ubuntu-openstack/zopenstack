@@ -4,12 +4,16 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
 import yaml
 
 
-RABBITMQ_IMAGE = "ghcr.io/canonical/rabbitmq:3.12.1-24.04_edge"
+# The RabbitMQ charm and image must come from the same major track. The image
+# must be reachable by the cluster and have an s390x manifest; the caller
+# supplies RABBITMQ_IMAGE for the selected charm ref.
+RABBITMQ_IMAGE = os.environ.get("RABBITMQ_IMAGE", "")
 
 
 def load_bundle(path: Path) -> list[dict]:
@@ -41,6 +45,11 @@ def render_control_plane(source: Path, destination: Path, charm_dir: Path) -> No
 
     rabbitmq = local_charm(charm_dir, "rabbitmq-k8s_s390x.charm")
     if rabbitmq:
+        if not RABBITMQ_IMAGE:
+            raise SystemExit(
+                "local RabbitMQ charm selected but RABBITMQ_IMAGE is unset; "
+                "provide the OCI image paired with the charm"
+            )
         app = apps["rabbitmq"]
         app["charm"] = rabbitmq
         app.pop("channel", None)
@@ -60,6 +69,9 @@ def render_machine(source: Path, destination: Path, charm_dir: Path) -> None:
         "cinder-volume": "cinder-volume_s390x.charm",
         "microceph": "microceph_s390x.charm",
         "cinder-microceph": "cinder-volume-ceph_s390x.charm",
+        "microcluster-token-distributor": "microcluster-token-distributor_s390x.charm",
+        "microovn": "microovn_s390x.charm",
+        "sunbeam-ovn-proxy": "sunbeam-ovn-proxy_s390x.charm",
     }
     for application, filename in overrides.items():
         charm = local_charm(charm_dir, filename)

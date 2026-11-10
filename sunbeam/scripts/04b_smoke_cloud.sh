@@ -21,6 +21,8 @@ fi
 source "${OPENRC}"
 
 prefix="${SMOKE_PREFIX:-$(target_arch)-verify}"
+smoke_image="${SMOKE_IMAGE:-ubuntu}"
+ext_net="${EXT_NET_NAME:-external-network}"
 network="${prefix}-net"
 subnet="${prefix}-subnet"
 router="${prefix}-router"
@@ -36,13 +38,114 @@ config_drive="${SMOKE_CONFIG_DRIVE:-true}"
 ssh_initial_sleep="${SMOKE_SSH_INITIAL_SLEEP:-90}"
 ssh_attempts="${SMOKE_SSH_ATTEMPTS:-30}"
 ssh_interval="${SMOKE_SSH_INTERVAL:-10}"
+cinder_ready_attempts="${CINDER_READY_ATTEMPTS:-30}"
+cinder_ready_interval="${CINDER_READY_INTERVAL:-10}"
+# Floating-IP SSH normally needs a client that can reach the external
+# provider network. When SMOKE_SSH_NETNS=1, attach a temporary veth to the
+# provider bridge with the provider VLAN tag and run SSH from a network
+# namespace; this validates the FIP path without external network access.
+smoke_ssh_netns="${SMOKE_SSH_NETNS:-1}"
+ext_net_type="${EXT_NET_TYPE:-vlan}"
+ext_vlan_id="${EXT_VLAN_ID:-2893}"
+ext_bridge="${EXT_BRIDGE:-br-ex}"
+ext_subnet_range="${EXT_SUBNET_RANGE:-10.13.3.0/24}"
+ext_provider_router="${EXT_PROVIDER_ROUTER:-provider-router}"
+smoke_client_ip="${SMOKE_CLIENT_IP:-}"
+fip_netns="${prefix}-fip"
+fip_veth="fipveth"
+fip_veth_ns="fipvethns"
+use_fip_netns=0
 launch_log="${ARTIFACT_DIR}/smoke_instance_launch.txt"
 fault_log="${ARTIFACT_DIR}/smoke_instance_fault.yaml"
 ssh_log="${ARTIFACT_DIR}/smoke_instance_ssh.txt"
 ssh_key="$(mktemp "${TMPDIR:-/tmp}/${prefix}-key.XXXXXX")"
 rm -f "${ssh_key}"
 
+cleanup_fip_client() {
+    sudo ovs-vsctl --if-exists del-port "${ext_bridge}" "${fip_veth}" >/dev/null 2>&1 || true
+    sudo ip netns del "${fip_netns}" >/dev/null 2>&1 || true
+    sudo ip link del "${fip_veth}" >/dev/null 2>&1 || true
+    sudo ip link del "${fip_veth_ns}" >/dev/null 2>&1 || true
+}
+
+setup_fip_client() {
+    [[ "${smoke_ssh_netns}" == "1" ]] || return 1
+    command -v ip >/dev/null 2>&1 || return 1
+    command -v ovs-vsctl >/dev/null 2>&1 || return 1
+    sudo ovs-vsctl br-exists "${ext_bridge}" || {
+        log "WARN: provider bridge ${ext_bridge} does not exist; using host for FIP SSH"
+        return 1
+    }
+    case "${ext_net_type}" in
+        flat|vlan) ;;
+        *)
+            log "WARN: FIP test namespace supports flat/vlan; EXT_NET_TYPE=${ext_net_type}; using host"
+            return 1
+            ;;
+    esac
+
+    local prefix_len client_cidr
+    prefix_len="${ext_subnet_range#*/}"
+    if [[ -z "${prefix_len}" || "${prefix_len}" == "${ext_subnet_range}" ]]; then
+        log "WARN: cannot derive prefix from EXT_SUBNET_RANGE=${ext_subnet_range}; using host"
+        return 1
+    fi
+    if [[ -z "${smoke_client_ip}" ]]; then
+        if ! smoke_client_ip="$(python3 - "${ext_subnet_range}" <<'PY'
+import ipaddress
+import sys
+
+net = ipaddress.ip_network(sys.argv[1], strict=False)
+# Stay outside the usual Neutron allocation pool at the low end.
+candidate = net.network_address + max(2, net.num_addresses - 6)
+if candidate >= net.broadcast_address:
+    candidate = net.network_address + 2
+print(candidate)
+PY
+        )"; then
+            log "WARN: could not derive SMOKE_CLIENT_IP; using host"
+            return 1
+        fi
+    fi
+    client_cidr="${smoke_client_ip}/${prefix_len}"
+
+    cleanup_fip_client
+    if ! sudo ip netns add "${fip_netns}" >/dev/null 2>&1; then
+        log "WARN: could not create FIP test namespace; using host"
+        return 1
+    fi
+    if ! sudo ip link add "${fip_veth}" type veth peer name "${fip_veth_ns}" >/dev/null 2>&1; then
+        cleanup_fip_client
+        log "WARN: could not create FIP test veth; using host"
+        return 1
+    fi
+    sudo ip link set "${fip_veth}" up
+    sudo ip link set "${fip_veth_ns}" netns "${fip_netns}"
+    if [[ "${ext_net_type}" == "vlan" ]]; then
+        sudo ovs-vsctl add-port "${ext_bridge}" "${fip_veth}" tag="${ext_vlan_id}" >/dev/null
+    else
+        sudo ovs-vsctl add-port "${ext_bridge}" "${fip_veth}" >/dev/null
+    fi
+    sudo ip netns exec "${fip_netns}" ip link set lo up
+    sudo ip netns exec "${fip_netns}" ip link set "${fip_veth_ns}" up
+    sudo ip netns exec "${fip_netns}" ip addr add "${client_cidr}" dev "${fip_veth_ns}"
+
+    # The subnet gateway is often not a host; use the provider-router's
+    # external port as the default gateway when one is available.
+    local router_gw
+    router_gw="$("${OSC}" router show "${ext_provider_router}" -f json 2>/dev/null \
+        | jq -r '.external_gateway_info.external_fixed_ips[0].ip_address // empty' 2>/dev/null || true)"
+    if [[ -n "${router_gw}" ]]; then
+        sudo ip netns exec "${fip_netns}" ip route add default via "${router_gw}" || true
+    fi
+    use_fip_netns=1
+    log "FIP SSH client namespace ${fip_netns} using ${client_cidr} on ${ext_bridge}"
+    return 0
+}
+
+
 cleanup_resources() {
+    cleanup_fip_client
     [[ "${cleanup}" == "1" ]] || return 0
     if [[ -n "${floating_ip:-}" ]]; then
         "${OSC}" server remove floating ip "${server}" "${floating_ip}" >/dev/null 2>&1 || true
@@ -82,12 +185,27 @@ run_logged "openstack catalog list" -- "${OSC}" catalog list
 run_logged "openstack hypervisor list" -- "${OSC}" hypervisor list
 run_logged "openstack volume service list" -- "${OSC}" volume service list
 
+log_step "waiting for cinder-volume service"
+cinder_ready=0
+for _ in $(seq 1 "${cinder_ready_attempts}"); do
+    if "${OSC}" volume service list -f value -c Binary -c State 2>/dev/null \
+            | awk '$1 == "cinder-volume" && $2 == "up" { found=1 } END { exit !found }'; then
+        cinder_ready=1
+        break
+    fi
+    sleep "${cinder_ready_interval}"
+done
+if (( ! cinder_ready )); then
+    log "FATAL: cinder-volume service did not become up within $((cinder_ready_attempts * cinder_ready_interval))s"
+    exit 1
+fi
+
 if [[ "$("${OSC}" hypervisor list -f value -c "Hypervisor Hostname" | wc -l)" -lt 1 ]]; then
     log "FATAL: no Nova hypervisor is registered"
     exit 1
 fi
-if ! "${OSC}" image show ubuntu >/dev/null 2>&1; then
-    log "FATAL: image 'ubuntu' is missing"
+if ! "${OSC}" image show "${smoke_image}" >/dev/null 2>&1; then
+    log "FATAL: image '${smoke_image}' is missing"
     exit 1
 fi
 
@@ -96,7 +214,7 @@ log_step "creating isolated smoke-test network"
 "${OSC}" subnet show "${subnet}" >/dev/null 2>&1 || \
     "${OSC}" subnet create --network "${network}" --subnet-range "${cidr}" "${subnet}"
 "${OSC}" router show "${router}" >/dev/null 2>&1 || "${OSC}" router create "${router}"
-"${OSC}" router set --external-gateway external-network "${router}"
+"${OSC}" router set --external-gateway "${ext_net}" "${router}"
 "${OSC}" router add subnet "${router}" "${subnet}" 2>/dev/null || true
 
 log_step "creating smoke-test keypair and security group"
@@ -114,8 +232,8 @@ if "${OSC}" server show "${server}" >/dev/null 2>&1; then
     "${OSC}" server show "${server}" > "${launch_log}" 2>&1
 else
     {
-        echo "+ openstack server create --flavor m1.tiny --image ubuntu --network ${network} --key-name ${keypair} --security-group ${security_group} --config-drive ${config_drive} --wait ${server}"
-        "${OSC}" server create --flavor m1.tiny --image ubuntu \
+        echo "+ openstack server create --flavor m1.tiny --image ${smoke_image} --network ${network} --key-name ${keypair} --security-group ${security_group} --config-drive ${config_drive} --wait ${server}"
+        "${OSC}" server create --flavor m1.tiny --image "${smoke_image}" \
             --network "${network}" --key-name "${keypair}" \
             --security-group "${security_group}" \
             --config-drive "${config_drive}" --wait "${server}"
@@ -125,7 +243,7 @@ if (( server_create_rc != 0 )); then
     "${OSC}" server show "${server}" -f yaml > "${fault_log}" 2>&1 || true
     cat "${fault_log}" >> "${PHASE_LOG}" || true
     if grep -qi "does not support ACPI" "${fault_log}" "${launch_log}"; then
-        log "FATAL: Nova/libvirt emitted ACPI for an s390x guest; see LP #2043987. Rebuild openstack-hypervisor with ppa:mylesjp/nova-acpi-patch and rerun phase 03b with HYPERVISOR_SNAP_PATH=<snap> HYPERVISOR_EXPECT_NOVA_ACPI_PATCH=1."
+        log "FATAL: Nova/libvirt emitted ACPI for an s390x guest; see LP #2043987. Rebuild openstack-hypervisor with ppa:himax16/s390x-nova-acpi and rerun phase 03b with HYPERVISOR_SNAP_PATH=<snap> HYPERVISOR_EXPECT_NOVA_ACPI_PATCH=1."
     else
         log "FATAL: smoke-test guest create failed; see ${launch_log} and ${fault_log}"
     fi
@@ -134,7 +252,7 @@ fi
 if ! wait_for_status server "${server}" ACTIVE 600; then
     "${OSC}" server show "${server}" -f yaml 2>&1 | tee "${fault_log}" | tee -a "${PHASE_LOG}" || true
     if grep -qi "does not support ACPI" "${fault_log}" "${launch_log}"; then
-        log "FATAL: Nova/libvirt emitted ACPI for an s390x guest; see LP #2043987. Rebuild openstack-hypervisor with ppa:mylesjp/nova-acpi-patch and rerun phase 03b with HYPERVISOR_SNAP_PATH=<snap> HYPERVISOR_EXPECT_NOVA_ACPI_PATCH=1."
+        log "FATAL: Nova/libvirt emitted ACPI for an s390x guest; see LP #2043987. Rebuild openstack-hypervisor with ppa:himax16/s390x-nova-acpi and rerun phase 03b with HYPERVISOR_SNAP_PATH=<snap> HYPERVISOR_EXPECT_NOVA_ACPI_PATCH=1."
         exit 1
     fi
     log "FATAL: smoke-test guest did not become ACTIVE"
@@ -154,8 +272,8 @@ wait_for_status volume "${volume}" in-use 300
 if [[ "${validate_ssh}" == "1" ]]; then
     log_step "assigning a floating IP and proving SSH access"
     {
-        echo "++ openstack floating ip create external-network"
-        floating_ip=$("${OSC}" floating ip create external-network -f value -c floating_ip_address)
+        echo "++ openstack floating ip create ${ext_net}"
+        floating_ip=$("${OSC}" floating ip create "${ext_net}" -f value -c floating_ip_address)
         echo "++ grep floating_ip_address"
         echo "++ awk '{print \$4}'"
         echo "+ ip_addr=${floating_ip}"
@@ -163,14 +281,26 @@ if [[ "${validate_ssh}" == "1" ]]; then
         ssh-keygen -f "${HOME}/.ssh/known_hosts" -R "${floating_ip}" || true
         echo "+ openstack server add floating ip ${server} ${floating_ip}"
         "${OSC}" server add floating ip "${server}" "${floating_ip}"
+        setup_fip_client || true
         echo "+ sleep ${ssh_initial_sleep}"
         sleep "${ssh_initial_sleep}"
-        echo "+ ssh ${ssh_user}@${floating_ip} -i ${ssh_key} -oStrictHostKeyChecking=accept-new echo SSH works"
+        if (( use_fip_netns )); then
+            echo "+ ip netns exec ${fip_netns} ssh ${ssh_user}@${floating_ip} -i ${ssh_key} echo SSH works"
+        else
+            echo "+ ssh ${ssh_user}@${floating_ip} -i ${ssh_key} -oStrictHostKeyChecking=accept-new echo SSH works"
+        fi
     } > "${ssh_log}"
+    ssh_args=(-i "${ssh_key}" -o BatchMode=yes -o ConnectTimeout=10)
+    ssh_cmd=(ssh)
+    if (( use_fip_netns )); then
+        ssh_cmd=(sudo ip netns exec "${fip_netns}" ssh)
+        ssh_args+=(-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no)
+    else
+        ssh_args+=(-o StrictHostKeyChecking=accept-new)
+    fi
     ssh_ok=0
     for _ in $(seq 1 "${ssh_attempts}"); do
-        if ssh -i "${ssh_key}" -o BatchMode=yes -o ConnectTimeout=10 \
-                -o StrictHostKeyChecking=accept-new \
+        if "${ssh_cmd[@]}" "${ssh_args[@]}" \
                 "${ssh_user}@${floating_ip}" \
                 'echo "SSH works"; uname -m; sed -n "1,6p" /etc/os-release' \
                 >> "${ssh_log}" 2>&1; then
