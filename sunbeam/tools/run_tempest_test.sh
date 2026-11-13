@@ -10,7 +10,9 @@
 #   ./tools/run_tempest_test.sh 'test_dashboard_basic_ops.TestDashboardBasicOps.test_basic_scenario'
 #
 # Defaults to the most recent run-id under artifacts/. Phase 06 must have run
-# at least once so that ${ARTIFACT_DIR}/tempest/tempest is populated.
+# at least once so that ${ARTIFACT_DIR}/tempest/tempest is populated. The
+# helper uses the tox/venv Tempest when present, otherwise /usr/bin/tempest
+# from TEMPEST_PLUGIN_MODE=distro.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -48,22 +50,43 @@ if [[ ! -d "${TEMPEST_REPO}" ]]; then
     exit 1
 fi
 
-# Reuse tempest's own tox-managed venv (created by `tox -e smoke --notest`).
-tempest_venv="${TEMPEST_REPO}/.tox/tempest"
-if [[ ! -x "${tempest_venv}/bin/tempest" ]]; then
-    # Some tempest tox envs are named smoke not tempest; fall back.
-    if [[ -x "${TEMPEST_REPO}/.tox/smoke/bin/tempest" ]]; then
-        tempest_venv="${TEMPEST_REPO}/.tox/smoke"
-    else
-        echo "FATAL: no tempest tox venv found under ${TEMPEST_REPO}/.tox/" >&2
-        echo "Run phase 06 first to set it up." >&2
-        exit 1
+# Reuse the tox-managed venv when phase 06 was run with TEMPEST_USE_TOX=1.
+# The upstream phase 06 path uses the venv at <artifact>/tempest/.venv, so fall
+# back to that as well. Distro mode installs /usr/bin/tempest and has no venv.
+tempest_bin=""
+run_dir="${REPO_ROOT}/artifacts/${RUN_ID}"
+for candidate in \
+    "${TEMPEST_REPO}/.tox/tempest/bin/tempest" \
+    "${TEMPEST_REPO}/.tox/smoke/bin/tempest" \
+    "${run_dir}/tempest/.venv/bin/tempest" \
+    /usr/bin/tempest; do
+    if [[ -x "${candidate}" ]]; then
+        tempest_bin="${candidate}"
+        break
     fi
+done
+if [[ -z "${tempest_bin}" ]]; then
+    echo "FATAL: no tempest binary found under ${TEMPEST_REPO}/.tox/, ${run_dir}/tempest/.venv, or /usr/bin" >&2
+    echo "Run phase 06 first to set it up." >&2
+    exit 1
+fi
+
+# Distro Tempest on Resolute needs the same testtools shim that phase 06 uses.
+compat_dir="${run_dir}/tempest/python-compat"
+if [[ -d "${compat_dir}" ]]; then
+    export PYTHONPATH="${compat_dir}${PYTHONPATH:+:${PYTHONPATH}}"
 fi
 
 echo "run-id: ${RUN_ID}"
-echo "tempest venv: ${tempest_venv}"
+echo "tempest binary: ${tempest_bin}"
 echo "pattern: ${pattern}"
 
 cd "${TEMPEST_REPO}"
-exec "${tempest_venv}/bin/tempest" run --serial --regex "${pattern}"
+tempest_args=(run --serial --regex "${pattern}")
+if [[ -f "${TEMPEST_REPO}/etc/tempest.conf" ]]; then
+    tempest_args+=(--config-file "${TEMPEST_REPO}/etc/tempest.conf")
+fi
+if [[ -s "${TEMPEST_REPO}/exclude-list.txt" ]]; then
+    tempest_args+=(--exclude-list "${TEMPEST_REPO}/exclude-list.txt")
+fi
+exec "${tempest_bin}" "${tempest_args[@]}"

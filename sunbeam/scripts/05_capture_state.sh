@@ -18,8 +18,9 @@ snaps_file="${ARTIFACT_DIR}/snaps.txt"
 bundle="${ARTIFACT_DIR}/juju_bundle.yaml"   # primary (openstack) bundle, for OCI sweep
 
 CONTROLLER="${JUJU_CONTROLLER:-sunbeam-controller}"
+MACHINE_MODEL="${MACHINE_MODEL:-machines}"
 # Capture every model on the controller (openstack control plane + machines).
-mapfile -t MODELS < <(juju models --format=json 2>/dev/null \
+mapfile -t MODELS < <(juju models -c "${CONTROLLER}" --format=json 2>/dev/null \
     | jq -r '.models[]."short-name"' 2>/dev/null | grep -v '^controller$' || true)
 [[ ${#MODELS[@]} -eq 0 ]] && MODELS=(openstack machines)
 
@@ -32,7 +33,13 @@ for m in "${MODELS[@]}"; do
         log "WARN: juju status (${m}) failed"
     juju status -m "${tgt}" --relations --color=false > "${ARTIFACT_DIR}/juju_status_relations_${m}.txt" 2>> "${PHASE_LOG}" || true
 done
-juju offers -m "${CONTROLLER}:openstack" > "${ARTIFACT_DIR}/juju_offers.txt" 2>> "${PHASE_LOG}" || true
+{
+    echo "=== ${CONTROLLER}:openstack ==="
+    juju offers -m "${CONTROLLER}:openstack" 2>&1 || true
+    echo
+    echo "=== ${CONTROLLER}:${MACHINE_MODEL} ==="
+    juju offers -m "${CONTROLLER}:${MACHINE_MODEL}" 2>&1 || true
+} > "${ARTIFACT_DIR}/juju_offers.txt" 2>> "${PHASE_LOG}"
 # Primary bundle for the OCI arch sweep below = the control-plane (openstack) one.
 cp -f "${ARTIFACT_DIR}/juju_bundle_openstack.yaml" "${bundle}" 2>/dev/null || true
 
@@ -58,16 +65,28 @@ log_step "snap inventory -> ${snaps_file}"
     done
 } > "${snaps_file}"
 
-log_step "OCI arch introspection across the resolved bundle"
+# `juju export-bundle` records charm resource revisions, not OCI image refs, so
+# the exported bundle alone is not enough. Sweep both the bundle (which may
+# contain explicit resources for local deployments) and the images actually
+# running in the cluster.
+log_step "OCI arch introspection across bundle refs and running pods"
+images=()
 if [[ -s "${bundle}" ]]; then
-    mapfile -t images < <("${SCRIPT_DIR}/../tools/extract_oci_images.sh" "${bundle}")
-    log_step "found ${#images[@]} OCI image refs in bundle"
-    for img in "${images[@]}"; do
-        "${SCRIPT_DIR}/../tools/check_oci_arch.sh" "${img}" || true
-    done
-else
-    log "WARN: bundle empty, skipping OCI introspection"
+    mapfile -t bundle_images < <("${SCRIPT_DIR}/../tools/extract_oci_images.sh" "${bundle}")
+    images+=("${bundle_images[@]}")
 fi
+if [[ -s "${k8s_yaml}" ]]; then
+    mapfile -t pod_images < <(
+        grep -oE 'image:[[:space:]]*[^[:space:]]+' "${k8s_yaml}" 2>/dev/null \
+            | sed -E 's/^image:[[:space:]]*//' | tr -d '"' | sort -u || true
+    )
+    images+=("${pod_images[@]}")
+fi
+mapfile -t images < <(printf '%s\n' "${images[@]}" | sed '/^$/d' | sort -u)
+log_step "found ${#images[@]} unique OCI image refs"
+for img in "${images[@]}"; do
+    "${SCRIPT_DIR}/../tools/check_oci_arch.sh" "${img}" || true
+done
 
 # Always succeed: collection-of-failure is itself the artifact.
 phase_done "${PHASE}"

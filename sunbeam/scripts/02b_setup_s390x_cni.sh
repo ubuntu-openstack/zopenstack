@@ -21,6 +21,10 @@ init_phase "${PHASE}"
 phase_skip_if_done "${PHASE}" && exit 0
 
 ARCH="$(target_arch)"
+# Phase 03 must not start against a cluster whose storage/LB substrate is
+# broken. Set SUBSTRATE_STRICT=0 only for diagnostic runs that intentionally
+# continue past a failed PVC/LoadBalancer check.
+SUBSTRATE_STRICT="${SUBSTRATE_STRICT:-1}"
 log_step "K8s setup for target arch: ${ARCH}"
 if [[ "${ARCH}" != "s390x" ]]; then
     log "FATAL: unsupported target arch ${ARCH}; phase 02b is s390x-only"
@@ -88,10 +92,23 @@ if ! run_logged "kubectl apply -f calico.yaml" -- sudo k8s kubectl apply -f "${C
     exit 1
 fi
 log_step "waiting for calico pods Ready (up to 5 min)"
-sudo k8s kubectl wait --for=condition=Ready pods -A -l k8s-app=calico-node --timeout=300s 2>&1 \
-    | tee -a "${PHASE_LOG}" || log "WARN: not all calico-node pods reached Ready"
-sudo k8s kubectl wait --for=condition=Ready pods -A -l k8s-app=calico-kube-controllers --timeout=300s 2>&1 \
-    | tee -a "${PHASE_LOG}" || log "WARN: calico-kube-controllers did not reach Ready"
+for calico_label in k8s-app=calico-node k8s-app=calico-kube-controllers; do
+    # `kubectl wait` returns "no matching resources found" if it races the
+    # DaemonSet/Deployment controller, so first wait for the pods to exist.
+    for _ in $(seq 1 30); do
+        if sudo k8s kubectl get pods -A -l "${calico_label}" -o name 2>/dev/null | grep -q .; then
+            break
+        fi
+        sleep 2
+    done
+    if ! sudo k8s kubectl wait --for=condition=Ready pods -A -l "${calico_label}" \
+            --timeout=300s 2>&1 | tee -a "${PHASE_LOG}"; then
+        log "FATAL: ${calico_label} pods did not become Ready"
+        sudo k8s kubectl get pods -A -l "${calico_label}" -o wide 2>&1 | tee -a "${PHASE_LOG}" || true
+        sudo k8s kubectl describe pods -A -l "${calico_label}" 2>&1 | tee -a "${PHASE_LOG}" || true
+        exit 1
+    fi
+done
 
 # Metrics Server is not required by this deployment and its images are not
 # consistently reachable/published for s390x. Remove it rather than carrying
@@ -103,6 +120,93 @@ sudo k8s kubectl -n kube-system delete service metrics-server \
     --ignore-not-found >/dev/null 2>&1 || true
 sudo k8s kubectl delete apiservice v1beta1.metrics.k8s.io \
     --ignore-not-found >/dev/null 2>&1 || true
+
+# The default local-storage driver is a local s390x image. If it is not in
+# containerd, the CSI pods ImagePullBackOff and every control-plane PVC stays
+# Pending; fail here instead of letting phase 03 fail later with a Juju timeout.
+RAWFILE_IMAGE="${RAWFILE_LOCALPV_IMAGE:-docker.io/library/rawfile-localpv:0.8.3-s390x}"
+if [[ "${RAWFILE_IMAGE}" == docker.io/library/rawfile-localpv* ]]; then
+    ctr_bin=/snap/k8s/current/bin/ctr
+    containerd_sock=/run/containerd/containerd.sock
+    if [[ -x "${ctr_bin}" && -S "${containerd_sock}" ]]; then
+        if ! sudo "${ctr_bin}" --address "${containerd_sock}" --namespace k8s.io images ls -q 2>/dev/null \
+                | grep -Fxq "${RAWFILE_IMAGE}"; then
+            rock="${RAWFILE_LOCALPV_ROCK:-}"
+            if [[ -z "${rock}" ]]; then
+                rock="$(find "${HOME}/builds/rawfile-localpv-rocks-s390x" \
+                    -maxdepth 1 -type f -name '*.rock' -print -quit 2>/dev/null || true)"
+            fi
+            if [[ -n "${rock}" && -r "${rock}" ]]; then
+                log "importing ${rock} into Kubernetes containerd"
+                run_logged "import rawfile-localpv rock" -- \
+                    sudo "${ctr_bin}" --address "${containerd_sock}" --namespace k8s.io \
+                        images import --base-name docker.io/library/rawfile-localpv "${rock}" || {
+                            log "FATAL: failed to import ${rock}"
+                            exit 1
+                        }
+                run_logged "tag rawfile-localpv s390x image" -- \
+                    sudo "${ctr_bin}" --address "${containerd_sock}" --namespace k8s.io \
+                        images tag --force docker.io/library/rawfile-localpv:0.8.3 "${RAWFILE_IMAGE}" || {
+                            log "FATAL: failed to tag ${RAWFILE_IMAGE}"
+                            exit 1
+                        }
+                sudo k8s kubectl -n kube-system delete pod \
+                    -l app.kubernetes.io/name=rawfile-csi --wait=false 2>/dev/null || true
+            else
+                log "FATAL: ${RAWFILE_IMAGE} is not present in the K8s containerd image store and no local rock was found."
+                log "Build it first with tools/build_rock.sh, or set RAWFILE_LOCALPV_ROCK to the .rock path:"
+                log "  ./tools/build_rock.sh rawfile-localpv --repo https://github.com/canonical/rawfile-localpv-rocks.git --source-dir $HOME/builds/rawfile-localpv-rocks-s390x --subdir . --tag docker.io/library/rawfile-localpv:0.8.3-s390x"
+                log "or set RAWFILE_LOCALPV_IMAGE to a pullable s390x image and re-run phase 02b."
+                exit 1
+            fi
+            if ! sudo "${ctr_bin}" --address "${containerd_sock}" --namespace k8s.io images ls -q 2>/dev/null \
+                    | grep -Fxq "${RAWFILE_IMAGE}"; then
+                log "FATAL: ${RAWFILE_IMAGE} is still absent after importing ${rock}."
+                exit 1
+            fi
+        fi
+    else
+        log "WARN: cannot inspect containerd at ${containerd_sock}; skipping ${RAWFILE_IMAGE} presence check"
+    fi
+fi
+
+# 4. Sideload the CSI sidecar images before enabling local-storage. The
+# upstream registry.k8s.io manifests redirect to a registry the lab proxy
+# blocks, and the Canonical images do not publish s390x.
+SIDELOAD_IMAGES_DIR="${SIDELOAD_IMAGES_DIR:-${HOME}/builds/s390x-k8s-images}"
+sidecar_images=(
+    registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.15.0
+    registry.k8s.io/sig-storage/csi-provisioner:v5.3.0
+)
+ctr_bin="${ctr_bin:-/snap/k8s/current/bin/ctr}"
+containerd_sock="${containerd_sock:-/run/containerd/containerd.sock}"
+if [[ -x "${ctr_bin}" && -S "${containerd_sock}" ]]; then
+    if [[ -d "${SIDELOAD_IMAGES_DIR}" ]]; then
+        for archive in "${SIDELOAD_IMAGES_DIR}"/*.tar; do
+            [[ -e "${archive}" ]] || continue
+            run_logged "import sideloaded image $(basename "${archive}")" -- \
+                sudo "${ctr_bin}" --address "${containerd_sock}" --namespace k8s.io \
+                    images import "${archive}" || {
+                        log "FATAL: failed to import ${archive}"
+                        exit 1
+                    }
+        done
+    fi
+    missing_sidecars=()
+    for image in "${sidecar_images[@]}"; do
+        if ! sudo "${ctr_bin}" --address "${containerd_sock}" --namespace k8s.io \
+                images ls -q 2>/dev/null | grep -Fxq "${image}"; then
+            missing_sidecars+=("${image}")
+        fi
+    done
+    if (( ${#missing_sidecars[@]} > 0 )); then
+        log "FATAL: required s390x CSI sidecar images are missing from ${containerd_sock}:"
+        printf '  %s\n' "${missing_sidecars[@]}" >&2
+        log "Sideload them with tools/sideload_s390x_k8s_images.sh from a host with registry access,"
+        log "or place the image archives in ${SIDELOAD_IMAGES_DIR} and rerun phase 02b."
+        exit 1
+    fi
+fi
 
 # 4. Enable core addons. Rewrite their images to upstream only on s390x.
 ADDONS=(dns local-storage)
@@ -126,6 +230,33 @@ for addon in "${ADDONS[@]}"; do
     "${SCRIPT_DIR}/../tools/rewrite_k8s_addon_images.sh" "${addon}" || \
         log "WARN: rewrite_k8s_addon_images for ${addon} reported unmapped images"
 done
+
+# Updating a StatefulSet image does not replace an existing pod when the
+# controller has already created it. Delete the rawfile CSI pods explicitly so
+# they pick up the rewritten local s390x image; otherwise rollout status can
+# time out with ImagePullBackOff on the old pod.
+log_step "restarting rawfile CSI pods after image rewrites"
+sudo k8s kubectl -n kube-system delete pod \
+    -l app.kubernetes.io/name=rawfile-csi --wait=false 2>/dev/null || true
+
+log_step "waiting for rawfile CSI controller and node pods"
+if ! sudo k8s kubectl -n kube-system rollout status statefulset/ck-storage-rawfile-csi-controller \
+        --timeout=180s 2>&1 | tee -a "${PHASE_LOG}"; then
+    log "FATAL: rawfile CSI controller did not become ready"
+    log "If the pod is ImagePullBackOff, import the local rawfile rock and/or sideload the CSI sidecars:"
+    log "  ./tools/build_rock.sh rawfile-localpv --repo https://github.com/canonical/rawfile-localpv-rocks.git --source-dir $HOME/builds/rawfile-localpv-rocks-s390x --subdir . --tag docker.io/library/rawfile-localpv:0.8.3-s390x"
+    log "  ./tools/sideload_s390x_k8s_images.sh ubuntu@<lpar>"
+    sudo k8s kubectl -n kube-system get pods -l app.kubernetes.io/name=rawfile-csi -o wide 2>&1 \
+        | tee -a "${PHASE_LOG}" || true
+    exit 1
+fi
+if ! sudo k8s kubectl -n kube-system rollout status daemonset/ck-storage-rawfile-csi-node \
+        --timeout=180s 2>&1 | tee -a "${PHASE_LOG}"; then
+    log "FATAL: rawfile CSI node daemonset did not become ready"
+    sudo k8s kubectl -n kube-system get pods -l app.kubernetes.io/name=rawfile-csi -o wide 2>&1 \
+        | tee -a "${PHASE_LOG}" || true
+    exit 1
+fi
 
 # 4b. Load-balancer addon WITH an explicit L2 address pool (both arches). Without
 # an external IP pool, traefik-k8s never gets a LoadBalancer IP, keystone's
@@ -158,6 +289,20 @@ run_logged "k8s set load-balancer pool" -- \
     log "WARN: rewrite_k8s_addon_images for load-balancer reported unmapped images"
 echo "${LB_CIDR}" > "${ARTIFACT_DIR}/lb_cidr"
 
+log_step "waiting for MetalLB controller and speaker"
+if ! sudo k8s kubectl -n metallb-system rollout status deployment/metallb-controller \
+        --timeout=180s 2>&1 | tee -a "${PHASE_LOG}"; then
+    log "FATAL: MetalLB controller did not become ready"
+    sudo k8s kubectl -n metallb-system get pods -o wide 2>&1 | tee -a "${PHASE_LOG}" || true
+    exit 1
+fi
+if ! sudo k8s kubectl -n metallb-system rollout status daemonset/metallb-speaker \
+        --timeout=180s 2>&1 | tee -a "${PHASE_LOG}"; then
+    log "FATAL: MetalLB speaker did not become ready"
+    sudo k8s kubectl -n metallb-system get pods -o wide 2>&1 | tee -a "${PHASE_LOG}" || true
+    exit 1
+fi
+
 # Wait for the node/CNI before running workload checks.
 log_step "waiting for the Kubernetes node and CNI to become Ready"
 if ! sudo k8s kubectl wait --for=condition=Ready node --all --timeout=300s \
@@ -186,8 +331,9 @@ fi
 # 6. Substrate readiness for the OpenStack control plane. The k8s charms need a
 #    default StorageClass that actually binds PVCs (keystone fernet/credential
 #    keys, glance image store, ovn db filesystems) and the load-balancer addon to
-#    hand out external IPs (traefik). Verify both now -- best-effort -- so a phase
-#    03 stall can be told apart from a substrate gap. Recorded to arch_report.md.
+#    hand out external IPs (traefik). Verify both now; phase 03 must not start
+#    against a broken substrate. The result is also recorded to arch_report.md.
+substrate_failed=0
 log_step "substrate check: default StorageClass binds a PVC"
 default_sc=$(sudo k8s kubectl get sc \
     -o jsonpath='{.items[?(@.metadata.annotations.storageclass\.kubernetes\.io/is-default-class=="true")].metadata.name}' \
@@ -231,7 +377,8 @@ if sudo k8s kubectl wait --for=jsonpath='{.status.phase}'=Bound \
     log "PVC bound and consumer pod is Ready -- local-storage provisioning works"
     arch_report_append k8s-substrate storage "${default_sc:-local-storage}" "yes (${ARCH})" "test PVC bound; consumer Ready"
 else
-    log "WARN: PVC/consumer did not become ready -- control-plane storage (keystone/glance/ovn) will stall"
+    substrate_failed=1
+    log "FATAL: PVC/consumer did not become ready -- control-plane storage (keystone/glance/ovn) will stall"
     sudo k8s kubectl describe pvc k8s-substrate-pvc 2>&1 | tee -a "${PHASE_LOG}" || true
     sudo k8s kubectl describe pod k8s-substrate-storage 2>&1 | tee -a "${PHASE_LOG}" || true
     arch_report_append k8s-substrate storage "${default_sc:-local-storage}" "no (${ARCH})" "PVC/consumer not ready -- see phase log"
@@ -255,7 +402,7 @@ spec:
       targetPort: 80
 EOF
 lb_ip=""
-for _ in $(seq 1 20); do
+for _ in $(seq 1 30); do
     lb_ip=$(sudo k8s kubectl get svc k8s-substrate-lb \
         -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
     [[ -n "${lb_ip}" ]] && break
@@ -265,10 +412,24 @@ if [[ -n "${lb_ip}" ]]; then
     log "load-balancer assigned ${lb_ip} -- traefik will get an external IP"
     arch_report_append k8s-substrate loadbalancer metallb "yes (${ARCH})" "assigned ${lb_ip}"
 else
-    log "WARN: no external IP assigned within 60s -- traefik ingress will stay pending (see README Load-balancer)"
-    arch_report_append k8s-substrate loadbalancer metallb "no (${ARCH})" "no ingress IP within 60s"
+    substrate_failed=1
+    log "FATAL: no external IP assigned within 90s -- traefik ingress will stay pending (see README Load-balancer)"
+    sudo k8s kubectl get svc k8s-substrate-lb -o yaml 2>&1 | tee -a "${PHASE_LOG}" || true
+    sudo k8s kubectl -n metallb-system get pods -o wide 2>&1 | tee -a "${PHASE_LOG}" || true
+    arch_report_append k8s-substrate loadbalancer metallb "no (${ARCH})" "no ingress IP within 90s"
 fi
 sudo k8s kubectl delete svc k8s-substrate-lb --ignore-not-found >/dev/null 2>&1 || true
+
+if (( substrate_failed )); then
+    if [[ "${SUBSTRATE_STRICT}" == "1" ]]; then
+        log "FATAL: Kubernetes substrate gate failed; refusing to mark phase 02b done."
+        log "Fix storage/load-balancer first (README: Kubernetes substrate), then remove"
+        log "  ${PHASE_STATUS_DIR}/${PHASE}.done"
+        log "and re-run phase 02b. Set SUBSTRATE_STRICT=0 only for diagnostics."
+        exit 1
+    fi
+    log "WARN: SUBSTRATE_STRICT=0 -- continuing despite a failed substrate gate"
+fi
 
 phase_done "${PHASE}"
 log_step "phase ${PHASE} complete"

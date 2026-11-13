@@ -16,9 +16,10 @@ nova-k8s_s390x.charm
 neutron-k8s_s390x.charm
 placement-k8s_s390x.charm
 cinder-k8s_s390x.charm
-ovn-central-k8s_s390x.charm
-ovn-relay-k8s_s390x.charm
 ```
+
+`ovn-central-k8s` and `ovn-relay-k8s` are retired; do not stage them. The
+machine-plane bundle now runs `microovn` + `sunbeam-ovn-proxy` instead.
 
 Machine-plane charms (consumed by `manifests/machine-lpar-s390x-local.yaml`):
 
@@ -26,7 +27,13 @@ Machine-plane charms (consumed by `manifests/machine-lpar-s390x-local.yaml`):
 sunbeam-machine_s390x.charm
 cinder-volume_s390x.charm
 openstack-hypervisor_s390x.charm
+microcluster-token-distributor_s390x.charm
 ```
+
+`microcluster-token-distributor` has no Charmhub s390x revision and is required
+for microovn to join its cluster. `microovn` and `sunbeam-ovn-proxy` have
+published s390x revisions, but you can also stage local builds
+(`microovn_s390x.charm`, `sunbeam-ovn-proxy_s390x.charm`) for hybrid mode.
 
 ## How to get them here
 
@@ -38,9 +45,9 @@ rsync -av --include='*/' \
   --include='keystone-k8s_s390x.charm' --include='glance-k8s_s390x.charm' \
   --include='nova-k8s_s390x.charm' --include='neutron-k8s_s390x.charm' \
   --include='placement-k8s_s390x.charm' --include='cinder-k8s_s390x.charm' \
-  --include='ovn-central-k8s_s390x.charm' --include='ovn-relay-k8s_s390x.charm' \
   --include='sunbeam-machine_s390x.charm' --include='cinder-volume_s390x.charm' \
-  --include='openstack-hypervisor_s390x.charm' --exclude='*' \
+  --include='openstack-hypervisor_s390x.charm' \
+  --include='microcluster-token-distributor_s390x.charm' --exclude='*' \
   <build-host>:.../sunbeam-charms-s390x/charms/ ./
 # then flatten if needed so the .charm files sit directly in charms/
 ```

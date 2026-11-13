@@ -5,3 +5,22 @@ artifacts/
 
 # Local s390x charm artifacts (staged for CHARM_SOURCE=local); keep charms/README.md
 charms/*.charm
+
+# Local s390x snap artifacts (staged for installation); keep patches/snaps tracked
+snaps/*.snap
+
+# Fresh rock source checkouts created by tools/build_rock.sh
+.rock-build/
+
+# Fresh charm source checkouts created by tools/build_local_charms.sh
+.charm-build/
+
+# Fresh snap source checkouts and built snaps
+.snap-build/
+
+# Host-specific proxy manifest; copy proxy.env.example to proxy.env
+proxy.env
+
+# Python bytecode
+__pycache__/
+*.py[cod]

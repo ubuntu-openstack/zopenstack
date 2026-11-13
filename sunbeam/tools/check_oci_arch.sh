@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh
 source "${SCRIPT_DIR}/lib.sh"
 
-image="${1:?image ref required, e.g. ghcr.io/canonical/keystone:2026.1-26.04_edge}"
+image="${1:?image ref required, e.g. ghcr.io/canonical/keystone:<tag>}"
 arch="${2:-${TARGET_ARCH:-s390x}}"
 
 if ! command -v skopeo >/dev/null 2>&1; then
@@ -21,7 +21,7 @@ fi
 
 # Fetch raw manifest. For multi-arch images this is the index/manifest-list;
 # for single-arch images it's the image manifest itself.
-raw=$(skopeo inspect --raw "docker://${image}" 2>/dev/null || true)
+raw=$(timeout "${CHECK_OCI_TIMEOUT:-20}" skopeo inspect --raw "docker://${image}" 2>/dev/null || true)
 
 if [[ -z "${raw}" ]]; then
     arch_report_append oci "${image}" "" unknown "skopeo inspect failed (unreachable or unauthorized)"
@@ -35,7 +35,8 @@ if grep -q '"manifests"' <<<"${raw}"; then
         arch_report_append oci "${image}" "" "yes (${arch})" ""
         echo yes
     else
-        archs=$(grep -oE '"architecture"[[:space:]]*:[[:space:]]*"[^"]+"' <<<"${raw}" | sort -u | tr '\n' ',' | sed 's/,$//')
+        archs=$(grep -oE '"architecture"[[:space:]]*:[[:space:]]*"[^"]+"' <<<"${raw}" \
+            | sort -u | tr '\n' ',' | sed 's/,$//' || true)
         arch_report_append oci "${image}" "" "no (${arch})" "manifests: ${archs}"
         echo no
     fi
@@ -43,8 +44,9 @@ if grep -q '"manifests"' <<<"${raw}"; then
 fi
 
 # Single-arch image: fall back to a non-raw inspect that surfaces Architecture.
-single=$(skopeo inspect "docker://${image}" 2>/dev/null || true)
-img_arch=$(grep -oE '"Architecture"[[:space:]]*:[[:space:]]*"[^"]+"' <<<"${single}" | head -n1 | sed -E 's/.*"([^"]+)"$/\1/')
+single=$(timeout "${CHECK_OCI_TIMEOUT:-20}" skopeo inspect "docker://${image}" 2>/dev/null || true)
+img_arch=$(grep -oE '"Architecture"[[:space:]]*:[[:space:]]*"[^"]+"' <<<"${single}" \
+    | head -n1 | sed -E 's/.*"([^"]+)"$/\1/' || true)
 if [[ "${img_arch}" == "${arch}" ]]; then
     arch_report_append oci "${image}" "" "yes (${arch})" "single-arch"
     echo yes
