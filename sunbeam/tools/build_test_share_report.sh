@@ -30,6 +30,7 @@ expected_files=(
     ceph_tests.txt
     hypervisor_list.txt
     image_list.txt
+    image_package_versions.txt
     instance_launch.txt
     instance_ssh.txt
     juju_status.txt
@@ -37,6 +38,7 @@ expected_files=(
     network_extension_list.txt
     network_list.txt
     openstack_origin.txt
+    source_provenance.txt
     tempest_smoke.txt
 )
 
@@ -98,16 +100,12 @@ series_name() {
     fi
 }
 
-openstack_series_name() {
-    echo "${OPENSTACK_SERIES:-gazpacho}"
-}
-
 tempest_result_text() {
     if [[ -s "${ARTIFACT_DIR}/tempest/failures.txt" ]]; then
         echo "The Tempest smoke tests detected the following failures:"
         echo
         sed 's/^/- /' "${ARTIFACT_DIR}/tempest/failures.txt"
-    elif [[ -f "${ARTIFACT_DIR}/.status/06_validate_tempest.done" ]]; then
+    elif [[ -f "${ARTIFACT_DIR}/.status/09_validate_tempest.done" ]]; then
         echo "All selected Tempest smoke tests passed."
     else
         echo "Tempest smoke did not complete; see tempest_smoke.txt and the full diagnostic archive."
@@ -144,7 +142,7 @@ if [[ -r "${OPENRC}" && -x "${OSC}" ]]; then
 else
     for f in catalog_list hypervisor_list image_list network_list \
              network_agent_list network_extension_list; do
-        echo "OpenStack client/openrc unavailable; phase 04 did not complete." \
+        echo "OpenStack client/openrc unavailable; phase 06 did not complete." \
             > "${REPORT_DIR}/${f}.txt"
     done
 fi
@@ -238,21 +236,30 @@ fi
     done
 } > "${REPORT_DIR}/ceph_tests.txt"
 
+cp -f "${ARTIFACT_DIR}/image_package_versions.txt" \
+    "${REPORT_DIR}/image_package_versions.txt" 2>/dev/null || \
+    echo "Image package inventory unavailable; phase 08 did not capture it." \
+        > "${REPORT_DIR}/image_package_versions.txt"
+cp -f "${ARTIFACT_DIR}/source_provenance.txt" \
+    "${REPORT_DIR}/source_provenance.txt" 2>/dev/null || \
+    echo "Source provenance unavailable; phase 08 did not capture it." \
+        > "${REPORT_DIR}/source_provenance.txt"
+
 if [[ -r "${ARTIFACT_DIR}/smoke_instance_launch.txt" ]]; then
     sed -E 's/(adminPass[[:space:]]*\|[[:space:]]*).*/\1<redacted> |/' \
         "${ARTIFACT_DIR}/smoke_instance_launch.txt" \
         > "${REPORT_DIR}/instance_launch.txt"
 else
-    echo "Instance launch proof unavailable; phase 04b did not complete." \
+    echo "Instance launch proof unavailable; phase 07 did not complete." \
         > "${REPORT_DIR}/instance_launch.txt"
 fi
 cp -f "${ARTIFACT_DIR}/smoke_instance_ssh.txt" \
     "${REPORT_DIR}/instance_ssh.txt" 2>/dev/null || \
-    echo "Instance SSH proof unavailable; phase 04b did not complete." \
+    echo "Instance SSH proof unavailable; phase 07 did not complete." \
         > "${REPORT_DIR}/instance_ssh.txt"
 cp -f "${ARTIFACT_DIR}/tempest/smoke_output.txt" \
     "${REPORT_DIR}/tempest_smoke.txt" 2>/dev/null || \
-    echo "Tempest output unavailable; phase 06 did not complete." \
+    echo "Tempest output unavailable; phase 09 did not complete." \
         > "${REPORT_DIR}/tempest_smoke.txt"
 
 for f in "${expected_files[@]}"; do

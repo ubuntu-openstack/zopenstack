@@ -1,3 +1,9 @@
+Description: Build the s390x QEMU system target.
+Author: Myles Penner <myles.penner@canonical.com>
+Origin: zopenstack/sunbeam commit e2c74c977350a47e3710eb167a673a4ace13c84b
+Last-Update: 2026-11-11
+Forwarded: no
+---
 diff --git a/snap/snapcraft.yaml b/snap/snapcraft.yaml
 index 231fa5f..9ae91fb 100644
 --- a/snap/snapcraft.yaml

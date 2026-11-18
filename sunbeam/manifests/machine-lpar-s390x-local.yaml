@@ -12,16 +12,21 @@
 # .charm files there first (see charms/README.md).
 #
 # LOCAL  (our s390x builds): sunbeam-machine, cinder-volume, hypervisor
-#        (openstack-hypervisor).
-# CHARMHUB (not built by us): microceph.
+#        (openstack-hypervisor), microcluster-token-distributor.
+# CHARMHUB (not built by us): microovn, sunbeam-ovn-proxy, microceph,
+# openstack-network-agents.
+# microceph squid/stable currently has no s390x charm revision; use the hybrid
+# local microceph charm (or 26.04 tentacle). ovn-central/ovn-relay are retired;
+# microovn + sunbeam-ovn-proxy provide OVN on the machine plane. role-distributor
+# is omitted from this minimal bundle.
 #
 # cinder-microceph (cinder-volume-ceph): we did NOT build an s390x revision (it was
 # dropped from the s390x charm work), so it is left on charmhub here. If the
 # charmhub 2026.1/edge revision has no s390x build it will block — in that case
-# comment out the `cinder-microceph` application AND its two relations below
+# comment out the `cinder-microceph` application AND its three relations below
 # (microceph:ceph<->cinder-microceph:ceph and cinder-volume:cinder-volume<->
 # cinder-microceph:cinder-volume and hypervisor:ceph-access<->cinder-microceph:
-# ceph-access) and accept cinder block storage stays unwired.
+# ceph-access) and accept that cinder block storage stays unwired.
 #
 # NOTE: the `saas:`, `relations:` and trailing `offers:` blocks are copied VERBATIM
 # from machine-lpar-s390x.yaml. Keep the two files in sync by hand.
@@ -33,6 +38,12 @@ applications:
   # ── local s390x builds ──
   sunbeam-machine:
     charm: ./charms/sunbeam-machine_s390x.charm
+    scale: 1
+    to:
+      - "0"
+  # charmhub has no s390x revision for the token distributor; build it locally.
+  microcluster-token-distributor:
+    charm: ./charms/microcluster-token-distributor_s390x.charm
     scale: 1
     to:
       - "0"
@@ -53,6 +64,24 @@ applications:
       external-bridge-address: 0.0.0.0/0
 
   # ── charmhub (external / not built for s390x) ──
+  microovn:
+    charm: microovn
+    channel: 26.03/edge
+    scale: 1
+    to:
+      - "0"
+  sunbeam-ovn-proxy:
+    charm: sunbeam-ovn-proxy
+    channel: 2026.1/edge
+    scale: 1
+    to:
+      - "0"
+  openstack-network-agents:
+    charm: openstack-network-agents
+    channel: 2026.1/edge
+    options:
+      snap-channel: 2026.1/edge
+      external-bridge-address: 0.0.0.0/0
   microceph:
     charm: microceph
     channel: squid/stable
@@ -79,14 +108,19 @@ saas:
     url: admin/openstack.cinder-database
   send-ca-cert:
     url: admin/openstack.send-ca-cert
-  ovsdb-cms:
-    url: admin/openstack.ovsdb-cms
   certificates:
     url: admin/openstack.certificates
   nova-service:
     url: admin/openstack.nova-service
 
 relations:
+  - - microcluster-token-distributor:microcluster-cluster
+    - microovn:cluster
+  - - microovn:ovsdb
+    - sunbeam-ovn-proxy:ovsdb
+  - - microovn:juju-info
+    - openstack-network-agents:juju-info
+
   - - cinder-volume:amqp
     - amqp:amqp
   - - cinder-volume:identity-credentials
@@ -109,10 +143,12 @@ relations:
     - hypervisor:identity-credentials
   - - send-ca-cert:send-ca-cert
     - hypervisor:receive-ca-cert
-  - - ovsdb-cms
+  - - sunbeam-ovn-proxy:ovsdb-cms
     - hypervisor:ovsdb-cms
   - - certificates
     - hypervisor:certificates
+  - - microovn:certificates
+    - certificates:certificates
   - - nova-service
     - hypervisor:nova-service
   - - hypervisor:ceph-access
@@ -125,3 +161,8 @@ applications:
       storage-backend:
         endpoints:
           - storage-backend
+  sunbeam-ovn-proxy:
+    offers:
+      ovsdb-cms:
+        endpoints:
+          - ovsdb-cms

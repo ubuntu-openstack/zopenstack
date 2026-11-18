@@ -14,13 +14,16 @@
 # Stage the .charm files there first (see charms/README.md).
 #
 # ─── what is local vs charmhub ───────────────────────────────────────────────
-# LOCAL  (our s390x builds): ovn-central, ovn-relay, keystone, glance, placement,
-#        nova, neutron, cinder.
+# LOCAL  (our s390x builds): keystone, glance, placement, nova, neutron, cinder.
+#        ovn-central/ovn-relay are retired; the machine-plane bundle now runs
+#        microovn + sunbeam-ovn-proxy.
 # CHARMHUB (external deps we do not build): mysql (mysql-k8s), rabbitmq
 #        (rabbitmq-k8s), tls-operator (self-signed-certificates), traefik
 #        (traefik-k8s), cinder-router (mysql-router-k8s). These still pull their
 #        own images from charmhub and therefore need their OWN s390x builds —
-#        check with tools/check_oci_arch.sh before relying on this.
+#        check with tools/check_oci_arch.sh before relying on this. rabbitmq-k8s
+#        currently has no s390x charm revision on any channel, so local mode
+#        cannot deploy it; use hybrid with a local RabbitMQ charm/rock.
 #
 # ─── s390x rock image refs — REPLACE the placeholders below ──────────────────
 # Each `resources:` value must point at an s390x build of the workload image.
@@ -33,9 +36,7 @@
 #   nova-k8s         : nova-api-image, nova-scheduler-image,
 #                      nova-conductor-image, nova-spiceproxy-image
 #   cinder-k8s       : cinder-api-image, cinder-scheduler-image
-#   ovn-central-k8s  : ovn-sb-db-server-image, ovn-nb-db-server-image,
-#                      ovn-northd-image
-#   ovn-relay-k8s    : ovn-sb-db-server-image
+#   (ovn-central/ovn-relay are retired and no longer have local charm entries)
 #
 # NOTE: the `relations:` and the trailing `offers:` document below are copied
 # VERBATIM from control-plane-k8s-s390x.yaml. If you change wiring in one file,
@@ -55,7 +56,7 @@ applications:
       experimental-max-connections: 466
   rabbitmq:
     charm: rabbitmq-k8s
-    channel: 3.12/edge
+    channel: 4.0/edge
     base: ubuntu@24.04
     scale: 1
     trust: true
@@ -63,19 +64,23 @@ applications:
       minimum-replicas: 1
   tls-operator:
     charm: self-signed-certificates
-    channel: 1/beta
-    base: ubuntu@22.04
+    # 1/beta has no s390x revision; 1/edge revision 327 is the current
+    # Ubuntu 24.04/s390x build.
+    channel: 1/edge
+    base: ubuntu@24.04
     scale: 1
     options:
       ca-common-name: internal-ca
   traefik:
     charm: traefik-k8s
-    channel: latest/candidate
-    base: ubuntu@20.04
+    # The s390x revisions on latest/candidate are Ubuntu 26.04 only; there is
+    # no s390x ubuntu@20.04 revision. latest/edge carries the same build.
+    channel: latest/edge
+    base: ubuntu@26.04
     scale: 1
     trust: true
     options:
-      kubernetes-service-annotations: metallb.universe.tf/address-pool=public
+      kubernetes-service-type: LoadBalancer
   cinder-router:
     charm: mysql-router-k8s
     channel: 8.0/edge
@@ -86,22 +91,6 @@ applications:
       expose-external: loadbalancer
 
   # ── local s390x builds ──
-  ovn-central:
-    charm: ./charms/ovn-central-k8s_s390x.charm
-    base: ubuntu@24.04
-    scale: 1
-    trust: true
-    resources:
-      ovn-sb-db-server-image: REPLACE-ME/ovn-sb-db-server:s390x
-      ovn-nb-db-server-image: REPLACE-ME/ovn-nb-db-server:s390x
-      ovn-northd-image: REPLACE-ME/ovn-northd:s390x
-  ovn-relay:
-    charm: ./charms/ovn-relay-k8s_s390x.charm
-    base: ubuntu@24.04
-    scale: 1
-    trust: true
-    resources:
-      ovn-sb-db-server-image: REPLACE-ME/ovn-sb-db-server:s390x
   keystone:
     charm: ./charms/keystone-k8s_s390x.charm
     base: ubuntu@24.04
@@ -157,13 +146,6 @@ applications:
       cinder-scheduler-image: REPLACE-ME/cinder-scheduler:s390x
 
 relations:
-  - - tls-operator:certificates
-    - ovn-central:certificates
-  - - tls-operator:certificates
-    - ovn-relay:certificates
-  - - ovn-relay:ovsdb-cms
-    - ovn-central:ovsdb-cms
-
   - - mysql:database
     - keystone:database
   - - traefik:ingress
@@ -222,8 +204,6 @@ relations:
     - neutron:ingress-internal
   - - tls-operator:certificates
     - neutron:certificates
-  - - neutron:ovsdb-cms
-    - ovn-central:ovsdb-cms
   - - keystone:send-ca-cert
     - neutron:receive-ca-cert
 
@@ -254,11 +234,6 @@ applications:
       certificates:
         endpoints:
           - certificates
-  ovn-relay:
-    offers:
-      ovsdb-cms:
-        endpoints:
-          - ovsdb-cms-relay
   keystone:
     offers:
       identity-service:

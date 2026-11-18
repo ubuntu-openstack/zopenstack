@@ -13,15 +13,21 @@
 #   juju add-model openstack <k8s-cloud>
 #   juju deploy ./control-plane-k8s-s390x.yaml --trust
 #
-# It EXPORTS the cross-model offers (amqp, identity-*, send-ca-cert, ovsdb-cms,
+# It EXPORTS the cross-model offers (amqp, identity-*, send-ca-cert,
 # certificates, nova-service, cinder-database) that the machine-plane bundle
 # (machine-lpar-s390x.yaml) consumes for the hypervisor + cinder-volume +
-# microceph. It also requires the `storage-backend` offer that the machine bundle
-# exports back -- phase 03b wires that one up after both models exist.
+# microceph. It also requires the `storage-backend` and `ovsdb-cms` offers that
+# the machine bundle exports back (cinder-volume and sunbeam-ovn-proxy
+# respectively) -- phase 03b wires those up after both models exist.
 #
-# Channels match manifests/sunbeam-2026.1-s390x.yaml. Resources are intentionally
-# omitted: deploying from charmhub makes Juju pull each revision's published OCI
-# image, which is exactly how phase 05 surfaces the per-image s390x gaps.
+# ovn-central-k8s and ovn-relay-k8s are retired. The machine-plane bundle now
+# runs microovn + sunbeam-ovn-proxy; neutron-k8s consumes the machine model's
+# ovsdb-cms offer during phase 03b.
+#
+# Channels follow the currently published s390x charm revisions (see README
+# "Channel pins"). Resources are intentionally omitted: deploying from charmhub
+# makes Juju pull each revision's published OCI image; phase 05 sweeps those
+# images from the running pods for per-image s390x gaps.
 bundle: kubernetes
 
 applications:
@@ -36,7 +42,7 @@ applications:
       experimental-max-connections: 466
   rabbitmq:
     charm: rabbitmq-k8s
-    channel: 3.12/edge
+    channel: 4.0/edge
     base: ubuntu@24.04
     scale: 1
     trust: true
@@ -44,35 +50,25 @@ applications:
       minimum-replicas: 1
   tls-operator:
     charm: self-signed-certificates
-    channel: 1/beta
-    base: ubuntu@22.04
+    # 1/beta has no s390x revision; 1/edge revision 327 is the current
+    # Ubuntu 24.04/s390x build.
+    channel: 1/edge
+    base: ubuntu@24.04
     scale: 1
     options:
       ca-common-name: internal-ca
   traefik:
     charm: traefik-k8s
-    channel: latest/candidate
-    base: ubuntu@20.04
+    # The s390x revisions on latest/candidate are Ubuntu 26.04 only; there is
+    # no s390x ubuntu@20.04 revision. latest/edge carries the same build.
+    channel: latest/edge
+    base: ubuntu@26.04
     scale: 1
     trust: true
-    # NOTE: this annotation targets MetalLB. The Canonical K8s load-balancer
-    # addon configured in phase 02b may not honour it; if traefik stays pending
-    # without an external IP, drop this option or match the addon's pool name.
-    # See README "Load-balancer".
+    # The Canonical K8s load-balancer add-on assigns an external IP to a
+    # LoadBalancer service; no MetalLB-specific annotation is required.
     options:
-      kubernetes-service-annotations: metallb.universe.tf/address-pool=public
-  ovn-central:
-    charm: ovn-central-k8s
-    channel: 26.03/edge
-    base: ubuntu@24.04
-    scale: 1
-    trust: true
-  ovn-relay:
-    charm: ovn-relay-k8s
-    channel: 26.03/edge
-    base: ubuntu@24.04
-    scale: 1
-    trust: true
+      kubernetes-service-type: LoadBalancer
   keystone:
     charm: keystone-k8s
     channel: 2026.1/edge
@@ -126,13 +122,6 @@ applications:
     trust: true
 
 relations:
-  - - tls-operator:certificates
-    - ovn-central:certificates
-  - - tls-operator:certificates
-    - ovn-relay:certificates
-  - - ovn-relay:ovsdb-cms
-    - ovn-central:ovsdb-cms
-
   - - mysql:database
     - keystone:database
   - - traefik:ingress
@@ -191,8 +180,6 @@ relations:
     - neutron:ingress-internal
   - - tls-operator:certificates
     - neutron:certificates
-  - - neutron:ovsdb-cms
-    - ovn-central:ovsdb-cms
   - - keystone:send-ca-cert
     - neutron:receive-ca-cert
 
@@ -223,11 +210,6 @@ applications:
       certificates:
         endpoints:
           - certificates
-  ovn-relay:
-    offers:
-      ovsdb-cms:
-        endpoints:
-          - ovsdb-cms-relay
   keystone:
     offers:
       identity-service:
