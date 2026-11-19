@@ -25,6 +25,7 @@ ALL_COMPONENTS = (
     "csi",
     "arch-report",
     "logs",
+    "image-inventory",
 )
 DEFAULT_COMPONENTS = ("local-artifacts", "csi")
 
@@ -321,6 +322,9 @@ def cmd_fetch(args: argparse.Namespace) -> int:
     if "logs" in components:
         copy_remote(f"{args.target}:{run_dir}/phase_*.log", str(dest) + "/")
 
+    if "image-inventory" in components:
+        copy_remote(f"{args.target}:{run_dir}/image_inventory.md", str(dest) + "/")
+
     if "csi" in components:
         csi_dest = dest / "s390x-k8s-images"
         csi_dest.mkdir(parents=True, exist_ok=True)
@@ -405,7 +409,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--remote-csi-dir", default=DEFAULT_REMOTE_CSI)
     p.add_argument("--no-csi", action="store_true")
     p.add_argument("--only", help="comma-separated components: "
-                   "local-artifacts,test-share,diagnostic,csi,arch-report,logs")
+                   "local-artifacts,test-share,diagnostic,csi,arch-report,logs,"
+                   "image-inventory")
     p.add_argument("--full", action="store_true")
     p.set_defaults(func=cmd_fetch)
 

@@ -105,26 +105,108 @@ source_file="${ARTIFACT_DIR}/source_provenance.txt"
         | sort -z | xargs -0 -r sha256sum
 } > "${source_file}"
 
-# Best-effort package inventory from the running workload images. Image
-# metadata alone does not expose package versions; query the containers.
+# Best-effort package inventory from the running workload images. Prefer Syft
+# when installed; fall back to dpkg-query inside the container.
 image_pkg_file="${ARTIFACT_DIR}/image_package_versions.txt"
-{
-    echo "=== image package versions ==="
-    if command -v k8s >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+
+declare -A local_images=()
+load_local_image_refs() {
+    local ctr_bin="${CTR_BIN:-/snap/k8s/current/bin/ctr}"
+    local sock="${CONTAINERD_SOCK:-/run/containerd/containerd.sock}"
+    local ref
+    if [[ ! -x "${ctr_bin}" || ! -S "${sock}" ]]; then
+        log "WARN: containerd ctr unavailable; treating all images as remote"
+        return 0
+    fi
+    while IFS= read -r ref; do
+        [[ -n "${ref}" ]] && local_images["${ref}"]=1
+    done < <(
+        sudo "${ctr_bin}" --address "${sock}" --namespace k8s.io images ls 2>/dev/null \
+            | awk -v platform="linux/${TARGET_ARCH:-s390x}" '
+                $1 !~ /@sha256:/ &&
+                $2 == "application/vnd.oci.image.manifest.v1+json" &&
+                $6 == platform { print $1 }
+            '
+    )
+    log "local OCI image refs: ${#local_images[@]}"
+}
+
+image_package_inventory_dpkg_container() {
+    local ns="$1" pod="$2" container="$3" out
+    out="$(sudo k8s kubectl exec -n "${ns}" "${pod}" -c "${container}" -- \
+        dpkg-query -W -f='${Package}\t${Version}\n' 2>&1)" || true
+    if [[ "${out}" == *"executable file not found"* ]]; then
+        echo "--- no dpkg-query in image"
+    elif [[ -z "${out}" ]]; then
+        echo "# dpkg-query returned no packages"
+    else
+        printf '%s\n' "${out}"
+    fi
+}
+
+image_package_inventory_dpkg() {
+    local ns pod container image
+    sudo k8s kubectl get pods -A -o json 2>/dev/null \
+        | jq -r '.items[] | .metadata.namespace as $ns | .metadata.name as $pod
+                 | .spec.containers[] | [$ns, $pod, .name, .image] | @tsv' \
+        | while IFS=$'\t' read -r ns pod container image; do
+            echo
+            echo "### ${ns}/${pod} [${container}] ${image}"
+            image_package_inventory_dpkg_container "${ns}" "${pod}" "${container}"
+        done
+}
+
+image_package_inventory_syft() {
+    local cache_dir ns pod container image safe json
+    cache_dir="$(mktemp -d "${TMPDIR:-/tmp}/image-syft.XXXXXX")"
+    declare -A image_json=()
+
+    while IFS=$'\t' read -r ns pod container image; do
+        echo
+        echo "### ${ns}/${pod} [${container}] ${image}"
+        if [[ -z "${local_images[${image}]:-}" ]]; then
+            # Remote images are reference-only in the inventory report. Keep the
+            # old dpkg path for them; Syft is reserved for locally built/imported
+            # images that dpkg-query cannot inspect.
+            image_package_inventory_dpkg_container "${ns}" "${pod}" "${container}"
+            continue
+        fi
+        safe="$(printf '%s' "${image}" | sed 's#[^A-Za-z0-9._-]#_#g')"
+        json="${cache_dir}/${safe}.json"
+        if [[ -z "${image_json[${image}]:-}" ]]; then
+            if sudo env CONTAINERD_NAMESPACE=k8s.io \
+                    SYFT_CHECK_FOR_APP_UPDATE=false \
+                    syft "containerd:${image}" --platform "linux/${TARGET_ARCH:-s390x}" \
+                    -q -o "syft-json=${json}" 2>/dev/null; then
+                sudo chmod 0644 "${json}" 2>/dev/null || true
+                image_json["${image}"]="${json}"
+            else
+                log "WARN: syft failed for ${image}; falling back to dpkg-query for ${pod}/${container}"
+                image_package_inventory_dpkg_container "${ns}" "${pod}" "${container}"
+                continue
+            fi
+        fi
+        jq -r '.artifacts[]? | [.name, .version] | @tsv' "${image_json[${image}]}" 2>/dev/null \
+            | sort -u || true
+    done < <(
         sudo k8s kubectl get pods -A -o json 2>/dev/null \
             | jq -r '.items[] | .metadata.namespace as $ns | .metadata.name as $pod
-                     | .spec.containers[] | [$ns, $pod, .name, .image] | @tsv' \
-            | while IFS=$'\t' read -r ns pod container image; do
-                echo
-                echo "### ${ns}/${pod} [${container}] ${image}"
-                sudo k8s kubectl exec -n "${ns}" "${pod}" -c "${container}" -- sh -c '
-                    if command -v dpkg-query >/dev/null 2>&1; then
-                        dpkg-query -W -f="\${Package}\t\${Version}\n" 2>/dev/null || true
-                    fi
-                ' 2>&1 || true
-            done
-    else
+                     | .spec.containers[] | [$ns, $pod, .name, .image] | @tsv'
+    )
+    rm -rf "${cache_dir}"
+}
+
+{
+    echo "=== image package versions ==="
+    if ! command -v k8s >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
         echo "k8s CLI or jq unavailable"
+    elif [[ "${SYFT_INVENTORY:-local}" != "0" ]] && command -v syft >/dev/null 2>&1; then
+        echo "generator: syft $(syft version 2>/dev/null | awk -F': *' '/^Version:/ {print $2; exit}') (local images)"
+        load_local_image_refs
+        image_package_inventory_syft
+    else
+        echo "generator: dpkg-query"
+        image_package_inventory_dpkg
     fi
 } > "${image_pkg_file}"
 

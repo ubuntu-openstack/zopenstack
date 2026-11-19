@@ -244,6 +244,54 @@ cp -f "${ARTIFACT_DIR}/source_provenance.txt" \
     "${REPORT_DIR}/source_provenance.txt" 2>/dev/null || \
     echo "Source provenance unavailable; phase 08 did not capture it." \
         > "${REPORT_DIR}/source_provenance.txt"
+if [[ -f "${ARTIFACT_DIR}/image_inventory.md" ]]; then
+    {
+        echo
+        echo "=== image sources ==="
+        python3 - "${ARTIFACT_DIR}/image_inventory.md" <<'PY'
+import re
+import sys
+
+section = None
+local_image = None
+local_fields = {}
+
+
+def flush_local():
+    if local_image:
+        print(
+            "local\t" + local_image
+            + "\t" + local_fields.get("digest", "")
+            + "\t" + local_fields.get("platform", "")
+            + "\t" + local_fields.get("used by", "")
+        )
+
+
+for raw in open(sys.argv[1], encoding="utf-8"):
+    line = raw.rstrip("\n")
+    if line.startswith("## "):
+        flush_local()
+        local_image = None
+        local_fields = {}
+        section = line[3:].strip()
+        continue
+    if section == "Remote OCI images" and line.startswith("| `"):
+        cells = [c.strip().strip("`") for c in line.strip("|").split("|")]
+        if len(cells) >= 4:
+            print("remote\t" + "\t".join(cells[:4]))
+    elif section == "Locally built OCI images":
+        match = re.match(r"^### `([^`]+)`", line)
+        if match:
+            flush_local()
+            local_image = match.group(1)
+            local_fields = {}
+        elif local_image and line.startswith("- "):
+            key, _, value = line[2:].partition(":")
+            local_fields[key.strip().lower()] = value.strip().strip("`")
+flush_local()
+PY
+    } >> "${REPORT_DIR}/source_provenance.txt"
+fi
 
 if [[ -r "${ARTIFACT_DIR}/smoke_instance_launch.txt" ]]; then
     sed -E 's/(adminPass[[:space:]]*\|[[:space:]]*).*/\1<redacted> |/' \

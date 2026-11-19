@@ -52,6 +52,7 @@ CINDER_VOLUME_CHANNEL="${CINDER_VOLUME_CHANNEL:-${default_cinder_volume}}"
 NETWORK_AGENTS_CHANNEL="${NETWORK_AGENTS_CHANNEL:-${default_hypervisor}}"
 MICROOVN_SNAP_CHANNEL="${MICROOVN_SNAP_CHANNEL:-26.03/stable}"
 OVN_EXPORTER_CHANNEL="${OVN_EXPORTER_CHANNEL:-stable}"
+SYFT_CHANNEL="${SYFT_CHANNEL:-stable}"
 SNAP_INSTALL_TIMEOUT="${SNAP_INSTALL_TIMEOUT:-600}"
 
 ARCH="$(target_arch)"
@@ -59,6 +60,7 @@ log_step "diagnosing ${ARCH} availability for required snaps (records appended t
 # Installed on the host:
 "${SCRIPT_DIR}/../tools/check_snap_arch.sh" juju "${JUJU_CHANNEL}" "${ARCH}" || true
 "${SCRIPT_DIR}/../tools/check_snap_arch.sh" k8s  "${K8S_CHANNEL}"  "${ARCH}" || true
+"${SCRIPT_DIR}/../tools/check_snap_arch.sh" syft "${SYFT_CHANNEL}" "${ARCH}" || true
 # Pulled by the machine-plane charms (phase 05) -- record availability now even
 # though Juju installs them later via the charm:
 "${SCRIPT_DIR}/../tools/check_snap_arch.sh" openstack-hypervisor "${HYPERVISOR_CHANNEL}"     "${ARCH}" || true
@@ -92,6 +94,17 @@ else
     if ! run_logged "snap install juju" -- timeout "${SNAP_INSTALL_TIMEOUT}" sudo snap install juju --channel="${JUJU_CHANNEL}"; then
         log "FATAL: snap install juju failed or timed out (no s390x revision in ${JUJU_CHANNEL}, or Snap Store unavailable). Cannot deploy bundles without juju."
         exit 1
+    fi
+fi
+
+log_step "installing syft snap from ${SYFT_CHANNEL}"
+if snap list syft >/dev/null 2>&1; then
+    log "syft snap already installed; refreshing to ${SYFT_CHANNEL}"
+    run_logged "snap refresh syft" -- timeout "${SNAP_INSTALL_TIMEOUT}" sudo snap refresh syft --channel="${SYFT_CHANNEL}" || \
+        log "WARN: snap refresh syft failed or timed out; phase 08 will use the installed syft or fall back to dpkg-query"
+else
+    if ! run_logged "snap install syft" -- timeout "${SNAP_INSTALL_TIMEOUT}" sudo snap install syft --classic --channel="${SYFT_CHANNEL}"; then
+        log "WARN: snap install syft failed or timed out; phase 08 will fall back to dpkg-query"
     fi
 fi
 
