@@ -401,12 +401,40 @@ commits, and configures `git insteadOf` rewrites for the current user and root.
 It also creates `$HOME/sunbeam-charms-src` as a compatibility symlink. Use
 `--no-git-config` to extract without changing Git configuration.
 
+## Image inventory
+
+Generate a Markdown inventory from the run artifacts:
+
+```bash
+./tools/generate_image_inventory.py artifacts/<run-id> \
+  --local-image docker.io/library/rawfile-localpv:0.8.3-s390x
+```
+
+The report references remote OCI images by name, digest, platform, and workload,
+and reports local OCI images and local charms/snaps/rocks in detail.
+
+For a local rock SBOM:
+
+```bash
+sudo snap install syft --classic
+syft oci-archive:rocks/rawfile-localpv_s390x.rock \
+  -o spdx-json=rawfile-localpv.spdx.json
+```
+
+Syft emits SPDX 2.3.
+
+Phase 08 uses Syft for the package inventory of locally built/imported workload
+images only. It scans each local image once through containerd and keeps the
+`dpkg-query` path for remote images. Images without `dpkg-query` are marked
+`--- no dpkg-query in image` instead of emitting a shell-exec error. Set
+`SYFT_INVENTORY=0` to force the dpkg path for all images.
+
 ## Phases
 
 | #   | Script                          | Purpose                                                                                |
 |-----|---------------------------------|----------------------------------------------------------------------------------------|
 | 00  | `00_check_host.sh`              | Verify the target architecture, Ubuntu release, passwordless sudo, and endpoint connectivity; record environment, network, and KVM facts. |
-| 01  | `01_install_prereqs.sh`         | Install prerequisites and Juju; check target architecture snaps and bundles.            |
+| 01  | `01_install_prereqs.sh`         | Install prerequisites, Juju, and Syft; check target architecture snaps and bundles.     |
 | 02  | `02_prepare_node.sh`            | Prepare the host (kernel modules and `/dev/kvm` check) and configure key-based SSH to itself for the manual cloud. |
 | 03  | `03_setup_s390x_cni.sh`         | Bootstrap Canonical Kubernetes, validate networking and storage, and **configure the load-balancer pool**. |
 | 04  | `04_bootstrap.sh`               | Register the cluster with Juju, bootstrap the controller, add the `openstack` model, and deploy the control-plane bundle. |
@@ -442,6 +470,9 @@ produced.
 - [artifacts.py](artifacts.py) — unified CLI for listing, verifying, packaging,
   uploading, staging, installing, fetching, CSI-sideloading, and packing or
   uploading opendev mirrors.
+- [tools/generate_image_inventory.py](tools/generate_image_inventory.py) —
+  generate a Markdown image inventory from a run's package capture and local
+  artifacts.
 - [tools/sideload_s390x_artifacts.sh](tools/sideload_s390x_artifacts.sh) — upload
   a local-artifacts archive to an SSH target as `local-artifacts.tar.zst`,
   stage/install it, and optionally sideload the CSI sidecar images. The old
@@ -982,7 +1013,9 @@ Each `artifacts/<run-id>/` contains:
 - `k8s_resources.yaml`, `k8s_events.txt`, `k8s_nodes_describe.txt`, `snaps.txt`
 - `source_provenance.txt` — source remotes, commit hashes, dirty state, and
   artifact checksums
-- `image_package_versions.txt` — apt package inventory from running containers
+- `image_inventory.md` — remote/local OCI image inventory and capture gaps
+- `image_package_versions.txt` — package inventory from running containers
+  (Syft for local images, `dpkg-query` for remote images)
 - `manual-cloud.yaml`, `manual_host_ip`, `lb_cidr`, `get-admin-account.json`
 - `cloud-admin-openrc`, `ca_bundle.pem` (if 04 ran)
 - `tempest/` + `tempest_report/` (if 06 ran)
@@ -1024,6 +1057,7 @@ Each `artifacts/<run-id>/` contains:
 ./artifacts.py fetch ubuntu@<lpar> --only local-artifacts,test-share
 ./artifacts.py fetch ubuntu@<lpar> --only csi
 ./artifacts.py fetch ubuntu@<lpar> --only diagnostic,test-share
+./artifacts.py fetch ubuntu@<lpar> --only image-inventory
 
 # Download a specific run, including the full run directory
 ./artifacts.py fetch ubuntu@<lpar> --run-id <run-id> --full
@@ -1069,7 +1103,9 @@ diagnostic data.
   `network_list.txt`, `network_agent_list.txt`,
   `network_extension_list.txt`, `ceph_tests.txt`, `instance_launch.txt`,
   `instance_ssh.txt`, `openstack_origin.txt`, `source_provenance.txt`,
-  `image_package_versions.txt`, and `tempest_smoke.txt`.
+  `image_package_versions.txt`, and `tempest_smoke.txt`. The
+  `source_provenance.txt` copy also records image sources: remote/local
+  references, digests, platforms, and workload usage from `image_inventory.md`.
 
 ## Load balancer (most likely failure point)
 
